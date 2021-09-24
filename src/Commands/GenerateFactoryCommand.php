@@ -16,33 +16,32 @@ class GenerateFactoryCommand extends Command
     public $description = 'Factory file generator';
     protected array $config;
 
-    public function handle (): bool
+    public function handle(): bool
     {
-        if ( ! $this->configFileExists())
-        {
+        if (! $this->configFileExists()) {
             return false;
         };
 
         $this->config = $this->getConfig();
 
-        if ($this->fileExists())
-        {
+        if ($this->fileExists()) {
             return false;
         };
 
         $this->create();
+
         return true;
     }
 
-    public function create ()
+    public function create()
     {
         $vars = $this->getVarsFromColumns();
         $definition = $this->getReturnFromColumns();
         $stub = $this->getStub();
-        if ( ! $stub)
-        {
+        if (! $stub) {
             $this->error('Error get stub');
             $this->error('Exit');
+
             return false;
         }
         $use = $this->getUse($vars);
@@ -51,31 +50,30 @@ class GenerateFactoryCommand extends Command
         File::put(self::DIRECTORY . $filename, $content);
     }
 
-    public function getVarsFromColumns (): string
+    public function getVarsFromColumns(): string
     {
         $vars = '';
-        foreach ($this->config['table']['columns'] as $column)
-        {
-            $row = sprintf("$%s = %s % s,\r\n",
+        foreach ($this->config['table']['columns'] as $column) {
+            $row = sprintf(
+                "$%s = %s % s,\r\n",
                 $column[1],
                 $this->getFaker($column),
                 in_array('unique', $this->config['table']['columns']) ? '->unique()' : null
             );
             $vars .= $row;
         }
+
         return $vars;
     }
 
-    private function getFaker (array $column): string
+    private function getFaker(array $column): string
     {
         $columns = $this->config['table']['columns'];
 
-        $faker = match ($column[1])
-        {
+        $faker = match ($column[1]) {
             'name' => '$this->faker->name()',
             'last_name' => '$this->faker->lastName()',
-            'slug' => match (true)
-            {
+            'slug' => match (true) {
                 $this->inArray('title', $columns) => 'Str::slug($title)',
                 $this->inArray('description', $columns) => 'Str::slug($description)',
                 $this->inArray('last_name', $columns) => 'Str::slug($last_name)',
@@ -106,17 +104,17 @@ class GenerateFactoryCommand extends Command
         return $faker . ";\r\n";
     }
 
-    private function inArray (string $needle, array $columns): bool
+    private function inArray(string $needle, array $columns): bool
     {
         return in_array($needle, call_user_func_array('array_merge', $columns));
     }
 
-    private function getReturnFromColumns (): string
+    private function getReturnFromColumns(): string
     {
         $return = "\r\nreturn [\r\n";
-        foreach ($this->config['table']['columns'] as $column)
-        {
-            $row = sprintf("'%s' => $%s,\r\n",
+        foreach ($this->config['table']['columns'] as $column) {
+            $row = sprintf(
+                "'%s' => $%s,\r\n",
                 $column[1],
                 $column[1],
             );
@@ -127,46 +125,46 @@ class GenerateFactoryCommand extends Command
         return $return . "\r\n]";
     }
 
-    private function getForeignKeys (): string
+    private function getForeignKeys(): string
     {
         $rows = '';
-        foreach ($this->config['table']['foreignKeys'] as $foreignKey)
-        {
+        foreach ($this->config['table']['foreignKeys'] as $foreignKey) {
             $model = $this->getModelNameFromForeignKey($foreignKey[0]);
             $rows .= "'$foreignKey[0]' => " . $model . "::inRandomOrder()->first() ?? " . $model . "::factory()->create();\r\n";
         }
+
         return $rows;
     }
 
-    private function getModelNameFromForeignKey (string $key): string
+    private function getModelNameFromForeignKey(string $key): string
     {
         return str_replace(' ', '', (ucwords(str_replace('_', ' ', substr_replace($key, "", -3)))));
     }
 
-    public function getUse (string $vars): string
+    public function getUse(string $vars): string
     {
         $use = 'use ' . $this->config['model'];
         $use .= str_contains($vars, 'Str::') ? "Illuminate\Support\Str;\r\n" : null;
         $use .= str_contains($vars, 'Carbon::') ? "use Carbon\Carbon;\r\n" : null;
-        foreach ($this->config['table']['foreignKeys'] as $key)
-        {
+        foreach ($this->config['table']['foreignKeys'] as $key) {
             $use .= "use App\Models\\" . $this->getModelNameFromForeignKey($key[0]) . ";\r\n";
         }
+
         return $use;
     }
 
-    private function replace (string $stub, string $use, string $vars, string $return): string
+    private function replace(string $stub, string $use, string $vars, string $return): string
     {
         $stub = str_replace(':use:', $use, $stub);
         $stub = str_replace(':vars:', $vars, $stub);
         $stub = str_replace(':return:', $return, $stub);
         $stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $stub);
+
         return str_replace(':modelName:', $this->getModelName(), $stub);
     }
 
-    private function getFileName (): string
+    private function getFileName(): string
     {
         return $this->getModelName() . 'Factory.php';
     }
-
 }

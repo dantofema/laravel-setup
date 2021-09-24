@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class GenerateModelCommand extends Command
-
 {
     use Config;
 
@@ -17,39 +16,39 @@ class GenerateModelCommand extends Command
     public $description = 'Model file generator';
     protected array $config;
 
-    public function handle (): bool
+    public function handle(): bool
     {
-        if ($this->configFileExists())
-        {
+        if ($this->configFileExists()) {
             return false;
         };
         $this->config = $this->getConfig();
 
-        if (File::exists(self::DIRECTORY . $this->getFileName()))
-        {
+        if (File::exists(self::DIRECTORY . $this->getFileName())) {
             $this->error('The migration file "' . $this->getFileName() . '" already exists ');
             $this->error('Exit');
+
             return false;
         }
 
         $this->create();
+
         return true;
     }
 
-    private function getFileName (): string
+    private function getFileName(): string
     {
         return $this->getModelName() . 'Factory.php';
     }
 
-    public function create ()
+    public function create()
     {
         $vars = $this->getVarsFromColumns();
         $definition = $this->getReturnFromColumns();
         $stub = $this->getStub();
-        if ( ! $stub)
-        {
+        if (! $stub) {
             $this->error('Error get stub');
             $this->error('Exit');
+
             return false;
         }
         $use = $this->getUse($vars);
@@ -63,5 +62,4 @@ class GenerateModelCommand extends Command
 ////        $stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $stub);
 ////        return str_replace(':modelName:', $this->getModelName(), $stub);
 //    }
-
 }

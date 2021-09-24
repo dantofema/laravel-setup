@@ -23,8 +23,7 @@ it('generate fields', function () {
     $content = File::files('database/factories')[0]->getContents();
 
     expect(Str::contains($content, "\$title = \$this->faker->sentence(\$maxNbChars = 10);"))->toBeTrue();
-    expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))->toBeTrue
-    ();
+    expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))->toBeTrue();
     expect(Str::contains($content, "\$this->faker->sentence();"))->toBeTrue();
     expect(Str::contains($content, "\$this->faker->name()->unique();"))->toBeTrue();
 });
@@ -39,8 +38,7 @@ it('generate foreign keys', function () {
     expect(Str::contains($content, "'author_id' => Author::inRandomOrder()->first() ?? Author::factory()->create();"))
         ->toBeTrue();
     expect(Str::contains($content, "'key_id' => Key::inRandomOrder()->first() ?? Key::factory()->create();"))
-        ->toBeTrue
-        ();
+        ->toBeTrue();
 });
 
 it('if factory file exist return error and exit', function () {
@@ -59,5 +57,6 @@ it('if factory file exist return error and exit', function () {
 it('if config file not found return error and exit', function () {
     expect(Artisan::call('generate:factory config/not-found.php'))->toEqual(0);
 
-    expect(count(File::files('database/factories')))->toEqual(0);;
+    expect(count(File::files('database/factories')))->toEqual(0);
+    ;
 });

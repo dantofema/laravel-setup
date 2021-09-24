@@ -54,5 +54,6 @@ it('if migration file exist return error and exit', function () {
 it('if config file not found return error and exit', function () {
     expect(Artisan::call('generate:migration config/not-found.php'))->toEqual(0);
 
-    expect(count(File::files('database/migrations')))->toEqual(0);;
+    expect(count(File::files('database/migrations')))->toEqual(0);
+    ;
 });

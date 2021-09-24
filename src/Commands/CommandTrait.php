@@ -1,28 +1,28 @@
 <?php
 
-namespace Dantofema\LaravelSetup\Traits;
+namespace Dantofema\LaravelSetup\Commands;
 
 use Illuminate\Support\Facades\File;
 use Str;
 
-trait Config
+trait CommandTrait
 {
     protected array $config;
+    private string $stub;
+
+    public function getModelPath (): string
+    {
+        return $this->config['model']['namespace'] . '\\' . $this->config['model']['name'];
+    }
 
     protected function getModelName (): string
     {
-        $array = explode('\\', $this->config['model']);
-        return end($array);
+        return $this->config['model']['name'];
     }
 
-    protected function inArray (string $needle, array $columns): bool
+    protected function inArray (string $needle, array $array): bool
     {
-        return in_array($needle, call_user_func_array('array_merge', $columns));
-    }
-
-    protected function getStub (): string|false
-    {
-        return file_get_contents(__DIR__ . self::STUB_PATH);
+        return in_array($needle, call_user_func_array('array_merge', $array));
     }
 
     protected function init (?string $type = null): bool
@@ -34,15 +34,17 @@ trait Config
 
         $this->config = $this->getConfig();
 
-        if ($type == 'migration')
+        if ($type == 'migration' and $this->migrationFileExists())
         {
-            return ! $this->migrationFileExists();
-        } else
-        {
-            return ! $this->fileExists();
+            return false;
         }
 
-        return true;
+        if ($this->fileExists())
+        {
+            return false;
+        }
+
+        return $this->setStub();
     }
 
     protected function configFileExists (): bool
@@ -84,4 +86,20 @@ trait Config
         }
         return false;
     }
+
+    protected function setStub (): bool
+    {
+        $content = file_get_contents(__DIR__ . self::STUB_PATH);
+
+        if ($content)
+        {
+            $this->stub = $content;
+            return true;
+        }
+
+        $this->error('Error get stub');
+        $this->error('Exit');
+        return false;
+    }
+
 }

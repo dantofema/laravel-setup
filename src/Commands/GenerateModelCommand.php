@@ -2,60 +2,43 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Traits\Config;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class GenerateModelCommand extends Command
 
 {
-    use Config;
+    use CommandTrait;
 
     protected const STUB_PATH = '/../Stubs/Model.php.stub';
-    protected const DIRECTORY = 'database/factories/';
+    protected const DIRECTORY = 'app/Models/';
     public $signature = 'generate:model {path : path to the config file }';
     public $description = 'Model file generator';
     protected array $config;
 
     public function handle (): bool
     {
-        if ($this->configFileExists())
+        if ( ! $this->init())
         {
             return false;
         };
-        $this->config = $this->getConfig();
+        return $this->create();
+    }
 
-        if (File::exists(self::DIRECTORY . $this->getFileName()))
-        {
-            $this->error('The migration file "' . $this->getFileName() . '" already exists ');
-            $this->error('Exit');
-            return false;
-        }
+    public function create (): bool
+    {
+        $vars = $this->getVarsFromColumns();
+        $definition = $this->getReturnFromColumns();
 
-        $this->create();
+        $use = $this->getUse($vars);
+
+        File::put(self::DIRECTORY . $this->getFileName(), $this->replace($stub, $use, $vars, $definition));
         return true;
     }
 
     private function getFileName (): string
     {
         return $this->getModelName() . 'Factory.php';
-    }
-
-    public function create ()
-    {
-        $vars = $this->getVarsFromColumns();
-        $definition = $this->getReturnFromColumns();
-        $stub = $this->getStub();
-        if ( ! $stub)
-        {
-            $this->error('Error get stub');
-            $this->error('Exit');
-            return false;
-        }
-        $use = $this->getUse($vars);
-        $content = $this->replace($stub, $use, $vars, $definition);
-        $filename = $this->getFileName();
-        File::put(self::DIRECTORY . $filename, $content);
     }
 
 //    private function replace (): string

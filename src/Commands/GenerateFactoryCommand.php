@@ -2,13 +2,12 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Traits\Config;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class GenerateFactoryCommand extends Command
 {
-    use Config;
+    use CommandTrait;
 
     protected const STUB_PATH = '/../Stubs/ModelFactory.php.stub';
     protected const DIRECTORY = 'database/factories/';
@@ -30,15 +29,8 @@ class GenerateFactoryCommand extends Command
     {
         $vars = $this->getVarsFromColumns();
         $definition = $this->getReturnFromColumns();
-        $stub = $this->getStub();
-        if ( ! $stub)
-        {
-            $this->error('Error get stub');
-            $this->error('Exit');
-            return false;
-        }
         $use = $this->getUse($vars);
-        $content = $this->replace($stub, $use, $vars, $definition);
+        $content = $this->replace($use, $vars, $definition);
         $filename = $this->getFileName();
         File::put(self::DIRECTORY . $filename, $content);
     }
@@ -137,7 +129,7 @@ class GenerateFactoryCommand extends Command
 
     public function getUse (string $vars): string
     {
-        $use = 'use ' . $this->config['model'];
+        $use = 'use ' . $this->getModelPath();
         $use .= str_contains($vars, 'Str::') ? "Illuminate\Support\Str;\r\n" : null;
         $use .= str_contains($vars, 'Carbon::') ? "use Carbon\Carbon;\r\n" : null;
         foreach ($this->config['table']['foreignKeys'] as $key)
@@ -147,13 +139,13 @@ class GenerateFactoryCommand extends Command
         return $use;
     }
 
-    private function replace (string $stub, string $use, string $vars, string $return): string
+    private function replace (string $use, string $vars, string $return): string
     {
-        $stub = str_replace(':use:', $use, $stub);
-        $stub = str_replace(':vars:', $vars, $stub);
-        $stub = str_replace(':return:', $return, $stub);
-        $stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $stub);
-        return str_replace(':modelName:', $this->getModelName(), $stub);
+        $this->stub = str_replace(':use:', $use, $this->stub);
+        $this->stub = str_replace(':vars:', $vars, $this->stub);
+        $this->stub = str_replace(':return:', $return, $this->stub);
+        $this->stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $this->stub);
+        return str_replace(':modelName:', $this->getModelName(), $this->stub);
     }
 
     private function getFileName (): string

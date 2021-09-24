@@ -1,0 +1,4 @@
+public function :method: (): :type:
+{
+    return $this->:relation:(:related:::class);
+}

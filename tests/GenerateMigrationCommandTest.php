@@ -3,7 +3,7 @@
 it('generate migration file', closure: function () {
     expect(collect(File::files('database/migrations'))->count())->toEqual(0);
 
-    expect(Artisan::call('generate:migration config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
 
     $files = collect(File::files('database/migrations'));
 
@@ -13,7 +13,7 @@ it('generate migration file', closure: function () {
 });
 
 it('generate fields', function () {
-    expect(Artisan::call('generate:migration config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
 
     $content = File::files('database/migrations')[0]->getContents();
 
@@ -24,7 +24,7 @@ it('generate fields', function () {
 });
 
 it('generate foreign keys', function () {
-    expect(Artisan::call('generate:migration config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
 
     $content = File::files('database/migrations')[0]->getContents();
 
@@ -37,11 +37,11 @@ it('generate foreign keys', function () {
 });
 
 it('if migration file exist return error and exit', function () {
-    Artisan::call('generate:migration config/example1.php');
+    Artisan::call('generate:migration tests/config/default.php');
     $file = File::files('database/migrations')[0];
     sleep(1);
 
-    expect(Artisan::call('generate:migration config/example1.php'))->toEqual(0);
+    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(0);
 
     $newFiles = File::files('database/migrations');
 
@@ -54,5 +54,38 @@ it('if migration file exist return error and exit', function () {
 it('if config file not found return error and exit', function () {
     expect(Artisan::call('generate:migration config/not-found.php'))->toEqual(0);
 
-    expect(count(File::files('database/migrations')))->toEqual(0);;
+    expect(count(File::files('database/migrations')))->toEqual(0);
+});
+
+it('add soft delete in migration file', function () {
+    Artisan::call('generate:migration tests/config/default.php');
+    $content = File::files('database/migrations')[0]->getContents();
+    expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
+});
+
+it('add softDeletes in migration file', function () {
+    Artisan::call('generate:migration tests/config/default.php');
+    $content = File::files('database/migrations')[0]->getContents();
+    expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
+});
+
+it('add Userstamps in migration file', function () {
+    Artisan::call('generate:migration tests/config/default.php');
+    $content = File::files('database/migrations')[0]->getContents();
+    expect(Str::contains($content, "\$table->unsignedBigInteger('created_by')->nullable();"))
+        ->toBeTrue();
+    expect(Str::contains($content, "\$table->unsignedBigInteger('updated_by')->nullable();"))
+        ->toBeTrue();
+});
+
+it('add Userstamps and SoftDeletes in migration file', function () {
+    Artisan::call('generate:migration tests/config/default.php');
+    $content = File::files('database/migrations')[0]->getContents();
+    expect(Str::contains($content, "\$table->unsignedBigInteger('created_by')->nullable();"))
+        ->toBeTrue();
+    expect(Str::contains($content, "\$table->unsignedBigInteger('updated_by')->nullable();"))
+        ->toBeTrue();
+    expect(Str::contains($content, "\$table->unsignedBigInteger('deleted_by')->nullable();"))
+        ->toBeTrue();
+    expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
 });

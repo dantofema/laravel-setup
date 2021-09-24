@@ -2,14 +2,13 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Traits\Config;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Str;
 
 class GenerateMigrationCommand extends Command
 {
-    use Config;
+    use CommandTrait;
 
     const STUB_PATH = '/../Stubs/create_setup_table.php.stub';
     protected const DIRECTORY = 'database/migrations/';
@@ -30,8 +29,7 @@ class GenerateMigrationCommand extends Command
     {
         $rows = $this->getRows();
         $foreignKeys = $this->getForeignKeys();
-        $stub = $this->getStub();
-        $content = $this->replace($rows, $foreignKeys, $stub,);
+        $content = $this->replace($rows, $foreignKeys);
         $filename = $this->getFileName();
         File::put('database/migrations/' . $filename, $content);
     }
@@ -48,6 +46,21 @@ class GenerateMigrationCommand extends Command
                 in_array('unique', $column) ? '->unique()' : null
             );
             $rows .= $row;
+        }
+
+        if (in_array('SoftDeletes', $this->config['model']['use']))
+        {
+            $rows .= "\$table->softDeletes();\r\n";
+        }
+
+        if (in_array('Userstamps', $this->config['model']['use']))
+        {
+            $rows .= "\$table->unsignedBigInteger('created_by')->nullable();\r\n";
+            $rows .= "\$table->unsignedBigInteger('updated_by')->nullable();\r\n";
+            if (in_array('SoftDeletes', $this->config['model']['use']))
+            {
+                $rows .= "\$table->unsignedBigInteger('deleted_by')->nullable();\r\n";
+            }
         }
         return $rows;
     }
@@ -68,11 +81,11 @@ class GenerateMigrationCommand extends Command
         return $rows;
     }
 
-    private function replace (string $rows, string $foreignKeys, bool|string $stub): string|array
+    private function replace (string $rows, string $foreignKeys): string|array
     {
-        $stub = str_replace(':fields:', $rows . $foreignKeys, $stub);
-        $stub = str_replace(':tableName:', $this->config['table']['name'], $stub);
-        return str_replace(':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(), $stub);
+        $this->stub = str_replace(':fields:', $rows . $foreignKeys, $this->stub);
+        $this->stub = str_replace(':tableName:', $this->config['table']['name'], $this->stub);
+        return str_replace(':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(), $this->stub);
     }
 
     private function getFileName (): string

@@ -3,13 +3,13 @@
 it('generate factory file return true', closure: function () {
     expect(count(File::files('database/factories')))->toEqual(0);
 
-    expect(Artisan::call('generate:factory config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
 });
 
 it('generate factory file', closure: function () {
     expect(collect(File::files('database/factories'))->count())->toEqual(0);
 
-    expect(Artisan::call('generate:factory config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
 
     $files = collect(File::files('database/factories'));
 
@@ -18,7 +18,7 @@ it('generate factory file', closure: function () {
 });
 
 it('generate fields', function () {
-    expect(Artisan::call('generate:factory config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
 
     $content = File::files('database/factories')[0]->getContents();
 
@@ -30,7 +30,7 @@ it('generate fields', function () {
 });
 
 it('generate foreign keys', function () {
-    expect(Artisan::call('generate:factory config/example1.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
 
     $content = File::files('database/factories')[0]->getContents();
 
@@ -44,10 +44,10 @@ it('generate foreign keys', function () {
 });
 
 it('if factory file exist return error and exit', function () {
-    Artisan::call('generate:factory config/example1.php');
+    Artisan::call('generate:factory tests/config/default.php');
     $file = File::files('database/factories')[0];
 
-    expect(Artisan::call('generate:factory config/example1.php'))->toEqual(0);
+    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(0);
 
     $newFiles = File::files('database/factories');
 

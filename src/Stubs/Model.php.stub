@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Wildside\Userstamps\Userstamps;
+
+class Post extends Model implements Feedable
+{
+    use HasFactory;
+    use PostCountTrait;
+    use PostFilterTrait;
+    use PostRelationTrait;
+    use PostFeedTrait;
+    use PostDeleteTrait;
+    use PostAttributeTrait;
+    use PostSummernoteTrait;
+    use PostScopeTrait;
+    use Userstamps;
+    use SoftDeletes;
+    use PostCategoryTrait;
+    use PostTagTrait;
+    use PostSpecialTrait;
+    use PostSearchTrait;
+
+    protected $rankingAttribute = null;
+
+    protected $fillable = [
+        'title',
+        'subtitle',
+        'text',
+        'person_id',
+        'tag_id',
+        'publication_time',
+        'program_id',
+        'image',
+        'abstract',
+        'epigraph',
+        'slug',
+        'lead',
+    ];
+
+}

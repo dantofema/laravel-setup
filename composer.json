@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "dantofema/laravel-setup",
+    "description": "This is my package laravel-setup",
     "keywords": [
-        ":vendor_name",
+        "dantofema",
         "laravel",
-        ":package_slug"
+        "laravel-setup"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/dantofema/laravel-setup",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Alejandro Leone",
+            "email": "dantofema@gmail.com",
             "role": "Developer"
         }
     ],
@@ -30,17 +30,17 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Dantofema\\LaravelSetup\\": "src",
+            "Dantofema\\LaravelSetup\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "Dantofema\\LaravelSetup\\Tests\\": "tests"
         }
     },
     "scripts": {
-        "test": "./vendor/bin/pest --no-coverage",
+        "test": "docker exec -it 96d5d3c23907  bash -c \"cd ../laravel-setup && ./vendor/bin/pest --no-coverage\"",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {
@@ -49,10 +49,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Dantofema\\LaravelSetup\\LaravelSetupServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\SkeletonFacade"
+                "LaravelSetup": "Dantofema\\LaravelSetup\\LaravelSetupFacade"
             }
         }
     },

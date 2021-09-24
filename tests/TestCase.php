@@ -1,36 +1,35 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace Dantofema\LaravelSetup\Tests;
 
+use Dantofema\LaravelSetup\LaravelSetupServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use VendorName\Skeleton\SkeletonServiceProvider;
 
 class TestCase extends Orchestra
 {
-    protected function setUp(): void
+    public function getEnvironmentSetUp ($app)
+    {
+        config()->set('database.default', 'testing');
+        /*
+        $migration = include __DIR__.'/../database/migrations/create_laravel-setup_table.php.stub';
+        $migration->up();
+        */
+    }
+
+    protected function setUp (): void
     {
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'VendorName\\Skeleton\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn(string $modelName) => 'Dantofema\\LaravelSetup\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders ($app)
     {
         return [
-            SkeletonServiceProvider::class,
+            LaravelSetupServiceProvider::class,
         ];
-    }
-
-    public function getEnvironmentSetUp($app)
-    {
-        config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_skeleton_table.php.stub';
-        $migration->up();
-        */
     }
 }

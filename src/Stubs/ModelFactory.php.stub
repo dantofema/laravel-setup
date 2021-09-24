@@ -1,0 +1,18 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+:use:
+
+class :classFactory: extends Factory
+{
+    protected $model = :modelName:::class;
+
+    public function definition()
+    {
+        :vars:
+        :return:
+    }
+}
+

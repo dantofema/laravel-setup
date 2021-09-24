@@ -14,18 +14,10 @@ class GenerateFactoryCommand extends Command
     protected const DIRECTORY = 'database/factories/';
     public $signature = 'generate:factory {path : path to the config file }';
     public $description = 'Factory file generator';
-    protected array $config;
 
     public function handle (): bool
     {
-        if ( ! $this->configFileExists())
-        {
-            return false;
-        };
-
-        $this->config = $this->getConfig();
-
-        if ($this->fileExists())
+        if ( ! $this->init())
         {
             return false;
         };

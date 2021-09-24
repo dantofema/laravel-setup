@@ -40,7 +40,7 @@
         }
     },
     "scripts": {
-        "test": "docker exec -it 96d5d3c23907  bash -c \"cd ../laravel-setup && ./vendor/bin/pest --no-coverage\"",
+        "test": "docker exec -it package-app_laravel.test_1  bash -c \"cd ../laravel-setup && ./vendor/bin/pest --no-coverage\"",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {

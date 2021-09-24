@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Classes\Migration;
 use Dantofema\LaravelSetup\Traits\Config;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -16,37 +15,15 @@ class GenerateMigrationCommand extends Command
     protected const DIRECTORY = 'database/migrations/';
     public $signature = 'generate:migration {path : path to the config file }';
     public $description = 'Migration file generator';
-    protected array $config;
 
     public function handle (): bool
     {
-        if ( ! $this->configFileExists())
+        if ( ! $this->init('migration'))
         {
             return false;
         };
-
-        $this->config = $this->getConfig();
-
-        if ($this->migrationFileExists())
-        {
-            return false;
-        }
-
         $this->create();
         return true;
-    }
-
-    public function migrationFileExists (): bool
-    {
-        return collect(File::files('database/migrations/'))
-            ->contains(function ($file) {
-                $name = $this->config['table']['name'];
-                if (Str::contains($file, '_create_' . $name . '_table.php'))
-                {
-                    return true;
-                }
-                return false;
-            });
     }
 
     public function create (): void

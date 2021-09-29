@@ -91,3 +91,16 @@ EOC;
     expect(Str::contains($content, $needle))->toBeTrue();
 });
 
+it('replace path', function () {
+    Artisan::call('generate:model tests/config/default.php');
+
+    $content = File::files('app/Models')[0]->getContents();
+    $config = include __DIR__ . '/config/default.php';
+
+    $path = $config['model']['path'];
+
+    expect(Str::contains($content, "return '$path/' . \$this->id;"))->toBeTrue();
+
+    expect(str_contains($content, ':path:'))->toBeFalse();
+});
+

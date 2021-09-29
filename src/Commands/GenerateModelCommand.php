@@ -65,6 +65,7 @@ class GenerateModelCommand extends Command
         $this->stub = str_replace(':use:', $this->use, $this->stub);
         $this->stub = str_replace(':search:', $this->getSearch(), $this->stub);
         $this->stub = str_replace(':relationships:', $this->getRelationships(), $this->stub);
+        $this->stub = $this->getPath();
         return str_replace(':modelName:', $this->getModelName(), $this->stub);
     }
 
@@ -110,4 +111,10 @@ class GenerateModelCommand extends Command
         }
         return $response;
     }
+
+    private function getPath (): string
+    {
+        return str_replace(':path:', $this->config['model']['path'], $this->stub);
+    }
+
 }

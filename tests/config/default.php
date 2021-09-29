@@ -4,6 +4,7 @@ return [
         'namespace' => 'App\Models',
         'name' => 'Post',
         'use' => ['SoftDeletes', 'Userstamps'],
+        'path' => 'notas',
         'relationships' => [
             'hasMany' => [
                 ['subcategories', 'Subcategory'],

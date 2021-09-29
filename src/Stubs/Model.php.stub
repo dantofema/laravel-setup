@@ -14,4 +14,8 @@ class :modelName: extends Model
     :search:
 
     :relationships:
+
+    public function path(){
+        return ':path:/' . $this->id;
+    }
 }

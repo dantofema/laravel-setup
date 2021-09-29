@@ -1,0 +1,107 @@
+<?php
+
+namespace :namespace:;
+
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
+use JetBrains\PhpStorm\ArrayShape;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
+use Livewire\WithSaveNewImage;
+use Storage;
+:useModels:
+
+class :modelName:Livewire extends Component
+{
+    use WithPagination, WithFileUploads, WithSaveNewImage;
+
+    public :editing; $editing;
+    public int $perPage = 10;
+    public string $sortField = ':sortField:';
+    public bool $sortDirection = true;
+    public string $search = '';
+    public bool $showConfirmModal = false;
+    public bool $showFormModal = false;
+    public bool $createAction = false;
+    public string $titleFormModal = '';
+    public $newImage;
+    public string $tags = '';
+
+    public function sortBy (string $field)
+    {
+        if ($this->sortField == $field)
+        {
+            $this->sortDirection = ! $this->sortDirection;
+        } else
+        {
+            $this->sortDirection = true;
+        }
+
+        $this->sortField = $field;
+    }
+
+    public function confirmDelete ()
+    {
+        :detach:
+        $this->editing->delete();
+        $this->showConfirmModal = false;
+    }
+
+    public function delete (:modelArgument:)
+    {
+        $this->editing = :varModel:;
+        $this->showConfirmModal = true;
+    }
+
+    public function edit (:modelArgument:)
+    {
+        $this->resetValidation();
+        $this->createAction = false;
+        $this->titleFormModal = 'Editar';
+        $this->editing = :varModel:;
+        :editNewImage:
+        $this->showFormModal = true;
+    }
+
+    public function create ()
+    {
+        $this->resetValidation();
+        $this->createAction = true;
+        $this->titleFormModal = 'Crear';
+        $this->editing = :modelName:::make();
+        :createNewImage:
+        $this->showFormModal = true;
+    }
+
+    public function save ()
+    {
+        $this->validate();
+        :saveNewImage:
+        :saveSlug:
+        $this->editing->save();
+        $this->showFormModal = false;
+    }
+
+    public function rules (): array
+    {
+        :rules:
+    }
+
+    public function render (): Factory|View|Application
+    {
+        return view(':view:', [
+            'items' => Post::search($this->search)
+                ->orderBy($this->sortField, $this->sortDirection ? 'desc' : 'asc')
+                ->paginate($this->perPage),
+        ]);
+    }
+
+    public function mount ()
+    {
+        $this->editing = :modelName:::make();
+    }
+}

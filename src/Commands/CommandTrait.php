@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Exception;
 use Illuminate\Support\Facades\File;
 use Str;
 
@@ -10,14 +11,9 @@ trait CommandTrait
     protected array $config;
     private string $stub;
 
-    public function getModelPath (): string
+    protected function getModelPath (): string
     {
         return $this->config['model']['namespace'] . '\\' . $this->config['model']['name'];
-    }
-
-    protected function getModelName (): string
-    {
-        return $this->config['model']['name'];
     }
 
     protected function inArray (string $needle, array $array): bool
@@ -25,23 +21,31 @@ trait CommandTrait
         return in_array($needle, call_user_func_array('array_merge', $array));
     }
 
+    /**
+     * @throws Exception
+     */
     protected function init (?string $type = null): bool
     {
         if ( ! $this->configFileExists())
         {
-            return false;
+            throw new Exception('Config file not found');
         };
 
         $this->config = $this->getConfig();
 
         if ($type == 'migration' and $this->migrationFileExists())
         {
-            return false;
+            throw new Exception('Migration file exists');
+        }
+
+        if ($type == 'livewire' and $this->livewireFileExists())
+        {
+            throw new Exception('Livewire file exists');
         }
 
         if ($this->fileExists())
         {
-            return false;
+            throw new Exception('File exists');
         }
 
         return $this->setStub();
@@ -63,7 +67,7 @@ trait CommandTrait
         return include $this->argument('path');
     }
 
-    public function migrationFileExists (): bool
+    protected function migrationFileExists (): bool
     {
         return collect(File::files('database/migrations/'))
             ->contains(function ($file) {
@@ -76,11 +80,25 @@ trait CommandTrait
             });
     }
 
+    protected function livewireFileExists (): bool
+    {
+        $backend = self::DIRECTORY . 'Backend/' . $this->getFileName();
+        $frontend = self::DIRECTORY . 'Frontend/' . $this->getFileName();
+        if (File::exists($backend) or File::exists($frontend))
+        {
+            $this->error('The livewire file "' . $this->getFileName() . '" already exists ');
+            $this->error('Exit');
+            return true;
+        }
+        return false;
+    }
+
     protected function fileExists (): bool
     {
-        if (File::exists(self::DIRECTORY . $this->getFileName()))
+        $path = self::DIRECTORY . $this->getFileName();
+        if (File::exists($path))
         {
-            $this->error('The migration file "' . $this->getFileName() . '" already exists ');
+            $this->error('The  file "' . $this->getFileName() . '" already exists ');
             $this->error('Exit');
             return true;
         }
@@ -100,6 +118,16 @@ trait CommandTrait
         $this->error('Error get stub');
         $this->error('Exit');
         return false;
+    }
+
+    protected function getVariableModel (): string
+    {
+        return '$' . strtolower($this->getModelName());
+    }
+
+    protected function getModelName (): string
+    {
+        return $this->config['model']['name'];
     }
 
 }

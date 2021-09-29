@@ -5,14 +5,13 @@ namespace :namespace:;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 :useNamespace:
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Wildside\Userstamps\Userstamps;
 
-class Post extends Model implements Feedable
+class :modelName: extends Model
 {
     use HasFactory;
-    use Userstamps;
-    use SoftDeletes;
     :use:
 
+    :search:
+
+    :relationships:
 }

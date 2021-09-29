@@ -9,7 +9,15 @@ uses(TestCase::class)
 
 function clearDirectories ()
 {
-    $directories = ['database/migrations', 'database/factories'];
+    $directories = [
+        'database/migrations',
+        'database/factories',
+        'app/Models',
+        'app/Http/Livewire/Backend',
+        'app/Http/Livewire/Frontend',
+        'resources/views/livewire/backend',
+        'resources/views/livewire/frontend',
+    ];
 
     foreach ($directories as $directory)
     {

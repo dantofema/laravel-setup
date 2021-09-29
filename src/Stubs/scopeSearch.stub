@@ -1,10 +1,4 @@
 public function scopeSearch (Builder $query, string $search): Builder
 {
-    return $query->where('title', 'like', '%' . $search . '%')
-        ->orWhere('subtitle', 'like', '%' . $search . '%')
-        ->orWhere('created_at', 'like', '%' . $search . '%')
-        ->orWhere('lead', 'like', '%' . $search . '%')
-        ->orWhere('author', 'like', '%' . $search . '%')
-        ->orWhereHas('tags', fn($q) => $q->where('name', 'like', '%' . $search . '%'))
-        ->orWhereHas('category', fn($q) => $q->where('name', 'like', '%' . $search . '%'));
+    return :query:
 }

@@ -29,7 +29,7 @@ class GenerateTestCommand extends Command
 
     public function create (): bool
     {
-        $path = self::DIRECTORY . $this->config['test']['subdirectory'];
+        $path = self::DIRECTORY . ($this->config['backend'] ? '/Backend/' : '/Frontend/');
 
         return File::put(
             $path . $this->getFileName(),

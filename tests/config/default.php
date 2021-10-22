@@ -1,5 +1,6 @@
 <?php
 return [
+    'backend' => true,
     'model' => [
         'namespace' => 'App\Models',
         'name' => 'Post',
@@ -64,10 +65,8 @@ return [
         ],
     ],
     'view' => [
-        'subdirectory' => '/backend/',
         'title' => 'Notas',
     ],
     'test' => [
-        'subdirectory' => '/Backend/',
     ],
 ];

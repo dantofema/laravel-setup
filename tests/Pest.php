@@ -12,6 +12,10 @@ function clearDirectories ()
 {
     File::delete('database/seeders/DatabaseSeeder.php');
     File::copy('database/seeders/_DatabaseSeeder.php', 'database/seeders/DatabaseSeeder.php');
+
+    File::delete('routes/web.php');
+    File::copy('routes/_web.php', 'routes/web.php');
+
     $directories = [
         'database/migrations',
         'database/factories',

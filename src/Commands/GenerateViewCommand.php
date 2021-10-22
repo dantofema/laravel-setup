@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -12,7 +13,7 @@ class GenerateViewCommand extends Command
 
     protected const STUB_PATH = '/../Stubs/view.stub';
     protected const DIRECTORY = 'resources/views/livewire';
-    public $signature = 'generate:view {path : path to the config file }';
+    public $signature = 'generate:view {path : path to the config file } {--force}';
     public $description = 'View file generator';
     protected array $config;
 

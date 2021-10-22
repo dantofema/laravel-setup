@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -11,7 +12,7 @@ class GenerateFactoryCommand extends Command
 
     protected const STUB_PATH = '/../Stubs/ModelFactory.php.stub';
     protected const DIRECTORY = 'database/factories/';
-    public $signature = 'generate:factory {path : path to the config file }';
+    public $signature = 'generate:factory {path : path to the config file } {--force}';
     public $description = 'Factory file generator';
 
     public function handle (): bool
@@ -31,8 +32,8 @@ class GenerateFactoryCommand extends Command
         $definition = $this->getReturnFromColumns();
         $use = $this->getUse($vars);
         $content = $this->replace($use, $vars, $definition);
-        $filename = $this->getFileName();
-        File::put(self::DIRECTORY . $filename, $content);
+
+        File::put(self::DIRECTORY . $this->getFileName(), $content);
     }
 
     public function getVarsFromColumns (): string
@@ -151,6 +152,32 @@ class GenerateFactoryCommand extends Command
     private function getFileName (): string
     {
         return $this->getModelName() . 'Factory.php';
+    }
+
+    public function seeder ()
+    {
+        $haystack = File::get('database/seeders/DatabaseSeeder.php');
+        $needle = ";\r\n";
+        $replace = ";\r\n";
+        $replace .= "use " . $this->getModelPath();
+        $pos = strpos($haystack, $needle);
+
+        if ($pos !== false)
+        {
+            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
+        }
+
+        $needle = "create();\r\n";
+        $replace = "create();\r\n";
+        $replace .= $this->getModelName() . "::factory(10)->create();\r\n";
+        $pos = strpos($haystack, $needle);
+
+        if ($pos !== false)
+        {
+            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
+        }
+
+        File::put('database/seeders/DatabaseSeeder.php', $haystack);
     }
 
 }

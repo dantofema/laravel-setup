@@ -2,9 +2,10 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Str;
+use Illuminate\Support\Str;
 
 class GenerateMigrationCommand extends Command
 {
@@ -12,7 +13,7 @@ class GenerateMigrationCommand extends Command
 
     const STUB_PATH = '/../Stubs/create_setup_table.php.stub';
     protected const DIRECTORY = 'database/migrations/';
-    public $signature = 'generate:migration {path : path to the config file }';
+    public $signature = 'generate:migration {path : path to the config file } {--force}';
     public $description = 'Migration file generator';
 
     public function handle (): bool

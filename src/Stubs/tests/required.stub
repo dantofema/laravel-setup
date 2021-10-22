@@ -1,0 +1,10 @@
+
+it(':field: is required in :table: table', function () {
+    $model = :model:::factory()->create();
+
+    Livewire::test(':view:')
+        ->call('edit', $model->id)
+        ->set('editing.:field:', '')
+        ->call('save')
+        ->assertHasErrors(['editing.:field:' => 'required']);
+}

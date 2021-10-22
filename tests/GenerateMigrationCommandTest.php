@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+
 it('generate migration file', closure: function () {
     expect(collect(File::files('database/migrations'))->count())->toEqual(0);
 
@@ -17,7 +21,7 @@ it('generate fields', function () {
 
     $content = File::files('database/migrations')[0]->getContents();
 
-    expect(Str::contains($content, "\$table->string('title');"))->toBeTrue();
+    expect(Str::contains($content, "\$table->string('title')->unique();"))->toBeTrue();
     expect(Str::contains($content, "\$table->text('body');"))->toBeTrue();
     expect(Str::contains($content, "\$table->string('epigraph')->nullable();"))->toBeTrue();
     expect(Str::contains($content, "\$table->string('name')->nullable()->unique();"))->toBeTrue();
@@ -36,7 +40,9 @@ it('generate foreign keys', function () {
         ->toBeTrue();
 });
 
-it('if migration file exist return error and exit', function () {
+it('if migration file exist return exception and exit', function () {
+    $this->expectException(Exception::class);
+
     Artisan::call('generate:migration tests/config/default.php');
     $file = File::files('database/migrations')[0];
     sleep(1);
@@ -52,6 +58,7 @@ it('if migration file exist return error and exit', function () {
 });
 
 it('if config file not found return error and exit', function () {
+    $this->expectException(Exception::class);
     expect(Artisan::call('generate:migration config/not-found.php'))->toEqual(0);
 
     expect(count(File::files('database/migrations')))->toEqual(0);

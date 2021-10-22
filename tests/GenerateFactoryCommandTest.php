@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+
 it('generate factory file return true', closure: function () {
     expect(count(File::files('database/factories')))->toEqual(0);
 
@@ -22,9 +26,9 @@ it('generate fields', function () {
 
     $content = File::files('database/factories')[0]->getContents();
 
-    expect(Str::contains($content, "\$title = \$this->faker->sentence(\$maxNbChars = 10);"))->toBeTrue();
-    expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))->toBeTrue
-    ();
+    expect(Str::contains($content, "\$title = \$this->faker->sentence(\$maxNbChars = 10)->unique();"))->toBeTrue();
+    expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))
+        ->toBeTrue();
     expect(Str::contains($content, "\$this->faker->sentence();"))->toBeTrue();
     expect(Str::contains($content, "\$this->faker->name()->unique();"))->toBeTrue();
 });
@@ -43,7 +47,9 @@ it('generate foreign keys', function () {
         ();
 });
 
-it('if factory file exist return error and exit', function () {
+it('if factory file exist return exception and exit', function () {
+    $this->expectException(Exception::class);
+
     Artisan::call('generate:factory tests/config/default.php');
     $file = File::files('database/factories')[0];
 
@@ -56,8 +62,26 @@ it('if factory file exist return error and exit', function () {
     expect($newFiles[0]->getBaseName())->toEqual($file->getBaseName());
 });
 
-it('if config file not found return error and exit', function () {
+it('if config file not found return exception and exit', function () {
+    $this->expectException(Exception::class);
+
     expect(Artisan::call('generate:factory config/not-found.php'))->toEqual(0);
 
-    expect(count(File::files('database/factories')))->toEqual(0);;
+    expect(count(File::files('database/factories')))->toEqual(0);
+});
+
+it('generate factory with --force return true', closure: function () {
+    expect(count(File::files('database/factories')))->toEqual(0);
+
+    expect(Artisan::call('generate:factory tests/config/default.php --force'))
+        ->toEqual(1);
+});
+
+it('if factory file exist when call with --force return true', closure: function () {
+    expect(count(File::files('database/factories')))->toEqual(0);
+
+    Artisan::call('generate:factory tests/config/default.php');
+
+    expect(Artisan::call('generate:factory tests/config/default.php --force'))
+        ->toEqual(1);
 });

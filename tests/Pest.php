@@ -17,6 +17,7 @@ function clearDirectories ()
         'app/Http/Livewire/Frontend',
         'resources/views/livewire/backend',
         'resources/views/livewire/frontend',
+        'tests/Feature/Backend',
     ];
 
     foreach ($directories as $directory)

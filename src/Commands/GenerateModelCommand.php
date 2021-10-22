@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -12,7 +13,7 @@ class GenerateModelCommand extends Command
 
     protected const STUB_PATH = '/../Stubs/Model.php.stub';
     protected const DIRECTORY = 'app/Models/';
-    public $signature = 'generate:model {path : path to the config file }';
+    public $signature = 'generate:model {path : path to the config file } {--force}';
     public $description = 'Model file generator';
     protected array $config;
     protected string $use = '';

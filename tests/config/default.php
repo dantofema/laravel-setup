@@ -23,7 +23,7 @@ return [
         'name' => 'posts',
         'columns' => [
             ['string', 'title', 'unique'],
-            ['string', 'slug', 'unique'],
+            ['string', 'slug', 'unique', 'from' => 'title'],
             ['string', 'image', 'nullable'],
             ['text', 'body'],
             ['string', 'epigraph', 'nullable'],
@@ -66,5 +66,8 @@ return [
     'view' => [
         'subdirectory' => '/backend/',
         'title' => 'Notas',
+    ],
+    'test' => [
+        'subdirectory' => '/Backend/',
     ],
 ];

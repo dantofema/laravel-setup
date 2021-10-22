@@ -1,0 +1,13 @@
+
+it('edit slug from :field: in :table: table', function () {
+    $model = :model:::factory([':field:' => 'bar'])->create();
+    $newValue = 'foo foo';
+
+    Livewire::test(':view:')
+        ->call('edit', $model->id)
+        ->set('editing.:field:', $newValue)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $this->assertEquals(Str::slug($newValue), :model:::first()->slug);
+}

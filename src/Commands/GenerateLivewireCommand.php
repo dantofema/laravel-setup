@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -12,7 +13,7 @@ class GenerateLivewireCommand extends Command
 
     protected const STUB_PATH = '/../Stubs/Livewire.php.stub';
     protected const DIRECTORY = 'app/Http/Livewire';
-    public $signature = 'generate:livewire {path : path to the config file }';
+    public $signature = 'generate:livewire {path : path to the config file } {--force}';
     public $description = 'Model file generator';
     protected array $config;
 

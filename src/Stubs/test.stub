@@ -1,2 +1,41 @@
 <?php
 
+it('has :table: page')->get('/:path:')->assertStatus(200);
+it('has create :table: page')->get('/:path:/create')->assertStatus(200);
+
+it('has show :table: page', function () {
+    $model = :model:::factory()->create();
+    $this->get(/$model->path())->assertStatus(200);
+});
+
+it('has edit :table: page', function () {
+    $model = :model:::factory()->create();
+    $this->get("/$model->path()/edit")->assertStatus(200);
+});
+
+it('can edit an single row from :table:', function () {
+
+    $model = :model:::factory()->create();
+
+    livewire(':view:')
+        ->call('edit', $model->id)
+        ->set('editing.:field:', 'foo')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $this->assertEquals('foo', :model:::first()->:field:);
+});
+
+it('can show an single row from :table:', function () {
+
+    $model = :model:::factory()->create();
+
+    livewire(':view:')
+        ->call('show', $model->id)
+        ->assertSee($model->:field:)
+        ->assertHasNoErrors();
+});
+
+:required:
+
+:edit-slug:

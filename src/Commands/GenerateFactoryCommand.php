@@ -20,7 +20,7 @@ class GenerateFactoryCommand extends Command
         if ( ! $this->init())
         {
             return false;
-        };
+        }
 
         $this->create();
         return true;
@@ -34,6 +34,8 @@ class GenerateFactoryCommand extends Command
         $content = $this->replace($use, $vars, $definition);
 
         File::put(self::DIRECTORY . $this->getFileName(), $content);
+
+        $this->seeder();
     }
 
     public function getVarsFromColumns (): string
@@ -157,9 +159,8 @@ class GenerateFactoryCommand extends Command
     public function seeder ()
     {
         $haystack = File::get('database/seeders/DatabaseSeeder.php');
-        $needle = ";\r\n";
-        $replace = ";\r\n";
-        $replace .= "use " . $this->getModelPath();
+        $needle = ";";
+        $replace = ";\r\nuse " . $this->getModelPath() . ";\r\n";
         $pos = strpos($haystack, $needle);
 
         if ($pos !== false)
@@ -167,7 +168,7 @@ class GenerateFactoryCommand extends Command
             $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
         }
 
-        $needle = "create();\r\n";
+        $needle = "create();";
         $replace = "create();\r\n";
         $replace .= $this->getModelName() . "::factory(10)->create();\r\n";
         $pos = strpos($haystack, $needle);
@@ -176,7 +177,6 @@ class GenerateFactoryCommand extends Command
         {
             $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
         }
-
         File::put('database/seeders/DatabaseSeeder.php', $haystack);
     }
 

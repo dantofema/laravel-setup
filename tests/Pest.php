@@ -1,6 +1,7 @@
 <?php
 
 use Dantofema\LaravelSetup\Tests\TestCase;
+use Illuminate\Support\Facades\File;
 
 uses(TestCase::class)
     ->beforeEach(fn() => clearDirectories())
@@ -9,6 +10,8 @@ uses(TestCase::class)
 
 function clearDirectories ()
 {
+    File::delete('database/seeders/DatabaseSeeder.php');
+    File::copy('database/seeders/_DatabaseSeeder.php', 'database/seeders/DatabaseSeeder.php');
     $directories = [
         'database/migrations',
         'database/factories',

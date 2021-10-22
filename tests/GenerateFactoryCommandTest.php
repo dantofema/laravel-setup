@@ -85,3 +85,11 @@ it('if factory file exist when call with --force return true', closure: function
     expect(Artisan::call('generate:factory tests/config/default.php --force'))
         ->toEqual(1);
 });
+
+it('update DatabaseSeeder', closure: function () {
+    Artisan::call('generate:factory tests/config/default.php');
+    $content = File::get('database/seeders/DatabaseSeeder.php');
+
+    expect(Str::contains($content, "Post::factory(10)->create();"))->toBeTrue();
+    expect(Str::contains($content, "use App\Models\Post;"))->toBeTrue();
+});

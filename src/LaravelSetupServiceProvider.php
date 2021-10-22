@@ -6,7 +6,6 @@ use Dantofema\LaravelSetup\Commands\GenerateFactoryCommand;
 use Dantofema\LaravelSetup\Commands\GenerateLivewireCommand;
 use Dantofema\LaravelSetup\Commands\GenerateMigrationCommand;
 use Dantofema\LaravelSetup\Commands\GenerateModelCommand;
-use Dantofema\LaravelSetup\Commands\GenerateSeederCommand;
 use Dantofema\LaravelSetup\Commands\GenerateTestCommand;
 use Dantofema\LaravelSetup\Commands\GenerateViewCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -29,7 +28,6 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
             ->hasCommand(GenerateMigrationCommand::class)
             ->hasCommand(GenerateModelCommand::class)
             ->hasCommand(GenerateViewCommand::class)
-            ->hasCommand(GenerateSeederCommand::class)
             ->hasCommand(GenerateLivewireCommand::class)
             ->hasCommand(GenerateTestCommand::class)
             ->hasCommand(GenerateFactoryCommand::class);

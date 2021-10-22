@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+
 it('livewire directory is empty', closure: function () {
     expect(count(File::files('app/Http/Livewire')))
         ->toEqual(0);
@@ -82,7 +85,6 @@ it('replace new image', closure: function () {
     expect(Artisan::call('generate:livewire tests/config/default.php'))
         ->toEqual(1);
 
-    $config = include __DIR__ . '/config/default.php';
     $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
 
     expect(str_contains($content, 'public $newImage;'))

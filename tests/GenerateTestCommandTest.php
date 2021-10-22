@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+
 it('backend directory is empty', closure: function () {
     expect(count(File::files('tests/Feature/Backend')))
         ->toEqual(0);

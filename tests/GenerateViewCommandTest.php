@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+
 it('view directory is empty', closure: function () {
     expect(count(File::files('resources/views/livewire/backend')))
         ->toEqual(0);

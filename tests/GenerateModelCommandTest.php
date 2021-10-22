@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+
 it('generate model file', closure: function () {
     expect(count(File::files('app/Models')))->toEqual(0);
 

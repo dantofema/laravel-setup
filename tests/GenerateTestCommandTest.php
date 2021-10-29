@@ -1,5 +1,7 @@
 <?php
 
+use Dantofema\LaravelSetup\Facades\Path;
+use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
@@ -79,4 +81,13 @@ it('replace edit slug', closure: function () {
 
     expect(str_contains($content, "->set('editing.$column', \$newValue)"))->toBeTrue();
     expect(str_contains($content, ':field:'))->toBeFalse();
+});
+
+it('replace edit-slug without slug', closure: function () {
+    Artisan::call('generate:test tests/config/without-slug.php');
+
+    $config = include __DIR__ . '/config/default.php';
+    $content = File::get(Text::config($config)->path('test'));
+
+    expect(str_contains($content, 'slug'))->toBeFalse();
 });

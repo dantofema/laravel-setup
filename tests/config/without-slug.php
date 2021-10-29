@@ -24,7 +24,6 @@ return [
         'name' => 'posts',
         'columns' => [
             ['string', 'title', 'unique'],
-            ['string', 'slug', 'unique', 'from' => 'title'],
             ['string', 'image', 'nullable'],
             ['text', 'body'],
             ['string', 'epigraph', 'nullable'],
@@ -38,7 +37,7 @@ return [
     ],
     'livewire' => [
         'namespace' => 'App\Http\Livewire\Backend',
-        'view' => 'livewire.backend.posts-livewire',
+        'view' => 'livewire.backend.post-livewire',
         'useModels' => [
             'App\Models\Category',
             'App\Models\Tag',
@@ -52,7 +51,6 @@ return [
                 'field' => 'image',
             ],
         ],
-        'save' => ['slug' => 'title'],
         'rules' => [
             'editing.title' => 'required|unique:App\Models\Post,title, . \$this->editing->id',
             'editing.subtitle' => 'nullable',

@@ -2,7 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -17,31 +19,23 @@ class GenerateLivewireCommand extends Command
     public $description = 'Model file generator';
     protected array $config;
 
+    /**
+     * @throws Exception
+     */
     public function handle (): bool
     {
-        if ( ! $this->init('livewire'))
-        {
-            return false;
-        };
+        File::ensureDirectoryExists(self::DIRECTORY . '/Backend/');
+        File::ensureDirectoryExists(self::DIRECTORY . '/Frontend/');
+
+        $this->init('livewire');
         return $this->create();
     }
 
     public function create (): bool
     {
-        $folders = explode('\\', $this->config['livewire']['namespace']);
-
-        $path = end($folders) == 'Livewire'
-            ? self::DIRECTORY
-            : self::DIRECTORY . '/' . end($folders);
-
         return File::put(
-            $path . '/' . $this->getFileName(),
+            Text::config($this->config)->path('livewire'),
             $this->replace());
-    }
-
-    private function getFileName (): string
-    {
-        return $this->getModelName() . 'Livewire.php';
     }
 
     private function replace (): string
@@ -49,8 +43,13 @@ class GenerateLivewireCommand extends Command
         $this->stub = $this->getNamespace();
         $this->stub = $this->getUseModels();
         $this->stub = str_replace(
+            ':className:',
+            ucfirst($this->config['table']['name']),
+            $this->stub
+        );
+        $this->stub = str_replace(
             ':modelName:',
-            $this->getModelName(),
+            ucfirst($this->config['model']['name']),
             $this->stub
         );
         $this->stub = $this->sortField();
@@ -82,9 +81,9 @@ class GenerateLivewireCommand extends Command
         $response = '';
         foreach ($this->config['livewire']['useModels'] as $item)
         {
-            $response .= "public Collection $$item;\r\n";
+            $response .= "use $item;\r\n";
         }
-        return str_replace(':useModels:', $response, $this->stub);;
+        return str_replace(':useModels:', $response, $this->stub);
     }
 
     private function sortField (): string
@@ -112,7 +111,7 @@ class GenerateLivewireCommand extends Command
     private function getEditing (): string
     {
         return str_replace(':editing:',
-            $this->config['livewire']['properties']['editing'],
+            $this->config['model']['name'],
             $this->stub);
     }
 
@@ -160,6 +159,7 @@ class GenerateLivewireCommand extends Command
                 $this->stub
             );
         }
+
         return str_replace(':saveNewImage:',
             "",
             $this->stub
@@ -180,7 +180,7 @@ class GenerateLivewireCommand extends Command
         $rules = "\$rules = [\r\n";
         foreach ($this->config['livewire']['rules'] as $key => $rule)
         {
-            $rules .= "$key => $rule\r\n";
+            $rules .= "'$key' => '$rule',\r\n";
         }
         $rules .= "];\r\n";
 
@@ -191,8 +191,8 @@ class GenerateLivewireCommand extends Command
             {
                 if (in_array('image', $column))
                 {
-                    $newImageRule .= count($column) == 2 ? '|required' : '';
-                    $newImageRule .= in_array('nullable', $column) ? '|nullable' : '';
+                    $newImageRule .= count($column) == 2 ? "|required" : '';
+                    $newImageRule .= in_array('nullable', $column) ? "|nullable" : '';
                 }
             }
             $rules .= <<<EOT
@@ -207,7 +207,7 @@ EOT;
         return str_replace(':rules:',
             $rules,
             $this->stub
-        );;
+        );
     }
 
     private function getView (): string
@@ -215,7 +215,7 @@ EOT;
         return str_replace(':view:',
             $this->config['livewire']['view'],
             $this->stub
-        );;
+        );
     }
 
 }

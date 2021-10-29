@@ -10,6 +10,12 @@ it('generate factory file return true', closure: function () {
     expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
 });
 
+//it('generate factory file return false', closure: function () {
+//    $this->configFactory->merge(['table' => ['columns' => 0]])->put();
+//
+//    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(0);
+//});
+
 it('generate factory file', closure: function () {
     expect(collect(File::files('database/factories'))->count())->toEqual(0);
 
@@ -87,7 +93,13 @@ it('if factory file exist when call with --force return true', closure: function
 });
 
 it('update DatabaseSeeder', closure: function () {
+    $content = File::get('database/seeders/DatabaseSeeder.php');
+
+    expect(Str::contains($content, "Post::factory(10)->create();"))->toBeFalse();
+    expect(Str::contains($content, "use App\Models\Post;"))->toBeFalse();
+
     Artisan::call('generate:factory tests/config/default.php');
+
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
     expect(Str::contains($content, "Post::factory(10)->create();"))->toBeTrue();

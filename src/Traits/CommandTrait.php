@@ -2,6 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
+use Dantofema\LaravelSetup\Facades\Delete;
+use Dantofema\LaravelSetup\Facades\Route;
+use Dantofema\LaravelSetup\Facades\Traits;
 use Exception;
 use Illuminate\Support\Facades\File;
 
@@ -11,6 +14,7 @@ trait CommandTrait
 
     protected array $config;
     private string $stub;
+    private Delete $delete;
 
     protected function getModelPath (): string
     {
@@ -25,44 +29,34 @@ trait CommandTrait
     /**
      * @throws Exception
      */
-    protected function init (?string $type = null): bool
+    protected function init (string $type): bool
     {
-        if ( ! $this->configFileExists())
-        {
-            throw new Exception('Config file not found');
-        };
+        File::ensureDirectoryExists(self::DIRECTORY);
+
+        Traits::withSaveNewImage();
+
+        $this->configFileExists();
 
         $this->config = $this->getConfig();
 
-        $this->force();
+        if ($this->option('force'))
+        {
+            Delete::type($type)->config($this->config);
+        }
+
+        if ($type == 'livewire')
+        {
+            Route::add($this->config);
+        }
 
         $this->exists($type);
 
         return $this->setStub();
     }
 
-    protected function configFileExists (): bool
-    {
-        if (File::exists($this->argument('path')))
-        {
-            return true;
-        }
-        $this->error('Not found "' . $this->argument('path') . '"');
-        $this->error('Exit');
-        return false;
-    }
-
     protected function getConfig (): mixed
     {
         return include $this->argument('path');
-    }
-
-    protected function force (): void
-    {
-        if ($this->option('force'))
-        {
-            File::delete(self::DIRECTORY . $this->getFileName());
-        }
     }
 
     protected function setStub (): bool

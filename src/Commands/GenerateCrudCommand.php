@@ -27,7 +27,6 @@ class GenerateCrudCommand extends Command
             $this->livewire();
             $this->migration();
             $this->model();
-            $this->seeder();
             $this->test();
             $this->view();
         }
@@ -60,15 +59,7 @@ class GenerateCrudCommand extends Command
 
     protected function model (): void
     {
-        $this->call('generate:GenerateCrudCommand', [
-                'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
-        );
-    }
-
-    protected function seeder (): void
-    {
-        $this->call('generate:seeder', [
+        $this->call('generate:model', [
                 'path' => $this->argument('path'),
                 '--force' => $this->option('force')]
         );

@@ -25,7 +25,6 @@ return [
         'columns' => [
             ['string', 'title', 'unique'],
             ['string', 'slug', 'unique', 'from' => 'title'],
-            ['string', 'image', 'nullable'],
             ['text', 'body'],
             ['string', 'epigraph', 'nullable'],
             ['string', 'name', 'nullable', 'unique'],
@@ -38,7 +37,7 @@ return [
     ],
     'livewire' => [
         'namespace' => 'App\Http\Livewire\Backend',
-        'view' => 'livewire.backend.posts-livewire',
+        'view' => 'livewire.backend.post-livewire',
         'useModels' => [
             'App\Models\Category',
             'App\Models\Tag',
@@ -47,10 +46,6 @@ return [
         'properties' => [
             'sortField' => 'created_at',
             'editing' => 'Post',
-            'newImage' => [
-                'disk' => 'notas',
-                'field' => 'image',
-            ],
         ],
         'save' => ['slug' => 'title'],
         'rules' => [

@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -19,26 +20,19 @@ class GenerateTestCommand extends Command
 
     public function handle (): bool
     {
-        if ( ! $this->init())
-        {
-            return false;
-        };
+        File::ensureDirectoryExists(self::DIRECTORY . '/Backend/');
+        File::ensureDirectoryExists(self::DIRECTORY . '/Frontend/');
+
+        $this->init('test');
 
         return $this->create();
     }
 
     public function create (): bool
     {
-        $path = self::DIRECTORY . ($this->config['backend'] ? '/Backend/' : '/Frontend/');
-
         return File::put(
-            $path . $this->getFileName(),
+            Text::config($this->config)->path('test'),
             $this->replace());
-    }
-
-    private function getFileName (): string
-    {
-        return ucfirst($this->config['table']['name']) . 'LivewireTest.php';
     }
 
     private function replace (): string

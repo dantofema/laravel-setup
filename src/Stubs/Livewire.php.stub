@@ -11,15 +11,15 @@ use JetBrains\PhpStorm\ArrayShape;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Livewire\WithSaveNewImage;
+use App\Http\Livewire\Traits\WithSaveNewImage;
 use Storage;
 :useModels:
 
-class :modelName:Livewire extends Component
+class :className:Livewire extends Component
 {
     use WithPagination, WithFileUploads, WithSaveNewImage;
 
-    public :editing; $editing;
+    public :editing: $editing;
     public int $perPage = 10;
     public string $sortField = ':sortField:';
     public bool $sortDirection = true;
@@ -28,7 +28,7 @@ class :modelName:Livewire extends Component
     public bool $showFormModal = false;
     public bool $createAction = false;
     public string $titleFormModal = '';
-    public $newImage;
+    :newImage:
     public string $tags = '';
 
     public function sortBy (string $field)

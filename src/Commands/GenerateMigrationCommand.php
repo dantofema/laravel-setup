@@ -2,6 +2,8 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Path;
+use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -18,11 +20,10 @@ class GenerateMigrationCommand extends Command
 
     public function handle (): bool
     {
-        if ( ! $this->init('migration'))
-        {
-            return false;
-        };
+        $this->init('migration');
+
         $this->create();
+
         return true;
     }
 
@@ -31,8 +32,7 @@ class GenerateMigrationCommand extends Command
         $rows = $this->getRows();
         $foreignKeys = $this->getForeignKeys();
         $content = $this->replace($rows, $foreignKeys);
-        $filename = $this->getFileName();
-        File::put('database/migrations/' . $filename, $content);
+        File::put(Text::config($this->config)->path('migration'), $content);
     }
 
     public function getRows (): string
@@ -87,12 +87,6 @@ class GenerateMigrationCommand extends Command
         $this->stub = str_replace(':fields:', $rows . $foreignKeys, $this->stub);
         $this->stub = str_replace(':tableName:', $this->config['table']['name'], $this->stub);
         return str_replace(':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(), $this->stub);
-    }
-
-    private function getFileName (): string
-    {
-        return now()->format('Y_m_d_His') . '_create_'
-            . $this->config['table']['name'] . '_table.php';
     }
 
 }

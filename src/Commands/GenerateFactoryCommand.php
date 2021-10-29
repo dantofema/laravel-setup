@@ -2,6 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Path;
+use Dantofema\LaravelSetup\Facades\Seeder;
+use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -17,10 +20,7 @@ class GenerateFactoryCommand extends Command
 
     public function handle (): bool
     {
-        if ( ! $this->init())
-        {
-            return false;
-        }
+        $this->init('factory');
 
         $this->create();
         return true;
@@ -33,9 +33,8 @@ class GenerateFactoryCommand extends Command
         $use = $this->getUse($vars);
         $content = $this->replace($use, $vars, $definition);
 
-        File::put(self::DIRECTORY . $this->getFileName(), $content);
-
-        $this->seeder();
+        File::put(Text::config($this->config)->path('factory'), $content);
+        Seeder::add($this->config);
     }
 
     public function getVarsFromColumns (): string
@@ -149,35 +148,6 @@ class GenerateFactoryCommand extends Command
         $this->stub = str_replace(':return:', $return, $this->stub);
         $this->stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $this->stub);
         return str_replace(':modelName:', $this->getModelName(), $this->stub);
-    }
-
-    private function getFileName (): string
-    {
-        return $this->getModelName() . 'Factory.php';
-    }
-
-    public function seeder ()
-    {
-        $haystack = File::get('database/seeders/DatabaseSeeder.php');
-        $needle = ";";
-        $replace = ";\r\nuse " . $this->getModelPath() . ";\r\n";
-        $pos = strpos($haystack, $needle);
-
-        if ($pos !== false)
-        {
-            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
-        }
-
-        $needle = "create();";
-        $replace = "create();\r\n";
-        $replace .= $this->getModelName() . "::factory(10)->create();\r\n";
-        $pos = strpos($haystack, $needle);
-
-        if ($pos !== false)
-        {
-            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
-        }
-        File::put('database/seeders/DatabaseSeeder.php', $haystack);
     }
 
 }

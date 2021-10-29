@@ -1,61 +1,61 @@
 {
-    "name": "dantofema/laravel-setup",
-    "description": "This is my package laravel-setup",
-    "keywords": [
-        "dantofema",
-        "laravel",
-        "laravel-setup"
-    ],
-    "homepage": "https://github.com/dantofema/laravel-setup",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Alejandro Leone",
-            "email": "dantofema@gmail.com",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": "^8.0",
-        "spatie/laravel-package-tools": "^1.4.3",
-        "illuminate/contracts": "^8.37"
-    },
-    "require-dev": {
-        "nunomaduro/collision": "^5.3",
-        "orchestra/testbench": "^6.15",
-        "pestphp/pest": "^1.18",
-        "pestphp/pest-plugin-laravel": "^1.1",
-        "spatie/laravel-ray": "^1.23",
-        "vimeo/psalm": "^4.8"
-    },
-    "autoload": {
-        "psr-4": {
-            "Dantofema\\LaravelSetup\\": "src",
-            "Dantofema\\LaravelSetup\\Database\\Factories\\": "database/factories"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Dantofema\\LaravelSetup\\Tests\\": "tests"
-        }
-    },
-    "scripts": {
-        "test": "docker exec -it package-app_laravel.test_1  bash -c \"cd ../laravel-setup && ./vendor/bin/pest --no-coverage\"",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Dantofema\\LaravelSetup\\LaravelSetupServiceProvider"
-            ],
-            "aliases": {
-                "LaravelSetup": "Dantofema\\LaravelSetup\\LaravelSetupFacade"
-            }
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "dantofema/laravel-setup",
+  "description": "This is my package laravel-setup",
+  "keywords": [
+    "dantofema",
+    "laravel",
+    "laravel-setup"
+  ],
+  "homepage": "https://github.com/dantofema/laravel-setup",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alejandro Leone",
+      "email": "dantofema@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.0",
+    "spatie/laravel-package-tools": "^1.4.3",
+    "illuminate/contracts": "^8.37"
+  },
+  "require-dev": {
+    "nunomaduro/collision": "^5.3",
+    "orchestra/testbench": "^6.15",
+    "pestphp/pest": "^1.18",
+    "pestphp/pest-plugin-laravel": "^1.1",
+    "spatie/laravel-ray": "^1.23",
+    "vimeo/psalm": "^4.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Dantofema\\LaravelSetup\\": "src",
+      "Dantofema\\LaravelSetup\\Database\\Factories\\": "database/factories"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Dantofema\\LaravelSetup\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "docker exec -it package-app_laravel.test_1  bash -c 'cd ../laravel-setup && ./vendor/bin/pest --no-coverage'",
+    "test-coverage": "docker exec -it package-app_laravel.test_1  bash -c 'cd ../laravel-setup && ./vendor/bin/pest --coverage'"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Dantofema\\LaravelSetup\\LaravelSetupServiceProvider"
+      ],
+      "aliases": {
+        "LaravelSetup": "Dantofema\\LaravelSetup\\LaravelSetupFacade"
+      }
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

@@ -18,7 +18,7 @@ it('generate livewire file', closure: function () {
         ->toEqual(1);
 
     expect($files[0]->getFilenameWithoutExtension())
-        ->toEqual('PostLivewire');
+        ->toEqual('PostsLivewire');
 });
 
 it('replace namespace', closure: function () {
@@ -26,7 +26,7 @@ it('replace namespace', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['livewire']['namespace']))
         ->toBeTrue();
@@ -40,7 +40,7 @@ it('replace use models', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['livewire']['useModels'][0]))
         ->toBeTrue();
@@ -58,7 +58,7 @@ it('replace model name', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['model']['name']))
         ->toBeTrue();
@@ -72,7 +72,7 @@ it('replace sort field', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['livewire']['properties']['sortField']))
         ->toBeTrue();
@@ -85,11 +85,23 @@ it('replace new image', closure: function () {
     expect(Artisan::call('generate:livewire tests/config/default.php'))
         ->toEqual(1);
 
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, 'public $newImage;'))
         ->toBeTrue();
 
+    expect(str_contains($content, ':newImage:'))
+        ->toBeFalse();
+});
+
+it('replace new image when without image', closure: function () {
+    expect(Artisan::call('generate:livewire tests/config/without-image.php'))
+        ->toEqual(1);
+
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
+
+    expect(str_contains($content, 'public $newImage;'))
+        ->toBeFalse();
     expect(str_contains($content, ':newImage:'))
         ->toBeFalse();
 });
@@ -99,7 +111,7 @@ it('replace editing', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['livewire']['properties']['editing']))
         ->toBeTrue();
@@ -113,7 +125,7 @@ it('replace detach', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     $belongsToMany = $config['model']['relationships']['belongsToMany'][0];
     expect(str_contains($content, "\$this->editing->$belongsToMany[0]()->detach();"))
@@ -128,7 +140,7 @@ it('replace model argument', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     $modelArgument = $config['model']['name'] . ' ' . '$' . strtolower($config['model']['name']);
     expect(str_contains($content, $modelArgument))
@@ -143,7 +155,7 @@ it('replace variable name', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, '$' . strtolower($config['model']['name'])))
         ->toBeTrue();
@@ -156,7 +168,7 @@ it('replace new image in edit method', closure: function () {
     expect(Artisan::call('generate:livewire tests/config/default.php'))
         ->toEqual(1);
 
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, '$this->newImage = "";'))
         ->toBeTrue();
@@ -169,7 +181,7 @@ it('replace new image in create method', closure: function () {
     expect(Artisan::call('generate:livewire tests/config/default.php'))
         ->toEqual(1);
 
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, '$this->newImage = null;'))
         ->toBeTrue();
@@ -183,7 +195,7 @@ it('replace new image in save method', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     $field = $config['livewire']['properties']['newImage']['field'];
     $disk = $config['livewire']['properties']['newImage']['disk'];
@@ -199,7 +211,7 @@ it('replace slug in save method', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     $field = $config['livewire']['save']['slug'];
     expect(str_contains($content, "\$this->setSlug('$field');"))
@@ -214,7 +226,7 @@ it('replace rules', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     foreach ($config['livewire']['rules'] as $rule)
     {
@@ -231,7 +243,7 @@ it('replace view', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['livewire']['view']))
         ->toBeTrue();

@@ -2,12 +2,13 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Path;
+use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class GenerateModelCommand extends Command
-
 {
     use CommandTrait;
 
@@ -21,10 +22,7 @@ class GenerateModelCommand extends Command
 
     public function handle (): bool
     {
-        if ( ! $this->init())
-        {
-            return false;
-        };
+        $this->init('model');
         return $this->create();
     }
 
@@ -32,7 +30,8 @@ class GenerateModelCommand extends Command
     {
         $this->getUserstamps();
         $this->getSoftDelete();
-        File::put(self::DIRECTORY . $this->getFileName(), $this->replace());
+
+        File::put(Text::config($this->config)->path('model'), $this->replace());
         return true;
     }
 
@@ -54,11 +53,6 @@ class GenerateModelCommand extends Command
         }
     }
 
-    private function getFileName (): string
-    {
-        return $this->getModelName() . '.php';
-    }
-
     private function replace (): string
     {
         $this->stub = str_replace(':namespace:', $this->config['model']['namespace'], $this->stub);
@@ -74,7 +68,7 @@ class GenerateModelCommand extends Command
     {
         $items = $this->config['model']['search'];
 
-        $searchStub = file_get_contents(__DIR__ . '/../Stubs/scopeSearch.stub');
+        $searchStub = file_get_contents(__DIR__ . '/../Stubs/model/scopeSearch.stub');
 
         $query = '';
         foreach ($items as $key => $item)
@@ -90,7 +84,7 @@ class GenerateModelCommand extends Command
             }
             $query .= count($item) == 1
                 ? "->orWhere('$item[0]', 'like', '%' . \$search . '%')\r\n"
-                : "->orWhereHas('$item[0]', fn(\$q) => \$q->where('$item[1]', 'like', '%' . \$search . '%'))\r\n";
+                : "->orWhereHas('$item[0]', fn(\$q) => \$q->where('$item[1]', 'like', '%' . \$search . '%'));\r\n";
         }
         return str_replace(':query:', $query, $searchStub);
     }
@@ -103,7 +97,7 @@ class GenerateModelCommand extends Command
         {
             foreach ($relations as $relation)
             {
-                $relationStub = file_get_contents(__DIR__ . '/../Stubs/relationshipMethod.stub');
+                $relationStub = file_get_contents(__DIR__ . '/../Stubs/model/relationshipMethod.stub');
                 $relationStub = str_replace(':type:', ucfirst($relationType), $relationStub);
                 $relationStub = str_replace(':relation:', $relationType, $relationStub);
                 $relationStub = str_replace(':method:', $relation[0], $relationStub);

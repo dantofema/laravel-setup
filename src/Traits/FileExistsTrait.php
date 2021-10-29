@@ -2,6 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
+use Dantofema\LaravelSetup\Facades\Name;
+use Dantofema\LaravelSetup\Facades\Path;
+use Dantofema\LaravelSetup\Facades\Text;
 use Exception;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -11,21 +14,18 @@ trait FileExistsTrait
     /**
      * @throws Exception
      */
-    protected function exists (?string $type): void
+    protected function exists (string $type): void
     {
-        if ($type == 'migration' and $this->migrationFileExists())
+        if ($type == 'migration')
         {
-            throw new Exception('Migration file exists');
+            $this->migrationFileExists();
         }
 
-        if ($type == 'livewire' and $this->livewireFileExists())
+        if (File::exists(Text::config($this->config)->path($type)))
         {
+            $this->error('The ' . $type . ' file "' . Text::config($this->config)->filename($type) . '" already exists ');
+            $this->error('Exit');
             throw new Exception('Livewire file exists');
-        }
-
-        if ($this->fileExists())
-        {
-            throw new Exception('File exists');
         }
     }
 
@@ -36,34 +36,23 @@ trait FileExistsTrait
                 $name = $this->config['table']['name'];
                 if (Str::contains($file, '_create_' . $name . '_table.php'))
                 {
-                    return true;
+                    throw new Exception('Migration file exists');
                 }
-                return false;
             });
     }
 
-    protected function livewireFileExists (): bool
+    /**
+     * @throws Exception
+     */
+    protected function configFileExists (): bool
     {
-        $backend = self::DIRECTORY . 'Backend/' . $this->getFileName();
-        $frontend = self::DIRECTORY . 'Frontend/' . $this->getFileName();
-        if (File::exists($backend) or File::exists($frontend))
+        if (File::exists($this->argument('path')))
         {
-            $this->error('The livewire file "' . $this->getFileName() . '" already exists ');
-            $this->error('Exit');
             return true;
         }
-        return false;
+        $this->error('Not found "' . $this->argument('path') . '"');
+        $this->error('Exit');
+        throw new Exception('Migration file exists');
     }
 
-    protected function fileExists (): bool
-    {
-        $path = self::DIRECTORY . $this->getFileName();
-        if (File::exists($path))
-        {
-            $this->error('The  file "' . $this->getFileName() . '" already exists ');
-            $this->error('Exit');
-            return true;
-        }
-        return false;
-    }
 }

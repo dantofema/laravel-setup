@@ -45,15 +45,15 @@ class RouteService
     {
         $rows = explode(';', File::get(self::ROUTES_WEB_PHP));
         $livewire = Text::config($config)->name('livewire');
+
+        $content = '';
         foreach ($rows as $key => $row)
         {
             if (str_contains($row, $livewire))
             {
-                unset($rows[$key]);
+                $content .= str_contains($row, '<?php') ? '<?php' : ';';
             }
         }
-
-        $content = implode(';', $rows);
 
         File::put(self::ROUTES_WEB_PHP, $content);
     }

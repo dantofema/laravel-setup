@@ -6,16 +6,25 @@ use Illuminate\Support\Facades\File;
 
 class TraitService
 {
-    protected const APP_HTTP_LIVEWIRE_TRAITS = 'app/Http/Livewire/Traits';
+    protected const APP_HTTP_LIVEWIRE_TRAITS = 'app/Http/Livewire/Traits/';
+    protected const STUB_PATH = '/../Stubs/livewire/';
+    protected array $files = [
+        'WithSaveNewImage',
+        'WithSetup',
+    ];
 
-    public function withSaveNewImage ()
+    public function get ()
     {
         File::ensureDirectoryExists(self::APP_HTTP_LIVEWIRE_TRAITS);
 
-        if ( ! File::exists(self::APP_HTTP_LIVEWIRE_TRAITS . '/WithSaveNewImage.php'))
+        foreach ($this->files as $file)
         {
-            $content = File::get(__DIR__ . '/../Stubs/livewire/WithSaveNewImage.stub');
-            File::put(self::APP_HTTP_LIVEWIRE_TRAITS . '/WithSaveNewImage.php', $content);
+            if ( ! File::exists(self::APP_HTTP_LIVEWIRE_TRAITS . $file))
+            {
+                $content = File::get(__DIR__ . self::STUB_PATH . $file . '.stub');
+                File::put(self::APP_HTTP_LIVEWIRE_TRAITS . $file . '.php', $content);
+            }
         }
     }
+
 }

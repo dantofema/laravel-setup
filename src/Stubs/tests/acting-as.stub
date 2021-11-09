@@ -1,0 +1,7 @@
+
+use App\Models\User;
+
+function actingAs (User $user, string $driver = null): Tests\TestCase
+{
+    return test()->actingAs($user, $driver);
+}

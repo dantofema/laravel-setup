@@ -1,5 +1,6 @@
 <?php
 
+use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -36,7 +37,7 @@ it('generate foreign keys', function () {
         ->toBeTrue();
     expect(Str::contains($content, "\$table->foreignId('author_id')->nullable()->constrained('authors');"))
         ->toBeTrue();
-    expect(Str::contains($content, "\$table->foreignId('key_id')->nullable()->constrained('keys')->unique();"))
+    expect(Str::contains($content, "\$table->foreignId('key_id')->nullable()->constrained('keys');"))
         ->toBeTrue();
 });
 
@@ -95,4 +96,11 @@ it('add Userstamps and SoftDeletes in migration file', function () {
     expect(Str::contains($content, "\$table->unsignedBigInteger('deleted_by')->nullable();"))
         ->toBeTrue();
     expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
+});
+
+it('migration file check syntax', closure: function () {
+    Artisan::call('generate:migration tests/config/default.php');
+    $config = include(__DIR__ . '/config/default.php');
+
+    expect(shell_exec("php -l -f " . Text::config($config)->path('migration')))->toContain('No syntax errors detected');
 });

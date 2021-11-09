@@ -2,24 +2,21 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
+use Dantofema\LaravelSetup\Facades\Before;
 use Dantofema\LaravelSetup\Facades\Delete;
 use Dantofema\LaravelSetup\Facades\Route;
-use Dantofema\LaravelSetup\Facades\Traits;
+use Dantofema\LaravelSetup\Facades\Text;
 use Exception;
-use Illuminate\Support\Facades\File;
 
 trait CommandTrait
 {
     use FileExistsTrait;
 
     protected array $config;
+    private string $jetstreamPath = '/../Stubs/view/jetstream/basic.blade.php';
+    private string $tailwindPath = '/../Stubs/view/tailwind/basic.blade.php';
     private string $stub;
     private Delete $delete;
-
-    protected function getModelPath (): string
-    {
-        return $this->config['model']['namespace'] . '\\' . $this->config['model']['name'];
-    }
 
     protected function inArray (string $needle, array $array): bool
     {
@@ -31,13 +28,11 @@ trait CommandTrait
      */
     protected function init (string $type): bool
     {
-        File::ensureDirectoryExists(self::DIRECTORY);
-
-        Traits::withSaveNewImage();
+        Before::setup();
 
         $this->configFileExists();
 
-        $this->config = $this->getConfig();
+        $this->config = include $this->argument('path');
 
         if ($this->option('force'))
         {
@@ -51,36 +46,28 @@ trait CommandTrait
 
         $this->exists($type);
 
-        return $this->setStub();
+        $this->getStub($type);
+
+        return true;
     }
 
-    protected function getConfig (): mixed
+    protected function getStub (string $type): void
     {
-        return include $this->argument('path');
-    }
-
-    protected function setStub (): bool
-    {
-        $content = file_get_contents(__DIR__ . self::STUB_PATH);
-
-        if ($content)
+        if ($type !== 'view')
         {
-            $this->stub = $content;
-            return true;
+            $path = self::STUB_PATH;
+        } else
+        {
+            $path = $this->config['view']['jetstream']
+                ? $this->jetstreamPath
+                : $this->tailwindPath;
         }
-
-        $this->error('Error get stub');
-        $this->error('Exit');
-        return false;
+        $this->stub = file_get_contents(__DIR__ . $path);
     }
 
     protected function getVariableModel (): string
     {
-        return '$' . strtolower($this->getModelName());
+        return '$' . strtolower(Text::config($this->config)->name('model'));
     }
 
-    protected function getModelName (): string
-    {
-        return $this->config['model']['name'];
-    }
 }

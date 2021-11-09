@@ -1,4 +1,4 @@
 public function scopeSearch (Builder $query, string $search): Builder
 {
-    return :query:
+    return :query:;
 }

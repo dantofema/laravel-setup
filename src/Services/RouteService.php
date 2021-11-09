@@ -12,48 +12,30 @@ class RouteService
 
     public function add (array $config)
     {
-        $haystack = File::get(self::ROUTES_WEB_PHP);
-        $namespace = Text::config($config)->namespace('livewire');
-        $needle = "?php";
-        $replace = "?php\r\nuse $namespace;\r\n";
-        $pos = strpos($haystack, $needle);
+        $content = File::get(self::ROUTES_WEB_PHP);
 
-        if ($pos !== false)
-        {
-            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
-        }
+        $content = str_replace(
+            "?php",
+            "?php\r\nuse " . Text::config($config)->namespace('livewire') . "\r\n", $content
+        );
 
-        $livewire = Text::config($config)->name('livewire');
-        $route = $this->routeGet($config['model']['path'], $livewire);
-        $route .= $this->routeMiddleware($config['backend']);
-        $route .= "->name('{$config['table']['name']}');\r\n";
-
-        File::put(self::ROUTES_WEB_PHP, $haystack . $route);
+        File::put(self::ROUTES_WEB_PHP, $content . $this->getRoute($config) . "\r\n");
     }
 
-    protected function routeGet ($path, $livewire): string
+    protected function getRoute (array $config): string
     {
-        return "\r\nRoute::get('/$path', $livewire::class)";
-    }
-
-    protected function routeMiddleware ($backend): string
-    {
-        return $backend ? "->middleware('auth')->prefix('sistema')" : "";
+        $route = "\r\nRoute::get('/" . $config['route']['path'] . "', " . Text::config($config)->name('livewire') . "::class)";
+        $route .= $config['backend'] ? "->middleware('auth')->prefix('sistema')" : "";
+        $route .= "->name('{$config['table']['name']}');";
+        return $route;
     }
 
     public function delete (array $config)
     {
-        $rows = explode(';', File::get(self::ROUTES_WEB_PHP));
-        $livewire = Text::config($config)->name('livewire');
+        $content = File::get(self::ROUTES_WEB_PHP);
+        $content = str_replace('use ' . Text::config($config)->namespace('livewire'), '', $content);
 
-        $content = '';
-        foreach ($rows as $key => $row)
-        {
-            if (str_contains($row, $livewire))
-            {
-                $content .= str_contains($row, '<?php') ? '<?php' : ';';
-            }
-        }
+        $content = str_replace($this->getRoute($config), '', $content);
 
         File::put(self::ROUTES_WEB_PHP, $content);
     }

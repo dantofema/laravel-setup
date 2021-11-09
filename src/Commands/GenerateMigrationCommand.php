@@ -14,7 +14,7 @@ class GenerateMigrationCommand extends Command
     use CommandTrait;
 
     const STUB_PATH = '/../Stubs/create_setup_table.php.stub';
-    protected const DIRECTORY = 'database/migrations/';
+
     public $signature = 'generate:migration {path : path to the config file } {--force}';
     public $description = 'Migration file generator';
 
@@ -71,11 +71,10 @@ class GenerateMigrationCommand extends Command
         $rows = '';
         foreach ($this->config['table']['foreignKeys'] as $foreignKey)
         {
-            $row = sprintf("\$table->foreignId('%s')%s->constrained('%s')%s;\r\n",
+            $row = sprintf("\$table->foreignId('%s')%s->constrained('%s');\r\n",
                 $foreignKey[0],
                 in_array('nullable', $foreignKey) ? '->nullable()' : null,
                 $foreignKey[1],
-                in_array('unique', $foreignKey) ? '->unique()' : null
             );
             $rows .= $row;
         }

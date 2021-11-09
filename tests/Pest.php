@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Dantofema\LaravelSetup\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 
@@ -25,6 +26,7 @@ function clearDirectories ()
         'resources/views/livewire/backend',
         'resources/views/livewire/frontend',
         'tests/Feature/Backend',
+        'app/Http/Livewire/Traits',
     ];
 
     foreach ($directories as $directory)
@@ -34,4 +36,9 @@ function clearDirectories ()
                 File::delete($value);
             });
     }
+}
+
+function actingAs (User $user, string $driver = null): Tests\TestCase
+{
+    return test()->actingAs($user, $driver);
 }

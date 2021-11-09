@@ -1,5 +1,6 @@
 <?php
 
+use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
@@ -43,10 +44,6 @@ it('replace use models', closure: function () {
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(str_contains($content, $config['livewire']['useModels'][0]))
-        ->toBeTrue();
-    expect(str_contains($content, $config['livewire']['useModels'][1]))
-        ->toBeTrue();
-    expect(str_contains($content, $config['livewire']['useModels'][2]))
         ->toBeTrue();
 
     expect(str_contains($content, ':useModels:'))
@@ -124,12 +121,7 @@ it('replace detach', closure: function () {
     expect(Artisan::call('generate:livewire tests/config/default.php'))
         ->toEqual(1);
 
-    $config = include __DIR__ . '/config/default.php';
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
-
-    $belongsToMany = $config['model']['relationships']['belongsToMany'][0];
-    expect(str_contains($content, "\$this->editing->$belongsToMany[0]()->detach();"))
-        ->toBeTrue();
 
     expect(str_contains($content, ':detach:'))
         ->toBeFalse();
@@ -245,9 +237,17 @@ it('replace view', closure: function () {
     $config = include __DIR__ . '/config/default.php';
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
-    expect(str_contains($content, $config['livewire']['view']))
+    expect(str_contains($content, Text::config($config)->renderView()))
         ->toBeTrue();
 
     expect(str_contains($content, ':view:'))
         ->toBeFalse();
+});
+
+it('livewire file check syntax', closure: function () {
+    Artisan::call('generate:livewire tests/config/default.php');
+    $config = include(__DIR__ . '/config/default.php');
+
+    expect(shell_exec("php -l -f " . Text::config($config)->path('livewire')))->toContain('No syntax errors detected');
+    expect(shell_exec("php -l -f " . Text::config($config)->path('route')))->toContain('No syntax errors detected');
 });

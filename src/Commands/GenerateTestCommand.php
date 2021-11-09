@@ -3,7 +3,10 @@
 namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Facades\Text;
+use Dantofema\LaravelSetup\Services\Tests\EditSlugService;
+use Dantofema\LaravelSetup\Services\Tests\RequiredService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
+use Dantofema\LaravelSetup\Traits\TestTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -11,18 +14,25 @@ class GenerateTestCommand extends Command
 
 {
     use CommandTrait;
+    use TestTrait;
 
     protected const STUB_PATH = '/../Stubs/test.stub';
-    protected const DIRECTORY = 'tests/Feature';
+
     public $signature = 'generate:test {path : path to the config file } {--force}';
     public $description = 'Test file generator';
     protected array $config;
+    private EditSlugService $editSlugService;
+    private RequiredService $requiredService;
+
+    public function __construct ()
+    {
+        parent::__construct();
+        $this->editSlugService = new EditSlugService();
+        $this->requiredService = new RequiredService();
+    }
 
     public function handle (): bool
     {
-        File::ensureDirectoryExists(self::DIRECTORY . '/Backend/');
-        File::ensureDirectoryExists(self::DIRECTORY . '/Frontend/');
-
         $this->init('test');
 
         return $this->create();
@@ -37,40 +47,31 @@ class GenerateTestCommand extends Command
 
     private function replace (): string
     {
-        $this->stub = $this->getTable();
-        $this->stub = $this->getPath();
-        $this->stub = str_replace(
-            ':model:',
-            $this->getModelName(),
-            $this->stub);
-        $this->stub = $this->getView();
+        $this->stub = $this->getUse();
+        $this->stub = $this->getTable($this->config, $this->stub);
+        $this->stub = $this->getUri();
+        $this->stub = $this->getModel($this->config, $this->stub);
+        $this->stub = $this->getLivewire($this->config, $this->stub);
         $this->stub = $this->getField();
-        $this->stub = $this->getRequired();
-        $this->stub = $this->getEditSlug();
+        $this->stub = $this->requiredService->get($this->config, $this->stub);
+        $this->stub = $this->editSlug();
+        $this->stub = $this->actingAs($this->config, $this->stub);
         return $this->stub;
     }
 
-    private function getTable (): string
+    private function getUse (): string|array
     {
-        return str_replace(
-            ':table:',
-            $this->config['table']['name'],
-            $this->stub);
+        $replace = 'use ' . Text::config($this->config)->namespace('model') . "\r\n";
+        $replace .= 'use ' . Text::config($this->config)->namespace('livewire') . "\r\n";
+        return str_replace(':use:', $replace, $this->stub);
     }
 
-    private function getPath (): string
+    private function getUri (): string
     {
+        $uri = $this->config['backend'] ? 'sistema/' : '';
         return str_replace(
-            ':path:',
-            $this->config['model']['path'],
-            $this->stub);
-    }
-
-    private function getView (): string
-    {
-        return str_replace(
-            ':view:',
-            $this->config['livewire']['view'],
+            ':uri:',
+            $uri . $this->config['route']['path'],
             $this->stub);
     }
 
@@ -84,86 +85,11 @@ class GenerateTestCommand extends Command
             $this->stub);
     }
 
-    private function getRequired (): string
+    private function editSlug (): string
     {
-        $columns = [];
-
-        foreach ($this->config['table']['columns'] as $column)
-        {
-            in_array('nullable', $column) ?: array_push($columns, $column);
-        }
-
-        $required = '';
-
-        foreach ($columns as $column)
-        {
-            $method = File::get(__DIR__ . '/../Stubs/tests/required.stub');
-            $method = str_replace(
-                ':field:',
-                $column[1],
-                $method);
-            $method = str_replace(
-                ':view:',
-                $this->config['livewire']['view'],
-                $method);
-            $method = str_replace(
-                ':model:',
-                $this->getModelName(),
-                $method);
-            $method = str_replace(
-                ':table:',
-                $this->config['table']['name'],
-                $method);
-            $required .= $method;
-        }
-
-        return str_replace(
-            ':required:',
-            $required,
-            $this->stub);
-    }
-
-    private function getEditSlug (): string
-    {
-        $columns = $this->config['table']['columns'];
-
-        if ( ! $this->inArray('slug', $columns))
-        {
-            return str_replace(
-                ':edit-slug:',
-                '',
-                $this->stub);
-        }
-
-        $field = 'missing';
-        foreach ($columns as $column)
-        {
-            if (in_array('slug', $column))
-            {
-                $field = $column['from'];
-            }
-        }
-
-        $method = File::get(__DIR__ . '/../Stubs/tests/edit-slug.stub');
-        $method = str_replace(
-            ':field:',
-            $field,
-            $method);
-        $method = str_replace(
-            ':view:',
-            $this->config['livewire']['view'],
-            $method);
-        $method = str_replace(
-            ':model:',
-            $this->getModelName(),
-            $method);
-        $method = str_replace(
-            ':table:',
-            $this->config['table']['name'],
-            $method);
         return str_replace(
             ':edit-slug:',
-            $method,
+            $this->editSlugService->get($this->config),
             $this->stub);
     }
 

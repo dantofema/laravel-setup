@@ -10,6 +10,7 @@ use Dantofema\LaravelSetup\Commands\GenerateMigrationCommand;
 use Dantofema\LaravelSetup\Commands\GenerateModelCommand;
 use Dantofema\LaravelSetup\Commands\GenerateTestCommand;
 use Dantofema\LaravelSetup\Commands\GenerateViewCommand;
+use Dantofema\LaravelSetup\Services\BeforeService;
 use Dantofema\LaravelSetup\Services\DeleteService;
 use Dantofema\LaravelSetup\Services\RouteService;
 use Dantofema\LaravelSetup\Services\SeederService;
@@ -62,6 +63,10 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
 
         $this->app->bind('text', function () {
             return new TextService();
+        });
+
+        $this->app->bind('before', function () {
+            return new BeforeService();
         });
     }
 

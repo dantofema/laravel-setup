@@ -1,24 +1,28 @@
 <?php
 return [
     'backend' => true,
+    'route' => [
+        'path' => 'notas',
+    ],
     'model' => [
         'namespace' => 'App\Models',
         'name' => 'Post',
         'use' => ['SoftDeletes', 'Userstamps'],
-        'path' => 'notas',
         'relationships' => [
             'hasMany' => [
-                ['subcategories', 'Subcategory'],
-                ['authors', 'Author'],
+//                ['subcategories', 'Subcategory'],
+
             ],
             'belongsToMany' => [
-                ['tags', 'Tag'],
+//                ['tags', 'Tag'],
             ],
             'belongsTo' => [
-                ['category', 'Category'],
+                ['author', 'Author'],
+//               ['category', 'Category'],
             ],
         ],
-        'search' => ['title', 'subtitle', 'created_at', 'tags.name', 'category.name'],
+//        'search' => ['title', 'subtitle', 'created_at', 'tags.name', 'category.name'],
+        'search' => ['title', 'subtitle', 'created_at', 'author.title'],
     ],
     'table' => [
         'name' => 'posts',
@@ -26,8 +30,10 @@ return [
             ['string', 'title', 'unique'],
             ['string', 'slug', 'unique', 'from' => 'title'],
             ['string', 'image', 'nullable'],
+            ['text', 'lead', 'nullable'],
             ['text', 'body'],
             ['string', 'epigraph', 'nullable'],
+            ['string', 'subtitle'],
             ['string', 'name', 'nullable', 'unique'],
         ],
         'foreignKeys' => [
@@ -38,10 +44,9 @@ return [
     ],
     'livewire' => [
         'namespace' => 'App\Http\Livewire\Backend',
-        'view' => 'livewire.backend.posts-livewire',
         'useModels' => [
-            'App\Models\Category',
-            'App\Models\Tag',
+//            'App\Models\Category',
+//            'App\Models\Tag',
             'App\Models\Post',
         ],
         'properties' => [
@@ -59,13 +64,30 @@ return [
             'editing.lead' => 'required',
             'editing.body' => 'required',
             'editing.epigraph' => 'nullable',
-            'editing.author' => 'nullable',
-            'editing.category_id' => 'required',
+            'editing.author_id' => 'nullable',
+//            'editing.category_id' => 'required',
             'tags' => 'nullable',
         ],
     ],
     'view' => [
-        'title' => 'Notas',
+        'jetstream' => true,
+        'title' => false,
+        'actions' => [
+            'edit' => true,
+            'delete' => true,
+        ],
+        'table' => [
+            'columns' => [
+                'title' => [
+                    'sortable' => true,
+                    'label' => 'Título',
+                ],
+                'author.title' => [
+                    'sortable' => false,
+                    'label' => 'Autor',
+                ],
+            ],
+        ],
     ],
     'test' => [
     ],

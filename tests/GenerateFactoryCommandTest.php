@@ -1,5 +1,6 @@
 <?php
 
+use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -32,11 +33,11 @@ it('generate fields', function () {
 
     $content = File::files('database/factories')[0]->getContents();
 
-    expect(Str::contains($content, "\$title = \$this->faker->sentence(\$maxNbChars = 10)->unique();"))->toBeTrue();
+    expect(Str::contains($content, "\$title = \$this->faker->unique()->sentence(\$maxNbChars = 10);"))->toBeTrue();
     expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))
         ->toBeTrue();
     expect(Str::contains($content, "\$this->faker->sentence();"))->toBeTrue();
-    expect(Str::contains($content, "\$this->faker->name()->unique();"))->toBeTrue();
+    expect(Str::contains($content, "\$this->faker->unique()->name();"))->toBeTrue();
 });
 
 it('generate foreign keys', function () {
@@ -44,13 +45,12 @@ it('generate foreign keys', function () {
 
     $content = File::files('database/factories')[0]->getContents();
 
-    expect(Str::contains($content, "'user_id' => User::inRandomOrder()->first() ?? User::factory()->create();"))
+    expect(Str::contains($content, [
+        "'user_id' => User::inRandomOrder()->first() ?? User::factory()->create(),",
+        "'author_id' => Author::inRandomOrder()->first() ?? Author::factory()->create(),",
+        "'key_id' => Key::inRandomOrder()->first() ?? Key::factory()->create(),",
+    ]))
         ->toBeTrue();
-    expect(Str::contains($content, "'author_id' => Author::inRandomOrder()->first() ?? Author::factory()->create();"))
-        ->toBeTrue();
-    expect(Str::contains($content, "'key_id' => Key::inRandomOrder()->first() ?? Key::factory()->create();"))
-        ->toBeTrue
-        ();
 });
 
 it('if factory file exist return exception and exit', function () {
@@ -104,4 +104,11 @@ it('update DatabaseSeeder', closure: function () {
 
     expect(Str::contains($content, "Post::factory(10)->create();"))->toBeTrue();
     expect(Str::contains($content, "use App\Models\Post;"))->toBeTrue();
+});
+
+it('factory file check syntax', closure: function () {
+    Artisan::call('generate:factory tests/config/default.php');
+    $config = include(__DIR__ . '/config/default.php');
+
+    expect(shell_exec("php -l -f " . Text::config($config)->path('factory')))->toContain('No syntax errors detected');
 });

@@ -4,7 +4,9 @@ namespace :namespace:;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 :useNamespace:
+:useRelationships:
 
 class :modelName: extends Model
 {
@@ -15,7 +17,7 @@ class :modelName: extends Model
 
     :relationships:
 
-    public function path(){
+    public function path():string{
         return ':path:/' . $this->id;
     }
 }

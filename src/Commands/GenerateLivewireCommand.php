@@ -14,9 +14,8 @@ class GenerateLivewireCommand extends Command
     use CommandTrait;
 
     protected const STUB_PATH = '/../Stubs/Livewire.php.stub';
-    protected const DIRECTORY = 'app/Http/Livewire';
     public $signature = 'generate:livewire {path : path to the config file } {--force}';
-    public $description = 'Model file generator';
+    public $description = 'Livewire file generator';
     protected array $config;
 
     /**
@@ -24,9 +23,6 @@ class GenerateLivewireCommand extends Command
      */
     public function handle (): bool
     {
-        File::ensureDirectoryExists(self::DIRECTORY . '/Backend/');
-        File::ensureDirectoryExists(self::DIRECTORY . '/Frontend/');
-
         $this->init('livewire');
         return $this->create();
     }
@@ -118,16 +114,18 @@ class GenerateLivewireCommand extends Command
     private function getDetach (): string
     {
         $response = '';
+
         foreach ($this->config['model']['relationships']['belongsToMany'] as $relation)
         {
             $response .= "\$this->editing->$relation[0]()->detach();\r\n";
         }
+
         return str_replace(':detach:', $response, $this->stub);
     }
 
     private function getModelArgument (): string
     {
-        $response = $this->getModelName() . ' ' . $this->getVariableModel();
+        $response = Text::config($this->config)->name('model') . ' ' . $this->getVariableModel();
         return str_replace(':modelArgument:', $response, $this->stub);
     }
 
@@ -213,7 +211,7 @@ EOT;
     private function getView (): string
     {
         return str_replace(':view:',
-            $this->config['livewire']['view'],
+            Text::config($this->config)->renderView('view'),
             $this->stub
         );
     }

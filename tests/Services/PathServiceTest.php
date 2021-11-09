@@ -3,7 +3,7 @@
 use Dantofema\LaravelSetup\Services\PathService;
 
 it('get path', closure: function () {
-    $config = include(__DIR__ . '/config/default.php');
+    $config = include(__DIR__ . '/../config/default.php');
     $path = new PathService();
 
     expect($path->livewire($config)->get())
@@ -13,7 +13,7 @@ it('get path', closure: function () {
         ->toEqual('app/Models/Post.php');
 
     expect($path->view($config)->get())
-        ->toEqual('resources/views/livewire/backend/posts-livewire.blade.php');
+        ->toEqual('resources/views/livewire/backend/posts.blade.php');
 
     expect($path->migration($config)->get())
         ->toContain('create_posts_table.php');

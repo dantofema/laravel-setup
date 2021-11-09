@@ -1,5 +1,6 @@
 <?php
 
+use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
@@ -16,20 +17,22 @@ it('generate view file', closure: function () {
 
     expect(count($files))->toEqual(1);
 
-    expect($files[0]->getFilenameWithoutExtension())->toEqual('posts-livewire.blade');
+    expect($files[0]->getFilenameWithoutExtension())->toEqual('posts.blade');
 });
 
 it('replace title', closure: function () {
     expect(Artisan::call('generate:view tests/config/default.php'))
         ->toEqual(1);
 
-    $content = File::get('resources/views/livewire/backend/posts-livewire.blade.php');
-    $config = include __DIR__ . '/config/default.php';
+    $content = File::get('resources/views/livewire/backend/posts.blade.php');
 
-    expect(str_contains($content, $config['view']['title']))
-        ->toBeTrue();
+    expect(str_contains($content, ':title:'))->toBeFalse();
+});
 
-    expect(str_contains($content, ':title:'))
-        ->toBeFalse();
+it('view file check syntax', closure: function () {
+    Artisan::call('generate:view tests/config/default.php');
+    $config = include(__DIR__ . '/config/default.php');
+
+    expect(shell_exec("php -l -f " . Text::config($config)->path('view')))->toContain('No syntax errors detected');
 });
 

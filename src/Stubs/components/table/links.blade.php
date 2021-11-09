@@ -1,0 +1,3 @@
+<div>
+    {{ $rows->links() }}
+</div>

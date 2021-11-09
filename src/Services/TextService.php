@@ -43,4 +43,11 @@ class TextService
     {
         return $this->name->$type($this->config)->get();
     }
+
+    public function renderView (): string
+    {
+        $name = 'livewire.';
+        $name .= $this->config['backend'] ? 'backend.' : 'frontend.';
+        return $name . $this->config['table']['name'];
+    }
 }

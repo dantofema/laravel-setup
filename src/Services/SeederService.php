@@ -11,42 +11,50 @@ class SeederService
 
     public function add (array $config)
     {
-        $haystack = File::get($this->databaseSeeder);
-        $needle = ";";
-        $replace = ";\r\nuse " . Text::config($config)->namespace('model') . "\r\n";
-        $pos = strpos($haystack, $needle);
+        $content = File::get($this->databaseSeeder);
 
-        if ($pos !== false)
-        {
-            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
-        }
-        $needle = "create();";
-        $replace = "create();\r\n";
-        $replace .= Text::config($config)->name('model') . "::factory(10)->create();\r\n";
-        $pos = strpos($haystack, $needle);
+        $use = Text::config($config)->namespace('model');
 
-        if ($pos !== false)
+        if ( ! str_contains($content, $use))
         {
-            $haystack = substr_replace($haystack, $replace, $pos, strlen($needle));
+            $content = str_replace(
+                "Seeders;",
+                "Seeders;\r\nuse " . $use . "\r\n",
+                $content
+            );
         }
 
-        File::put($this->databaseSeeder, $haystack);
+        $factory = Text::config($config)->name('model') . "::factory(10)->create();";
+
+        if ( ! str_contains($content, $factory))
+        {
+            $content = str_replace(
+                "User::factory(10)->create();",
+                "User::factory(10)->create();\r\n" . $factory . "\r\n",
+                $content
+            );
+        }
+
+        File::put($this->databaseSeeder, $content);
     }
 
     public function delete (array $config)
     {
         $rows = explode(';', File::get($this->databaseSeeder));
 
-        foreach ($rows as $key => $row)
+        $content = '';
+        foreach ($rows as $row)
         {
-            if (str_contains($row, Text::config($config)->name('seeder')))
+            if (str_contains($row, Text::config($config)->name('model')))
             {
-                unset($rows[$key]);
+                $content .= str_contains($row, '<?php') ? '<?php' : '';
+            } else
+            {
+                $content .= $row . ';';
             }
         }
 
-        $content = implode('', $rows);
-
         File::put($this->databaseSeeder, $content);
     }
+
 }

@@ -2,8 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Path;
 use Dantofema\LaravelSetup\Facades\Text;
+use Dantofema\LaravelSetup\Services\Models\RelationshipService;
+use Dantofema\LaravelSetup\Services\Models\SearchService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -13,12 +14,20 @@ class GenerateModelCommand extends Command
     use CommandTrait;
 
     protected const STUB_PATH = '/../Stubs/Model.php.stub';
-    protected const DIRECTORY = 'app/Models/';
     public $signature = 'generate:model {path : path to the config file } {--force}';
     public $description = 'Model file generator';
     protected array $config;
     protected string $use = '';
     protected string $useNamespace = '';
+    private RelationshipService $modelRelationship;
+    private SearchService $searchService;
+
+    public function __construct ()
+    {
+        parent::__construct();
+        $this->modelRelationship = new RelationshipService();
+        $this->searchService = new SearchService($this);
+    }
 
     public function handle (): bool
     {
@@ -58,58 +67,23 @@ class GenerateModelCommand extends Command
         $this->stub = str_replace(':namespace:', $this->config['model']['namespace'], $this->stub);
         $this->stub = str_replace(':useNamespace:', $this->useNamespace, $this->stub);
         $this->stub = str_replace(':use:', $this->use, $this->stub);
-        $this->stub = str_replace(':search:', $this->getSearch(), $this->stub);
-        $this->stub = str_replace(':relationships:', $this->getRelationships(), $this->stub);
+        $this->stub = $this->searchService->get($this->config, $this->stub);
+        $this->stub = $this->modelRelationship->get($this->config['model']['relationships'], $this->stub);
         $this->stub = $this->getPath();
-        return str_replace(':modelName:', $this->getModelName(), $this->stub);
-    }
-
-    protected function getSearch (): string
-    {
-        $items = $this->config['model']['search'];
-
-        $searchStub = file_get_contents(__DIR__ . '/../Stubs/model/scopeSearch.stub');
-
-        $query = '';
-        foreach ($items as $key => $item)
-        {
-            $item = explode('.', $item);
-
-            if ($key === array_key_first($items))
-            {
-                $query .= count($item) == 1
-                    ? "\$query->where('$item[0]', 'like', '%' . \$search . '%')\r\n"
-                    : "\$query->whereHas('$item[0]', fn(\$q) => \$q->where('$item[1]', 'like', '%' . \$search . '%'))\r\n";
-                continue;
-            }
-            $query .= count($item) == 1
-                ? "->orWhere('$item[0]', 'like', '%' . \$search . '%')\r\n"
-                : "->orWhereHas('$item[0]', fn(\$q) => \$q->where('$item[1]', 'like', '%' . \$search . '%'));\r\n";
-        }
-        return str_replace(':query:', $query, $searchStub);
-    }
-
-    protected function getRelationships (): string
-    {
-        $response = '';
-
-        foreach ($this->config['model']['relationships'] as $relationType => $relations)
-        {
-            foreach ($relations as $relation)
-            {
-                $relationStub = file_get_contents(__DIR__ . '/../Stubs/model/relationshipMethod.stub');
-                $relationStub = str_replace(':type:', ucfirst($relationType), $relationStub);
-                $relationStub = str_replace(':relation:', $relationType, $relationStub);
-                $relationStub = str_replace(':method:', $relation[0], $relationStub);
-                $response .= str_replace(':related:', $relation[1], $relationStub);
-            }
-        }
-        return $response;
+        return str_replace(':modelName:', Text::config($this->config)->name('model'), $this->stub);
     }
 
     private function getPath (): string
     {
-        return str_replace(':path:', $this->config['model']['path'], $this->stub);
+        return str_replace(':path:', $this->config['route']['path'], $this->stub);
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig (): array
+    {
+        return $this->config;
     }
 
 }

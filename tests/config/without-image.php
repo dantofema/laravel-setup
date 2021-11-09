@@ -1,11 +1,13 @@
 <?php
 return [
     'backend' => true,
+    'route' => [
+        'path' => 'notas',
+    ],
     'model' => [
         'namespace' => 'App\Models',
         'name' => 'Post',
         'use' => ['SoftDeletes', 'Userstamps'],
-        'path' => 'notas',
         'relationships' => [
             'hasMany' => [
                 ['subcategories', 'Subcategory'],

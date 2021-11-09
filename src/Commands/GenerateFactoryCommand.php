@@ -14,7 +14,7 @@ class GenerateFactoryCommand extends Command
     use CommandTrait;
 
     protected const STUB_PATH = '/../Stubs/ModelFactory.php.stub';
-    protected const DIRECTORY = 'database/factories/';
+
     public $signature = 'generate:factory {path : path to the config file } {--force}';
     public $description = 'Factory file generator';
 
@@ -42,10 +42,9 @@ class GenerateFactoryCommand extends Command
         $vars = '';
         foreach ($this->config['table']['columns'] as $column)
         {
-            $row = sprintf("$%s = %s % s,\r\n",
+            $row = sprintf("$%s = %s\r\n",
                 $column[1],
-                $this->getFaker($column),
-                in_array('unique', $this->config['table']['columns']) ? '->unique()' : null
+                $this->getFaker($column)
             );
             $vars .= $row;
         }
@@ -56,10 +55,13 @@ class GenerateFactoryCommand extends Command
     {
         $columns = $this->config['table']['columns'];
 
+        $preFaker = '$this->faker->';
+        $preFaker .= in_array('unique', $column) ? 'unique()->' : null;
+
         $faker = match ($column[1])
         {
-            'name' => '$this->faker->name()',
-            'last_name' => '$this->faker->lastName()',
+            'name' => $preFaker . 'name()',
+            'last_name' => $preFaker . 'lastName()',
             'slug' => match (true)
             {
                 $this->inArray('title', $columns) => 'Str::slug($title)',
@@ -67,35 +69,33 @@ class GenerateFactoryCommand extends Command
                 $this->inArray('last_name', $columns) => 'Str::slug($last_name)',
                 default => 'Str::slug($name)',
             },
-            'email' => '$this->faker->safeEmail()',
-            'email_verified_at' => 'now()',
-            'password' => 'bcrypt("password")',
-            'remember_token' => 'Str::random(10)',
-            'link' => '$this->faker->url',
-            'image' => '$this->faker->word()." . jpg"',
-            'phone' => '$this->faker->isbn10',
-            'title' => '$this->faker->sentence($maxNbChars = 10)',
-            'subtitle' => '$this->faker->sentence($maxNbChars = 20)',
-            'body' => '$this->faker->sentence($nbWords = 350, $variableNbWords = true)',
-            'lead' => '$this->faker->sentence($nbWords = 60, $variableNbWords = true)',
-            'publication_time' => '$this->faker->dateTimeBetween(" - 90 days", " + 7 days", null)->format("d - m - Y H:i:s")',
-            'epigraph' => '$this->faker->sentence()',
-            'facebook' => '$this->faker->url',
-            'birthday' => '$this->faker->date()',
-            'date_from' => '$this->faker->dateTimeBetween("now", "now", null)->format("d - m - Y H:i:s")',
-            'date_to' => '$this->faker->dateTimeInInterval("now", " + 5 days", null)->format("d - m - Y H:i:s")',
-            default => '$this->faker->word()'
+            'email' => $preFaker . 'safeEmail()',
+            'email_verified_at' => $preFaker . 'now()',
+            'password' => $preFaker . 'bcrypt("password")',
+            'remember_token' => $preFaker . 'Str::random(10)',
+            'link' => $preFaker . 'url',
+            'image' => $preFaker . 'word()." . jpg"',
+            'phone' => $preFaker . 'isbn10',
+            'title' => $preFaker . 'sentence($maxNbChars = 10)',
+            'subtitle' => $preFaker . 'sentence($maxNbChars = 20)',
+            'body' => $preFaker . 'sentence($nbWords = 350, $variableNbWords = true)',
+            'lead' => $preFaker . 'sentence($nbWords = 60, $variableNbWords = true)',
+            'publication_time' => $preFaker . 'dateTimeBetween(" - 90 days", " + 7 days", null)->format("d - m - Y H:i:s")',
+            'epigraph' => $preFaker . 'sentence()',
+            'facebook' => $preFaker . 'url()',
+            'birthday' => $preFaker . 'date()',
+            'date_from' => $preFaker . 'dateTimeBetween("now", "now", null)->format("d - m - Y H:i:s")',
+            'date_to' => $preFaker . 'dateTimeInInterval("now", " + 5 days", null)->format("d - m - Y H:i:s")',
+            default => 'word()'
         };
-
-        $faker .= in_array('unique', $column) ? '->unique()' : null;
 
         return $faker . ";\r\n";
     }
 
-    private function inArray (string $needle, array $columns): bool
-    {
-        return in_array($needle, call_user_func_array('array_merge', $columns));
-    }
+//    private function inArray (string $needle, array $columns): bool
+//    {
+//        return in_array($needle, call_user_func_array('array_merge', $columns));
+//    }
 
     private function getReturnFromColumns (): string
     {
@@ -110,7 +110,7 @@ class GenerateFactoryCommand extends Command
         }
         $return .= $this->getForeignKeys();
 
-        return $return . "\r\n]";
+        return $return . "\r\n];";
     }
 
     private function getForeignKeys (): string
@@ -119,7 +119,7 @@ class GenerateFactoryCommand extends Command
         foreach ($this->config['table']['foreignKeys'] as $foreignKey)
         {
             $model = $this->getModelNameFromForeignKey($foreignKey[0]);
-            $rows .= "'$foreignKey[0]' => " . $model . "::inRandomOrder()->first() ?? " . $model . "::factory()->create();\r\n";
+            $rows .= "'$foreignKey[0]' => " . $model . "::inRandomOrder()->first() ?? " . $model . "::factory()->create(),\r\n";
         }
         return $rows;
     }
@@ -131,8 +131,8 @@ class GenerateFactoryCommand extends Command
 
     public function getUse (string $vars): string
     {
-        $use = 'use ' . $this->getModelPath();
-        $use .= str_contains($vars, 'Str::') ? "Illuminate\Support\Str;\r\n" : null;
+        $use = 'use ' . Text::config($this->config)->namespace('model') . ";\r\n";
+        $use .= str_contains($vars, 'Str::') ? "use Illuminate\Support\Str;\r\n" : null;
         $use .= str_contains($vars, 'Carbon::') ? "use Carbon\Carbon;\r\n" : null;
         foreach ($this->config['table']['foreignKeys'] as $key)
         {
@@ -146,8 +146,8 @@ class GenerateFactoryCommand extends Command
         $this->stub = str_replace(':use:', $use, $this->stub);
         $this->stub = str_replace(':vars:', $vars, $this->stub);
         $this->stub = str_replace(':return:', $return, $this->stub);
-        $this->stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $this->stub);
-        return str_replace(':modelName:', $this->getModelName(), $this->stub);
+        $this->stub = str_replace(':classFactory:', Text::config($this->config)->name('model') . 'Factory', $this->stub);
+        return str_replace(':modelName:', Text::config($this->config)->name('model'), $this->stub);
     }
 
 }

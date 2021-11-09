@@ -1,23 +1,38 @@
 <?php
+use App\Models\User;
+use function Pest\Livewire\livewire;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+:use:
 
-it('has :table: page')->get('/:path:')->assertStatus(200);
-it('has create :table: page')->get('/:path:/create')->assertStatus(200);
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->user =User::factory()->create();
+});
+
+it('has :table: page', function () {
+    :actingAs:->get('/:uri:')->assertStatus(200);
+});
+
+it('has create :table: page', function () {
+   :actingAs:->get('/:uri:/create')->assertStatus(200);
+});
 
 it('has show :table: page', function () {
     $model = :model:::factory()->create();
-    $this->get(/$model->path())->assertStatus(200);
+    :actingAs:->get("/$model->path()")->assertStatus(200);
 });
 
 it('has edit :table: page', function () {
     $model = :model:::factory()->create();
-    $this->get("/$model->path()/edit")->assertStatus(200);
+    :actingAs:->get("/$model->path()/edit")->assertStatus(200);
 });
 
 it('can edit an single row from :table:', function () {
 
     $model = :model:::factory()->create();
 
-    livewire(':view:')
+    livewire(:livewire:):actingAs:
         ->call('edit', $model->id)
         ->set('editing.:field:', 'foo')
         ->call('save')
@@ -30,7 +45,7 @@ it('can show an single row from :table:', function () {
 
     $model = :model:::factory()->create();
 
-    livewire(':view:')
+    livewire(:livewire:):actingAs:
         ->call('show', $model->id)
         ->assertSee($model->:field:)
         ->assertHasNoErrors();

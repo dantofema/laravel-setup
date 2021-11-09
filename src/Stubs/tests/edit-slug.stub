@@ -1,7 +1,7 @@
 
 it('edit slug from :field: in :table: table', function () {
-    $model = :model:::factory([':field:' => 'bar'])->create();
-    $newValue = 'foo foo';
+    $model = :model:::factory([':field:' => Str::random(40)])->create();
+    $newValue = Str::random(40);
 
     Livewire::test(':view:')
         ->call('edit', $model->id)
@@ -10,4 +10,4 @@ it('edit slug from :field: in :table: table', function () {
         ->assertHasNoErrors();
 
     $this->assertEquals(Str::slug($newValue), :model:::first()->slug);
-}
+});

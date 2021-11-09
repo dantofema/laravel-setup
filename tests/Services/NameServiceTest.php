@@ -3,7 +3,7 @@
 use Dantofema\LaravelSetup\Services\NameService;
 
 it('get Text', closure: function () {
-    $config = include('tests/config/default.php');
+    $config = include(__DIR__ . '/../config/default.php');
     $name = new NameService();
 
     expect($name->livewire($config)->get())->toEqual('PostsLivewire');
@@ -13,9 +13,10 @@ it('get Text', closure: function () {
     expect($name->model($config)->file())->toEqual('Post.php');
 
     expect($name->table($config)->get())->toEqual('posts');
+    expect($name->seeder($config)->get())->toEqual('PostSeeder');
 
-    expect($name->view($config)->get())->toEqual('posts-livewire.blade');
-    expect($name->view($config)->file())->toEqual('posts-livewire.blade.php');
+    expect($name->view($config)->get())->toEqual('posts.blade');
+    expect($name->view($config)->file())->toEqual('posts.blade.php');
 
     expect($name->migration($config)->get())->toContain('create_posts_table');
     expect($name->migration($config)->file())->toContain('create_posts_table.php');

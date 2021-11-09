@@ -1,12 +1,10 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Name;
-use Dantofema\LaravelSetup\Facades\Path;
 use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
-it('delete files generated', closure: function () {
+it('delete files', closure: function () {
     Artisan::call('generate:crud tests/config/default.php --all');
     Artisan::call('generate:delete tests/config/default.php --all');
     $config = include(__DIR__ . '/config/default.php');

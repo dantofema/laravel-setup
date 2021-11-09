@@ -5,10 +5,17 @@ namespace Dantofema\LaravelSetup\Services;
 use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use JetBrains\PhpStorm\Pure;
 
 class DeleteService
 {
     private string $type;
+    private RouteService $route;
+
+    #[Pure] public function __construct ()
+    {
+        $this->route = new RouteService();
+    }
 
     public function config (array $config): void
     {
@@ -19,7 +26,7 @@ class DeleteService
 
         if ($this->type == 'livewire')
         {
-            $this->deleteRoute(Text::config($config)->name('livewire'));
+            $this->route->delete($config);
         }
 
         $this->deleteFile($config);
@@ -34,22 +41,6 @@ class DeleteService
                     File::delete($file);
                 }
             });
-    }
-
-    private function deleteRoute (string $livewire)
-    {
-        $rows = explode(';', File::get(Text::path('route')));
-
-        foreach ($rows as $key => $row)
-        {
-            if (str_contains($row, $livewire))
-            {
-                unset($rows[$key]);
-            }
-        }
-
-        $content = implode(';', $rows);
-        File::put(Text::path('route'), $content);
     }
 
     protected function deleteFile (array $config): void

@@ -26,7 +26,7 @@ class NameService
 
     public function view (array $config): NameService
     {
-        $this->name = $config['table']['name'] . '-livewire.blade';
+        $this->name = $config['table']['name'] . '.blade';
         return $this;
     }
 
@@ -40,6 +40,12 @@ class NameService
     public function factory (array $config): NameService
     {
         $this->name = $config['model']['name'] . 'Factory';
+        return $this;
+    }
+
+    public function seeder (array $config): NameService
+    {
+        $this->name = $config['model']['name'] . 'Seeder';
         return $this;
     }
 

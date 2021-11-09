@@ -1,6 +1,5 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Path;
 use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -42,7 +41,7 @@ it('replace path', closure: function () {
     $config = include __DIR__ . '/config/default.php';
     $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
 
-    expect(str_contains($content, $config['model']['path']))->toBeTrue();
+    expect(str_contains($content, $config['route']['path']))->toBeTrue();
 
     expect(str_contains($content, ':path:'))->toBeFalse();
 });
@@ -54,7 +53,7 @@ it('replace view', closure: function () {
     $config = include __DIR__ . '/config/default.php';
     $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
 
-    expect(str_contains($content, $config['livewire']['view']))->toBeTrue();
+    expect(str_contains($content, Text::config($config)->renderView()))->toBeTrue();
 
     expect(str_contains($content, ':view:'))->toBeFalse();
 });
@@ -88,6 +87,23 @@ it('replace edit-slug without slug', closure: function () {
 
     $config = include __DIR__ . '/config/default.php';
     $content = File::get(Text::config($config)->path('test'));
-
-    expect(str_contains($content, 'slug'))->toBeFalse();
+    expect(str_contains($content, ':edit-slug:'))->toBeFalse();
 });
+
+it('add use model', closure: function () {
+    Artisan::call('generate:test tests/config/without-slug.php');
+
+    $config = include __DIR__ . '/config/default.php';
+    $content = File::get(Text::config($config)->path('test'));
+
+    expect(str_contains($content, 'use ' . Text::config($config)->namespace('model')))->toBeTrue();
+    expect(str_contains($content, ':use:'))->toBeFalse();
+});
+
+it('test file check syntax', closure: function () {
+    Artisan::call('generate:test tests/config/default.php');
+    $config = include(__DIR__ . '/config/default.php');
+//    dd(File::get(Text::config($config)->path('test')));
+    expect(shell_exec("php -l -f " . Text::config($config)->path('test')))->toContain('No syntax errors detected');
+});
+

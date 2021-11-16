@@ -1,0 +1,19 @@
+it('can create new item in :table:', function () {
+    actingAs($this->user);
+
+    $test = Livewire::test(:livewire:::class);
+
+    :vars:
+
+    :sets:
+
+    :newFile:
+
+    $test->set('createAction', true)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    :assertDatabase:
+
+    :assertExists:
+});

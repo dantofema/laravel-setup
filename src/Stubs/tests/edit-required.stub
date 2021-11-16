@@ -1,8 +1,8 @@
 
-it(':field: is required in :table: table', function () {
+it('required :field: when edit :table:', function () {
     $model = :model:::factory()->create();
-
-    Livewire::test(:livewire:):actingAs:
+    :actingAs:
+    Livewire::test(:livewire:::class)
         ->call('edit', $model->id)
         ->set('editing.:field:', '')
         ->call('save')

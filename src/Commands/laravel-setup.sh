@@ -66,6 +66,7 @@ mkdir storage/app/public/images
 ./vendor/bin/sail composer require pestphp/pest --dev --with-all-dependencies
 ./vendor/bin/sail composer require pestphp/pest-plugin-laravel --dev
 ./vendor/bin/sail php artisan pest:install -q
+./vendor/bin/sail composer require pestphp/pest-plugin-faker --dev
 
 ./vendor/bin/sail composer update;
 ./vendor/bin/sail composer dump-autoload;

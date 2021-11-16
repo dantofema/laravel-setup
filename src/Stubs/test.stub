@@ -1,6 +1,8 @@
 <?php
+
 use App\Models\User;
 use function Pest\Livewire\livewire;
+use function Pest\Faker\faker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 :use:
 
@@ -8,31 +10,20 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user =User::factory()->create();
+    :disk:
 });
 
 it('has :table: page', function () {
-    :actingAs:->get('/:uri:')->assertStatus(200);
-});
-
-it('has create :table: page', function () {
-   :actingAs:->get('/:uri:/create')->assertStatus(200);
-});
-
-it('has show :table: page', function () {
-    $model = :model:::factory()->create();
-    :actingAs:->get("/$model->path()")->assertStatus(200);
-});
-
-it('has edit :table: page', function () {
-    $model = :model:::factory()->create();
-    :actingAs:->get("/$model->path()/edit")->assertStatus(200);
+    :actingAs:
+    test()->get('/:uri:')->assertStatus(200);
 });
 
 it('can edit an single row from :table:', function () {
 
     $model = :model:::factory()->create();
+    :actingAs:
 
-    livewire(:livewire:):actingAs:
+    livewire(:livewire:::class)
         ->call('edit', $model->id)
         ->set('editing.:field:', 'foo')
         ->call('save')
@@ -41,16 +32,8 @@ it('can edit an single row from :table:', function () {
     $this->assertEquals('foo', :model:::first()->:field:);
 });
 
-it('can show an single row from :table:', function () {
-
-    $model = :model:::factory()->create();
-
-    livewire(:livewire:):actingAs:
-        ->call('show', $model->id)
-        ->assertSee($model->:field:)
-        ->assertHasNoErrors();
-});
-
 :required:
 
 :edit-slug:
+
+

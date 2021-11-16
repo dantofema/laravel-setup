@@ -1,15 +1,15 @@
 <?php
 
-use Dantofema\LaravelSetup\Services\TraitService;
+use Dantofema\LaravelSetup\Services\FileService;
 use Illuminate\Support\Facades\File;
 
-it('add WithSaveNewImage', closure: function () {
-    $traitService = new TraitService();
+it('add WithSetup', closure: function () {
+    $traitService = new FileService();
 
-    $traitService->get();
+    $traitService->copy();
 
-    expect(File::exists('app/Http/Livewire/Traits/WithSaveNewImage.php'))->toBeTrue();
-    expect(shell_exec("php -l -f app/Http/Livewire/Traits/WithSaveNewImage.php"))
+    expect(File::exists('app/Http/Livewire/Traits/WithSetup.php'))->toBeTrue();
+    expect(shell_exec("php -l -f app/Http/Livewire/Traits/WithSetup.php"))
         ->toContain('No syntax errors detected');
 });
 

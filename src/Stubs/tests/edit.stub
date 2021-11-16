@@ -1,0 +1,16 @@
+
+
+it('edit :table:.:field:', function () {
+    $model = :model:::factory()->create();
+    $newValue = :faker:;
+
+    :actingAs:
+
+    Livewire::test(:livewire:::class)
+        ->call('edit', $model->id)
+        ->set('editing.:field:', $newValue)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $this->assertEquals($newValue, :model:::find($model->id)->:field:);
+});

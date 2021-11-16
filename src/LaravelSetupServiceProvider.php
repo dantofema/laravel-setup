@@ -12,10 +12,12 @@ use Dantofema\LaravelSetup\Commands\GenerateTestCommand;
 use Dantofema\LaravelSetup\Commands\GenerateViewCommand;
 use Dantofema\LaravelSetup\Services\BeforeService;
 use Dantofema\LaravelSetup\Services\DeleteService;
+use Dantofema\LaravelSetup\Services\FieldService;
+use Dantofema\LaravelSetup\Services\FileService;
+use Dantofema\LaravelSetup\Services\ReplaceService;
 use Dantofema\LaravelSetup\Services\RouteService;
 use Dantofema\LaravelSetup\Services\SeederService;
 use Dantofema\LaravelSetup\Services\TextService;
-use Dantofema\LaravelSetup\Services\TraitService;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -57,8 +59,8 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
             return new SeederService();
         });
 
-        $this->app->bind('traits', function () {
-            return new TraitService();
+        $this->app->bind('file', function () {
+            return new FileService();
         });
 
         $this->app->bind('text', function () {
@@ -67,6 +69,14 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
 
         $this->app->bind('before', function () {
             return new BeforeService();
+        });
+
+        $this->app->bind('field', function () {
+            return new FieldService();
+        });
+
+        $this->app->bind('replace', function () {
+            return new ReplaceService();
         });
     }
 

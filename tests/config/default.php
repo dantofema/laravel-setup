@@ -5,90 +5,128 @@ return [
         'path' => 'notas',
     ],
     'model' => [
-        'namespace' => 'App\Models',
         'name' => 'Post',
         'use' => ['SoftDeletes', 'Userstamps'],
-        'relationships' => [
-            'hasMany' => [
-//                ['subcategories', 'Subcategory'],
-
-            ],
-            'belongsToMany' => [
-//                ['tags', 'Tag'],
-            ],
-            'belongsTo' => [
-                ['author', 'Author'],
-//               ['category', 'Category'],
-            ],
-        ],
-//        'search' => ['title', 'subtitle', 'created_at', 'tags.name', 'category.name'],
-        'search' => ['title', 'subtitle', 'created_at', 'author.title'],
     ],
     'table' => [
         'name' => 'posts',
-        'columns' => [
-            ['string', 'title', 'unique'],
-            ['string', 'slug', 'unique', 'from' => 'title'],
-            ['string', 'image', 'nullable'],
-            ['text', 'lead', 'nullable'],
-            ['text', 'body'],
-            ['string', 'epigraph', 'nullable'],
-            ['string', 'subtitle'],
-            ['string', 'name', 'nullable', 'unique'],
-        ],
-        'foreignKeys' => [
-            ['user_id', 'users'],
-            ['author_id', 'authors', 'nullable'],
-            ['key_id', 'keys', 'nullable', 'unique'],
-        ],
     ],
     'livewire' => [
-        'namespace' => 'App\Http\Livewire\Backend',
-        'useModels' => [
-//            'App\Models\Category',
-//            'App\Models\Tag',
-            'App\Models\Post',
-        ],
         'properties' => [
             'sortField' => 'created_at',
-            'editing' => 'Post',
-            'newImage' => [
-                'disk' => 'notas',
-                'field' => 'image',
-            ],
-        ],
-        'save' => ['slug' => 'title'],
-        'rules' => [
-            'editing.title' => 'required|unique:App\Models\Post,title, . \$this->editing->id',
-            'editing.subtitle' => 'nullable',
-            'editing.lead' => 'required',
-            'editing.body' => 'required',
-            'editing.epigraph' => 'nullable',
-            'editing.author_id' => 'nullable',
-//            'editing.category_id' => 'required',
-            'tags' => 'nullable',
         ],
     ],
     'view' => [
         'jetstream' => true,
         'title' => false,
-        'actions' => [
-            'edit' => true,
-            'delete' => true,
-        ],
-        'table' => [
-            'columns' => [
-                'title' => [
-                    'sortable' => true,
-                    'label' => 'Título',
-                ],
-                'author.title' => [
-                    'sortable' => false,
-                    'label' => 'Autor',
-                ],
+    ],
+
+    /**
+     * default values
+     *
+     * 'edit' = true
+     * 'show' = true
+     * 'nullable' = false
+     * 'unique' = false
+     * 'required' = false
+     * 'searchable' = false
+     * 'index' = false
+     * 'sortable' = false
+     * 'modelNamespace' = 'App\Models'
+     * 'actions' => ['edit' => true, 'delete' => true],
+     */
+    'fields' => [
+        [
+            'name' => 'title',
+            'label' => 'Título',
+            'unique' => true,
+            'searchable' => true,
+            'index' => true,
+            'sortable' => true,
+            /**
+             * types
+             *
+             * string, text
+             */
+            'type' => 'string',
+            /**
+             * HTML inputs in forms
+             *
+             * text, textarea, file, select
+             */
+            'form' => [
+                'input' => 'text',
+            ],
+            /**
+             * default values in rules
+             *
+             * [ nullable => false , unique => false , extra => [] ]
+             */
+            'rules' => [
+                'required' => true,
+                'unique' => "'unique:App\Models\Post,title,' . \$this->editing->id",
+                'extra' => ['min:3', 'max:100'],
             ],
         ],
-    ],
-    'test' => [
+        [
+            'name' => 'author_id',
+            'label' => 'Autor',
+            'nullable' => true,
+            'searchable' => true,
+            'index' => true,
+            'sortable' => false,
+            'form' => [
+                'input' => 'select',
+            ],
+            'rules' => [
+                'nullable' => true,
+            ],
+            'relationships' => [
+                'type' => 'belongsTo',
+                'name' => 'author',
+                'model' => 'Author',
+                'searchable' => 'name',
+                'table' => 'authors',
+                'label' => 'Autor',
+                'namespace' => 'App\Models\\',
+            ],
+        ],
+        [
+            'name' => 'image',
+            'type' => 'string',
+            'label' => 'Foto',
+            'nullable' => true,
+            'disk' => 'notas',
+            'form' => [
+                'input' => 'file',
+            ],
+            'rules' => [
+                'nullable' => true,
+                'extra' => ['image', 'file'],
+            ],
+        ],
+        [
+            'name' => 'slug',
+            'type' => 'string',
+            'label' => 'Slug',
+            'form' => [
+                'input' => false,
+            ],
+            'source' => 'title',
+            'rules' => [
+                'required' => true,
+            ],
+        ],
+        [
+            'name' => 'body',
+            'type' => 'text',
+            'label' => 'Cuerpo',
+            'form' => [
+                'input' => 'textarea',
+            ],
+            'rules' => [
+                'nullable' => true,
+            ],
+        ],
     ],
 ];

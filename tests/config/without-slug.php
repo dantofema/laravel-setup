@@ -48,7 +48,7 @@ return [
         'properties' => [
             'sortField' => 'created_at',
             'editing' => 'Post',
-            'newImage' => [
+            'newFile' => [
                 'disk' => 'notas',
                 'field' => 'image',
             ],
@@ -66,6 +66,18 @@ return [
     ],
     'view' => [
         'title' => 'Notas',
+        'edit' => [
+            [
+                'field' => 'title',
+                'type' => 'text',
+                'label' => 'Título',
+            ],
+            [
+                'field' => 'body',
+                'type' => 'textarea',
+                'label' => 'Cuerpo',
+            ],
+        ],
     ],
     'test' => [
     ],

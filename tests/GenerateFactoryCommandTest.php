@@ -11,12 +11,6 @@ it('generate factory file return true', closure: function () {
     expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
 });
 
-//it('generate factory file return false', closure: function () {
-//    $this->configFactory->merge(['table' => ['columns' => 0]])->put();
-//
-//    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(0);
-//});
-
 it('generate factory file', closure: function () {
     expect(collect(File::files('database/factories'))->count())->toEqual(0);
 
@@ -33,24 +27,15 @@ it('generate fields', function () {
 
     $content = File::files('database/factories')[0]->getContents();
 
-    expect(Str::contains($content, "\$title = \$this->faker->unique()->sentence(\$maxNbChars = 10);"))->toBeTrue();
-    expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$this->faker->sentence();"))->toBeTrue();
-    expect(Str::contains($content, "\$this->faker->unique()->name();"))->toBeTrue();
-});
-
-it('generate foreign keys', function () {
-    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
-
-    $content = File::files('database/factories')[0]->getContents();
-
     expect(Str::contains($content, [
+        "\$title = \$this->faker->unique()->sentence(\$maxNbChars = 10);",
+        "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);",
+        "\$this->faker->sentence();",
+        "\$this->faker->unique()->name();",
         "'user_id' => User::inRandomOrder()->first() ?? User::factory()->create(),",
         "'author_id' => Author::inRandomOrder()->first() ?? Author::factory()->create(),",
         "'key_id' => Key::inRandomOrder()->first() ?? Key::factory()->create(),",
-    ]))
-        ->toBeTrue();
+    ]))->toBeTrue();
 });
 
 it('if factory file exist return exception and exit', function () {
@@ -110,5 +95,6 @@ it('factory file check syntax', closure: function () {
     Artisan::call('generate:factory tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
 
+//    dd(File::get(Text::config($config)->path('factory')));
     expect(shell_exec("php -l -f " . Text::config($config)->path('factory')))->toContain('No syntax errors detected');
 });

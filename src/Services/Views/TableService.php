@@ -8,31 +8,34 @@ class TableService
 {
     use CommandTrait;
 
-    protected string $heading = '<x-table.heading :sort: :width:>:label:</x-table.heading>';
+    protected string $heading = '<x-table.heading :sortable: :class:>:label:</x-table.heading>';
 
-    protected string $sort = 'sortable sortBy=":field:"';
+    protected string $sortable = 'sortable sortBy=":sortBy:"';
 
-    protected string $width = 'class="w-1/2"';
+    protected string $class = 'class="w-full"';
 
-    public function getHeadings (array $columns, string $stub): string
+    public function getHeadings (array $fields, string $stub): string
     {
         $headings = '';
-        foreach ($columns as $key => $column)
+        foreach ($fields as $key => $field)
         {
             $heading = $this->heading;
 
-            if ($key === array_key_first($columns))
+            $class = 'class="w-1/4"';
+            if ($key === array_key_first($fields))
             {
-                $heading = str_replace(':width:', $this->width, $heading);
+                $class = $this->class;
             }
+            $heading = str_replace(':class:', $class, $heading);
+            $heading = str_replace(':label:', $field['label'], $heading);
 
-            $heading = str_replace(':label:', $column['label'], $heading);
-
-            if ($column['sortable'])
+            $sortable = '';
+            if ( ! empty($field['sortable']))
             {
-                $sort = str_replace(':field:', $key, $this->sort);
-                $heading = str_replace(':sort:', $sort, $heading);
+                $sortable = str_replace(':sortBy:', $field['name'], $this->sortable);
             }
+            $heading = str_replace(':sortable:', $sortable, $heading);
+
             $headings .= $heading . "\r\n";
         }
 
@@ -43,16 +46,22 @@ class TableService
         );
     }
 
-    public function getCells (array $columns, string $stub): string
+    public function getCells (array $fields, string $stub): string
     {
         $cells = '';
-        foreach ($columns as $key => $column)
+        foreach ($fields as $key => $field)
         {
-            $cell = '<x-table.cell>{{ $row->:field: }}</x-table.cell>';
+            $cell = '<x-table.cell>{{ :field: }}</x-table.cell>';
 
             $row = explode('.', $key);
 
-            $cell = str_replace(':field:', implode('->', $row), $cell);
+            $cell = array_key_exists('relationships', $field)
+                ? str_replace(':field:',
+                    "optional(\$row->{$field['relationships']['name']})->{$field['relationships']['searchable']}",
+                    $cell)
+                : str_replace(':field:',
+                    "\$row->{$field['name']}",
+                    $cell);
 
             $cells .= $cell . "\r\n";
         }

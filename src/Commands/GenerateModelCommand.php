@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Models\RelationshipService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
@@ -26,7 +27,7 @@ class GenerateModelCommand extends Command
     {
         parent::__construct();
         $this->modelRelationship = new RelationshipService();
-        $this->searchService = new SearchService($this);
+        $this->searchService = new SearchService();
     }
 
     public function handle (): bool
@@ -64,13 +65,25 @@ class GenerateModelCommand extends Command
 
     private function replace (): string
     {
-        $this->stub = str_replace(':namespace:', $this->config['model']['namespace'], $this->stub);
+        $this->stub = $this->getNamespace();
         $this->stub = str_replace(':useNamespace:', $this->useNamespace, $this->stub);
         $this->stub = str_replace(':use:', $this->use, $this->stub);
         $this->stub = $this->searchService->get($this->config, $this->stub);
-        $this->stub = $this->modelRelationship->get($this->config['model']['relationships'], $this->stub);
+        $this->stub = $this->modelRelationship->get(Field::config($this->config)->getRelationships(), $this->stub);
         $this->stub = $this->getPath();
         return str_replace(':modelName:', Text::config($this->config)->name('model'), $this->stub);
+    }
+
+    private function getNamespace (): string
+    {
+        $namespace = explode('\\', Text::config($this->config)->namespace('model'));
+        array_pop($namespace);
+
+        return str_replace(
+            ':namespace:',
+            implode("\\", $namespace),
+            $this->stub
+        );
     }
 
     private function getPath (): string

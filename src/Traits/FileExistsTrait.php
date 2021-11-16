@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
-use Dantofema\LaravelSetup\Facades\Name;
-use Dantofema\LaravelSetup\Facades\Path;
 use Dantofema\LaravelSetup\Facades\Text;
 use Exception;
 use Illuminate\Support\Facades\File;
@@ -14,7 +12,7 @@ trait FileExistsTrait
     /**
      * @throws Exception
      */
-    protected function exists (string $type): void
+    protected function exists (string $type): bool
     {
         if ($type == 'migration')
         {
@@ -27,6 +25,7 @@ trait FileExistsTrait
             $this->error('Exit');
             throw new Exception('Livewire file exists');
         }
+        return false;
     }
 
     protected function migrationFileExists (): bool

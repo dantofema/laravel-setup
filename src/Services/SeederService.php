@@ -35,6 +35,11 @@ class SeederService
             );
         }
 
+//        $content = str_replace(
+//            "\r\n\r\n",
+//            "", $content
+//        );
+
         File::put($this->databaseSeeder, $content);
     }
 

@@ -2,6 +2,9 @@
 
 namespace App\Http\Livewire\Traits;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 trait WithSetup
 {
 
@@ -28,5 +31,19 @@ trait WithSetup
 
         $this->sortField = $field;
     }
+
+        public function setNewFile (string $field, string $disk)
+        {
+            if ($this->newFile)
+            {
+                Storage::disk($disk)->delete($this->editing->$field);
+                $this->editing->$field = $this->newFile->store('/', $disk);
+            }
+        }
+
+        public function setSlug (string $field)
+        {
+            $this->editing->slug = Str::slug($this->editing->$field);
+        }
 
 }

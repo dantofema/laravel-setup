@@ -63,6 +63,18 @@ return [
     ],
     'view' => [
         'title' => 'Notas',
+        'edit' => [
+            [
+                'field' => 'title',
+                'type' => 'text',
+                'label' => 'Título',
+            ],
+            [
+                'field' => 'body',
+                'type' => 'textarea',
+                'label' => 'Cuerpo',
+            ],
+        ],
     ],
     'test' => [
     ],

@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Services\Tests;
 
+use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Support\Facades\File;
@@ -11,44 +12,31 @@ class EditSlugService
     use CommandTrait;
 
     protected const STUB_PATH = __DIR__ . '/../../Stubs/tests/edit-slug.stub';
+    private string $editSlug = '';
 
     public function get (array $config): string
     {
-        if ($this->slugIsInArray($config['table']['columns']))
+        $slugField = Field::config($config)->getSlug();
+
+        if ( ! empty($slugField))
         {
-            return str_replace(
-                ':edit-slug:',
-                '',
-                File::get(self::STUB_PATH)
-            );
+            $this->editSlug = $this->replace($slugField, $config);
         }
 
-        return $this->replace(
-            $this->getField($config['table']['columns']),
-            File::get(self::STUB_PATH),
-            $config);
+        return $this->editSlug;
     }
 
-    protected function slugIsInArray (mixed $columns): bool
+    protected function replace (array $field, array $config): string
     {
-        return ! $this->inArray('slug', $columns);
-    }
-
-    protected function replace (string $field, string $stub, array $config): string
-    {
+        $stub = File::get(self::STUB_PATH);
         $stub = str_replace(
             ':field:',
-            $field,
+            $field['source'],
             $stub);
 
         $stub = str_replace(
             ':view:',
             Text::config($config)->renderView('view'),
-            $stub);
-
-        $stub = str_replace(
-            ':model:',
-            Text::config($config)->name('model'),
             $stub);
 
         return str_replace(
@@ -57,16 +45,4 @@ class EditSlugService
             $stub);
     }
 
-    protected function getField (mixed $columns): mixed
-    {
-        $field = 'missing';
-        foreach ($columns as $column)
-        {
-            if (in_array('slug', $column))
-            {
-                $field = $column['from'];
-            }
-        }
-        return $field;
-    }
 }

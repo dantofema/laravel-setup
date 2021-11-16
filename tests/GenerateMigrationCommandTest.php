@@ -20,25 +20,17 @@ it('generate migration file', closure: function () {
 it('generate fields', function () {
     expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
 
-    $content = File::files('database/migrations')[0]->getContents();
-
-    expect(Str::contains($content, "\$table->string('title')->unique();"))->toBeTrue();
-    expect(Str::contains($content, "\$table->text('body');"))->toBeTrue();
-    expect(Str::contains($content, "\$table->string('epigraph')->nullable();"))->toBeTrue();
-    expect(Str::contains($content, "\$table->string('name')->nullable()->unique();"))->toBeTrue();
-});
-
-it('generate foreign keys', function () {
-    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
-
-    $content = File::files('database/migrations')[0]->getContents();
-
-    expect(Str::contains($content, "\$table->foreignId('user_id')->constrained('users');"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$table->foreignId('author_id')->nullable()->constrained('authors');"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$table->foreignId('key_id')->nullable()->constrained('keys');"))
-        ->toBeTrue();
+    expect(Str::contains(File::files('database/migrations')[0]->getContents(), [
+        "\$table->string('title')->unique();",
+        "\$table->text('image');",
+        "\$table->string('slug');",
+        "\$table->text('body')->nullable();",
+        "\$table->foreignId('author_id')->nullable()->constrained('authors');",
+        "\$table->unsignedBigInteger('updated_by')->nullable();",
+        "\$table->unsignedBigInteger('created_by')->nullable();",
+        "\$table->unsignedBigInteger('deleted_by')->nullable();",
+        "\$table->softDeletes();",
+    ]))->toBeTrue();
 });
 
 it('if migration file exist return exception and exit', function () {
@@ -54,8 +46,7 @@ it('if migration file exist return exception and exit', function () {
 
     expect(count($newFiles))->toEqual(1);
 
-    expect($newFiles[0]->getBaseName())
-        ->toEqual($file->getBaseName());
+    expect($newFiles[0]->getBaseName())->toEqual($file->getBaseName());
 });
 
 it('if config file not found return error and exit', function () {
@@ -63,39 +54,6 @@ it('if config file not found return error and exit', function () {
     expect(Artisan::call('generate:migration config/not-found.php'))->toEqual(0);
 
     expect(count(File::files('database/migrations')))->toEqual(0);
-});
-
-it('add soft delete in migration file', function () {
-    Artisan::call('generate:migration tests/config/default.php');
-    $content = File::files('database/migrations')[0]->getContents();
-    expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
-});
-
-it('add softDeletes in migration file', function () {
-    Artisan::call('generate:migration tests/config/default.php');
-    $content = File::files('database/migrations')[0]->getContents();
-    expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
-});
-
-it('add Userstamps in migration file', function () {
-    Artisan::call('generate:migration tests/config/default.php');
-    $content = File::files('database/migrations')[0]->getContents();
-    expect(Str::contains($content, "\$table->unsignedBigInteger('created_by')->nullable();"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$table->unsignedBigInteger('updated_by')->nullable();"))
-        ->toBeTrue();
-});
-
-it('add Userstamps and SoftDeletes in migration file', function () {
-    Artisan::call('generate:migration tests/config/default.php');
-    $content = File::files('database/migrations')[0]->getContents();
-    expect(Str::contains($content, "\$table->unsignedBigInteger('created_by')->nullable();"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$table->unsignedBigInteger('updated_by')->nullable();"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$table->unsignedBigInteger('deleted_by')->nullable();"))
-        ->toBeTrue();
-    expect(Str::contains($content, "\$table->softDeletes();"))->toBeTrue();
 });
 
 it('migration file check syntax', closure: function () {

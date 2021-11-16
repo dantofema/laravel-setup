@@ -2,6 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Views\DeleteModalService;
 use Dantofema\LaravelSetup\Services\Views\FormModalService;
@@ -47,10 +48,17 @@ class GenerateViewCommand extends Command
     private function replace (): string
     {
         $this->stub = $this->getTitle();
-        $this->stub = $this->formModal->get($this->stub);
+        $this->stub = $this->formModal->get($this->config, $this->stub);
         $this->stub = $this->deleteModal->get($this->stub);
-        $this->stub = $this->tableService->getHeadings($this->config['view']['table']['columns'], $this->stub);
-        $this->stub = $this->tableService->getCells($this->config['view']['table']['columns'], $this->stub);
+
+        $this->stub = $this->tableService->getHeadings(
+            Field::config($this->config)->getIndex(),
+            $this->stub
+        );
+
+        $this->stub = $this->tableService->getCells(
+            Field::config($this->config)->getIndex(), $this->stub
+        );
         return $this->stub;
     }
 

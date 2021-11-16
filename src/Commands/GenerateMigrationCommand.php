@@ -2,7 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Path;
+use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
@@ -29,23 +29,34 @@ class GenerateMigrationCommand extends Command
 
     public function create (): void
     {
-        $rows = $this->getRows();
-        $foreignKeys = $this->getForeignKeys();
-        $content = $this->replace($rows, $foreignKeys);
+        $rows = $this->getFields();
+        $content = $this->replace($rows);
         File::put(Text::config($this->config)->path('migration'), $content);
     }
 
-    public function getRows (): string
+    public function getFields (): string
     {
         $rows = '';
-        foreach ($this->config['table']['columns'] as $column)
+        foreach ($this->config['fields'] as $field)
         {
-            $row = sprintf("\$table->%s('%s')%s%s;\r\n",
-                $column[0],
-                $column[1],
-                in_array('nullable', $column) ? '->nullable()' : null,
-                in_array('unique', $column) ? '->unique()' : null
-            );
+            $relationship = Field::getRelationship($field);
+            $rules = Field::getRules($field);
+            if (empty($relationship))
+            {
+                $row = sprintf("\$table->%s('%s')%s%s;\r\n",
+                    $field['type'],
+                    $field['name'],
+                    ! empty($rules['nullable']) ? '->nullable()' : null,
+                    ! empty($rules['unique']) ? '->unique()' : null
+                );
+            } else
+            {
+                $row = sprintf("\$table->foreignId('%s')%s->constrained('%s');\r\n",
+                    $field['name'],
+                    ! empty($rules['nullable']) ? '->nullable()' : null,
+                    $relationship['relationships']['table'],
+                );
+            }
             $rows .= $row;
         }
 
@@ -66,26 +77,9 @@ class GenerateMigrationCommand extends Command
         return $rows;
     }
 
-    public function getForeignKeys (): string
+    private function replace (string $rows): string|array
     {
-        $rows = '';
-        foreach ($this->config['table']['foreignKeys'] as $foreignKey)
-        {
-            $row = sprintf("\$table->foreignId('%s')%s->constrained('%s');\r\n",
-                $foreignKey[0],
-                in_array('nullable', $foreignKey) ? '->nullable()' : null,
-                $foreignKey[1],
-            );
-            $rows .= $row;
-        }
-        return $rows;
-    }
-
-    private function replace (string $rows, string $foreignKeys): string|array
-    {
-        $this->stub = str_replace(':fields:', $rows . $foreignKeys, $this->stub);
-        $this->stub = str_replace(':tableName:', $this->config['table']['name'], $this->stub);
+        $this->stub = str_replace(':fields:', $rows, $this->stub);
         return str_replace(':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(), $this->stub);
     }
-
 }

@@ -3,6 +3,7 @@
 use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 it('backend directory is empty', closure: function () {
     expect(count(File::files('tests/Feature/Backend')))
@@ -29,75 +30,13 @@ it('replace table', closure: function () {
     $config = include __DIR__ . '/config/default.php';
     $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
 
-    expect(str_contains($content, $config['table']['name']))->toBeTrue();
-
-    expect(str_contains($content, ':table:'))->toBeFalse();
-});
-
-it('replace path', closure: function () {
-    expect(Artisan::call('generate:test tests/config/default.php'))
-        ->toEqual(1);
-
-    $config = include __DIR__ . '/config/default.php';
-    $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
-
-    expect(str_contains($content, $config['route']['path']))->toBeTrue();
-
-    expect(str_contains($content, ':path:'))->toBeFalse();
-});
-
-it('replace view', closure: function () {
-    expect(Artisan::call('generate:test tests/config/default.php'))
-        ->toEqual(1);
-
-    $config = include __DIR__ . '/config/default.php';
-    $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
-
-    expect(str_contains($content, Text::config($config)->renderView()))->toBeTrue();
-
-    expect(str_contains($content, ':view:'))->toBeFalse();
-});
-
-it('replace is required', closure: function () {
-    expect(Artisan::call('generate:test tests/config/default.php'))
-        ->toEqual(1);
-
-    $config = include __DIR__ . '/config/default.php';
-    $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
-    $column = $config['table']['columns'][0][1];
-
-    expect(str_contains($content, "->set('editing.$column', '')"))->toBeTrue();
-    expect(str_contains($content, ':field:'))->toBeFalse();
-});
-
-it('replace edit slug', closure: function () {
-    expect(Artisan::call('generate:test tests/config/default.php'))
-        ->toEqual(1);
-
-    $config = include __DIR__ . '/config/default.php';
-    $content = File::get('tests/Feature/Backend/PostsLivewireTest.php');
-    $column = $config['table']['columns'][0][1];
-
-    expect(str_contains($content, "->set('editing.$column', \$newValue)"))->toBeTrue();
-    expect(str_contains($content, ':field:'))->toBeFalse();
-});
-
-it('replace edit-slug without slug', closure: function () {
-    Artisan::call('generate:test tests/config/without-slug.php');
-
-    $config = include __DIR__ . '/config/default.php';
-    $content = File::get(Text::config($config)->path('test'));
-    expect(str_contains($content, ':edit-slug:'))->toBeFalse();
-});
-
-it('add use model', closure: function () {
-    Artisan::call('generate:test tests/config/without-slug.php');
-
-    $config = include __DIR__ . '/config/default.php';
-    $content = File::get(Text::config($config)->path('test'));
-
-    expect(str_contains($content, 'use ' . Text::config($config)->namespace('model')))->toBeTrue();
-    expect(str_contains($content, ':use:'))->toBeFalse();
+    expect(Str::contains($content, [
+        $config['table']['name'],
+        $config['route']['path'],
+        Text::config($config)->name('livewire') . '::class',
+        "->set('editing.{$config['fields'][0]['name']}', '')",
+        'use ' . Text::config($config)->namespace('model'),
+    ]))->toBeTrue();
 });
 
 it('test file check syntax', closure: function () {

@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
-use Dantofema\LaravelSetup\Facades\Traits;
 use Dantofema\LaravelSetup\Services\Tests\PestService;
 use Illuminate\Support\Facades\File;
 use JetBrains\PhpStorm\Pure;
@@ -25,12 +24,12 @@ class BeforeService
         'resources/views/livewire/frontend/',
         'resources/views/components/',
     ];
-    private ComponentService $component;
+    private FileService $file;
 
     #[Pure] public function __construct ()
     {
         $this->pest = new PestService();
-        $this->component = new ComponentService();
+        $this->file = new FileService();
     }
 
     public function setup ()
@@ -40,9 +39,7 @@ class BeforeService
             File::ensureDirectoryExists($directory);
         }
 
-        $this->component->copy();
-
-        Traits::get();
+        $this->file->copy();
 
         $this->pest->actingAs();
     }

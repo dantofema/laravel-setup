@@ -9,7 +9,7 @@ class DeleteModalService
 
     protected const STUB_PATH = __DIR__ . '/../../Stubs/view/jetstream/delete-modal.blade.php';
 
-    public function get (string $stub)
+    public function get (string $stub): string
     {
         $form = File::get(self::STUB_PATH);
 

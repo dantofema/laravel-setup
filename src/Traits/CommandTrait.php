@@ -4,8 +4,8 @@ namespace Dantofema\LaravelSetup\Traits;
 
 use Dantofema\LaravelSetup\Facades\Before;
 use Dantofema\LaravelSetup\Facades\Delete;
+use Dantofema\LaravelSetup\Facades\Replace;
 use Dantofema\LaravelSetup\Facades\Route;
-use Dantofema\LaravelSetup\Facades\Text;
 use Exception;
 
 trait CommandTrait
@@ -18,9 +18,12 @@ trait CommandTrait
     private string $stub;
     private Delete $delete;
 
-    protected function inArray (string $needle, array $array): bool
+    /**
+     * @return array
+     */
+    public function getConfig (): array
     {
-        return in_array($needle, call_user_func_array('array_merge', $array));
+        return $this->config;
     }
 
     /**
@@ -62,12 +65,7 @@ trait CommandTrait
                 ? $this->jetstreamPath
                 : $this->tailwindPath;
         }
-        $this->stub = file_get_contents(__DIR__ . $path);
-    }
-
-    protected function getVariableModel (): string
-    {
-        return '$' . strtolower(Text::config($this->config)->name('model'));
+        $this->stub = Replace::config($this->config, file_get_contents(__DIR__ . $path));
     }
 
 }

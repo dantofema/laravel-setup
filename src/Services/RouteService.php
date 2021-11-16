@@ -19,6 +19,11 @@ class RouteService
             "?php\r\nuse " . Text::config($config)->namespace('livewire') . "\r\n", $content
         );
 
+        $content = str_replace(
+            "\r\n\r\n",
+            "", $content
+        );
+
         File::put(self::ROUTES_WEB_PHP, $content . $this->getRoute($config) . "\r\n");
     }
 

@@ -2,7 +2,7 @@
 it('edit slug from :field: in :table: table', function () {
     $model = :model:::factory([':field:' => Str::random(40)])->create();
     $newValue = Str::random(40);
-
+    :actingAs:
     Livewire::test(':view:')
         ->call('edit', $model->id)
         ->set('editing.:field:', $newValue)

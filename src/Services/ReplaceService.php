@@ -6,41 +6,134 @@ use Dantofema\LaravelSetup\Facades\Text;
 
 class ReplaceService
 {
+    private array $config;
+    private string $stub;
+    private string $type;
 
-    public function config (array $config, string $stub): string
+    public function stub (string $stub): ReplaceService
     {
-        $stub = str_replace(':table:', Text::config($config)->name('table'), $stub);
-        $stub = str_replace(':livewire:', Text::config($config)->name('livewire'), $stub);
-        $stub = str_replace(':tableName:', $config['table']['name'], $stub);
-        $stub = str_replace(':actingAs:', $config['backend'] == true ? "actingAs(\$this->user);" : '', $stub);
-        return str_replace(':model:', Text::config($config)->name('model'), $stub);
+        $this->stub = $stub;
+        return $this;
     }
 
-    public function field (array $field, string $stub): string
+    public function config (array $config): ReplaceService
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    public function type (string $type): ReplaceService
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function field (array $field): string
     {
         if ( ! empty($field['disk']))
         {
-            $stub = str_replace(':disk:', $field['disk'], $stub);
-            $stub = str_replace(':testFakerFile:', "UploadedFile::fake()->image('file.jpg')", $stub);
+            $this->stub = str_replace(':disk:', $field['disk'], $this->stub);
+            $this->stub = str_replace(':testFakerFile:', "UploadedFile::fake()->image('file.jpg')", $this->stub);
 
-            if ( ! str_contains($stub, "use Illuminate\Http\UploadedFile;"))
+            if ( ! str_contains($this->stub, "use Illuminate\Http\UploadedFile;"))
             {
-                str_replace('<?php', '<?php' . PHP_EOL . "use Illuminate\Http\UploadedFile;", $stub);
+                str_replace(
+                    '<?php',
+                    '<?php' . PHP_EOL . "use Illuminate\Http\UploadedFile;",
+                    $this->stub
+                );
             }
         }
 
-        $stub = str_replace(':field:', $field['name'], $stub);
-        $stub = str_replace(':label:', $field['label'], $stub);
-        $stub = empty($field['type']) ? $stub : str_replace(':type:', $field['type'], $stub);
-        return str_replace(':formInput:', $field['form']['input'], $stub);
+        $this->stub = str_replace(':field:', $field['name'], $this->stub);
+        $this->stub = str_replace(':label:', $field['label'], $this->stub);
+        $this->stub = empty($field['type'])
+            ? $this->stub
+            : str_replace(':type:', $field['type'], $this->stub);
+        return str_replace(':formInput:', $field['form']['input'], $this->stub);
     }
 
-    public function end (string $stub): string
+    public function default (): string
     {
-        $stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $stub);
-        $stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $stub);
-        $stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $stub);
-        return str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $stub);
+        $this->replaceTable();
+        $this->replaceLivewire();
+        $this->replaceRenderView();
+        $this->replaceActingAs();
+        $this->replaceFactory();
+        $this->replaceModel();
+        $this->replaceUse();
+        $this->clearPhpEol();
+
+        return $this->stub;
+    }
+
+    private function replaceTable (): void
+    {
+        $this->stub = str_replace(':tableName:', $this->config['table']['name'], $this->stub);
+        $this->stub = str_replace(':table:', Text::config($this->config)->name('table'), $this->stub);
+    }
+
+    private function replaceLivewire (): void
+    {
+        $this->stub = str_replace(':livewire:', Text::config($this->config)->name('livewire'), $this->stub);
+    }
+
+    private function replaceRenderView (): void
+    {
+        $this->stub = str_replace(':renderView:', Text::config($this->config)->renderView(), $this->stub);
+    }
+
+    private function replaceActingAs (): void
+    {
+        $this->stub = str_replace(':actingAs:', $this->config['backend'] == true ? "actingAs(\$this->user);" : '', $this->stub);
+    }
+
+    private function replaceFactory (): void
+    {
+        $this->stub = str_replace(':factory:', Text::config($this->config)->name('model') . 'Factory', $this->stub);
+    }
+
+    private function replaceModel (): void
+    {
+        $this->stub = str_replace(':model:', Text::config($this->config)->name('model'), $this->stub);
+    }
+
+    public function replaceUse (): void
+    {
+        $useString = '';
+        foreach ($this->config['fields'] as $field)
+        {
+            if (array_key_exists('relationships', $field))
+            {
+                $useString .= "use App\Models\\" . $field['relationships']['model'] . ";" . PHP_EOL;
+            }
+        }
+
+        $useString .= str_contains($this->stub, 'BelongsTo')
+            ? "use Illuminate\Database\Eloquent\Relations\BelongsTo;" . PHP_EOL
+            : null;
+
+        if ($this->type !== 'model')
+        {
+            $useString .= 'use ' . Text::config($this->config)->namespace('model') . ";" . PHP_EOL;
+        }
+
+        $useString .= str_contains($this->stub, 'Carbon::')
+            ? "use Carbon\Carbon;" . PHP_EOL
+            : null;
+
+        $useString .= str_contains($this->stub, 'Str::')
+            ? "use Illuminate\Support\Str;" . PHP_EOL
+            : null;
+
+        $this->stub = str_replace(':useDefault:', $useString, $this->stub);
+    }
+
+    private function clearPhpEol (): void
+    {
+        $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
+        $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
+        $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
     }
 
 }

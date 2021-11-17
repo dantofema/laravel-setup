@@ -5,19 +5,6 @@ namespace Dantofema\LaravelSetup\Services;
 class FakerService
 {
 
-    public function getUseForeignKeys (array $config): string
-    {
-        $string = '';
-        foreach ($config['fields'] as $field)
-        {
-            if (array_key_exists('relationships', $field))
-            {
-                $string .= "use App\Models\\" . $field['relationships']['model'] . ";" . PHP_EOL;
-            }
-        }
-        return $string;
-    }
-
     public function toTest ($field): string
     {
         $string = $this->get($field);

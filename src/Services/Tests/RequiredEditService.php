@@ -40,8 +40,8 @@ class RequiredEditService
 
         foreach ($requiredFields as $field)
         {
-            $requiredStub = Replace::config($config, File::get(self::REQUIRED_STUB));
-            $required .= Replace::field($field, $requiredStub);
+            $requiredStub = Replace::config($config)->stub(File::get(self::REQUIRED_STUB))->type('test')->default();
+            $required .= Replace::config($config)->stub($requiredStub)->field($field);
         }
         return $required;
     }

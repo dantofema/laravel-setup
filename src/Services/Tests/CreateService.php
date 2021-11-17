@@ -22,7 +22,7 @@ class CreateService
 
     public function get (array $config, string $stub): string
     {
-        $saveStub = Replace::config($config, File::get(self::SAVE_STUB));
+        $saveStub = Replace::config($config)->stub(File::get(self::SAVE_STUB))->type('test')->default();
         $saveStub = $this->replaceNewFileSection($config, $saveStub);
         $saveStub = $this->replaceVarSection($config, $saveStub);
         $saveStub = $this->replaceSetSection($config, $saveStub);

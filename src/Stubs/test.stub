@@ -1,5 +1,6 @@
 <?php
 
+:useDefault:
 use App\Models\User;
 use function Pest\Livewire\livewire;
 use function Pest\Faker\faker;

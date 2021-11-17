@@ -16,6 +16,6 @@ class PestService
     {
         $pest = File::get(self::PEST_PATH);
         $actingAs = File::get(self::STUB_PATH);
-        str_contains($pest, $actingAs) ?: File::put(self::PEST_PATH, $pest . $actingAs);
+        str_contains($pest, 'actingAs') ?: File::put(self::PEST_PATH, $pest . $actingAs);
     }
 }

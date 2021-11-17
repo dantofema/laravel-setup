@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+:useDefault:
 use Illuminate\Database\Eloquent\Factories\Factory;
 :use:
 
-class :classFactory: extends Factory
+class :factory: extends Factory
 {
-    protected $model = :modelName:::class;
+    protected $model = :model:::class;
 
     public function definition()
     {

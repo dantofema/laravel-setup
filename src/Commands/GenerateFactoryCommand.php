@@ -37,8 +37,8 @@ class GenerateFactoryCommand extends Command
     {
         $vars = $this->getVarsFromColumns();
         $definition = $this->getReturnFromColumns();
-        $use = $this->getUse($vars);
-        $content = $this->replace($use, $vars, $definition);
+
+        $content = $this->replace($vars, $definition);
 
         File::put(Text::config($this->config)->path('factory'), $content);
         Seeder::add($this->config);
@@ -73,22 +73,10 @@ class GenerateFactoryCommand extends Command
         return $return . PHP_EOL . "];" . PHP_EOL;
     }
 
-    public function getUse (string $vars): string
+    private function replace (string $vars, string $return): string
     {
-        $use = 'use ' . Text::config($this->config)->namespace('model') . ";\r\n";
-        $use .= str_contains($vars, 'Str::') ? "use Illuminate\Support\Str;\r\n" : null;
-        $use .= str_contains($vars, 'Carbon::') ? "use Carbon\Carbon;\r\n" : null;
-        $use .= $this->faker->getUseForeignKeys($this->config);
-        return $use;
-    }
-
-    private function replace (string $use, string $vars, string $return): string
-    {
-        $this->stub = str_replace(':use:', $use, $this->stub);
         $this->stub = str_replace(':vars:', $vars, $this->stub);
-        $this->stub = str_replace(':return:', $return, $this->stub);
-        $this->stub = str_replace(':classFactory:', Text::config($this->config)->name('model') . 'Factory', $this->stub);
-        return str_replace(':modelName:', Text::config($this->config)->name('model'), $this->stub);
+        return str_replace(':return:', $return, $this->stub);
     }
 
 }

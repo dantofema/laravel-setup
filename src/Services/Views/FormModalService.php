@@ -71,7 +71,7 @@ class FormModalService
         $stub = File::get(self::INPUT_FILE_PATH);
 
         $stub = str_replace(':label:', $field['label'], $stub);
-        return str_replace(':field:', $field['name'], $stub);
+        return str_replace(':field:', 'newFile', $stub);
     }
 
     private function inputSelect (array $field): string

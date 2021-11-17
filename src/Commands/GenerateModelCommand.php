@@ -8,7 +8,6 @@ use Dantofema\LaravelSetup\Services\Models\RelationshipService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 
 class GenerateModelCommand extends Command
 {
@@ -18,7 +17,7 @@ class GenerateModelCommand extends Command
     public $signature = 'generate:model {path : path to the config file } {--force}';
     public $description = 'Model file generator';
     protected array $config;
-    protected string $use = '';
+    protected string $useInClass = '';
     protected string $useNamespace = '';
     private RelationshipService $modelRelationship;
     private SearchService $searchService;
@@ -33,15 +32,10 @@ class GenerateModelCommand extends Command
     public function handle (): bool
     {
         $this->init('model');
-        return $this->create();
-    }
-
-    public function create (): bool
-    {
         $this->getUserstamps();
         $this->getSoftDelete();
 
-        File::put(Text::config($this->config)->path('model'), $this->replace());
+        $this->put($this->replace());
         return true;
     }
 
@@ -49,8 +43,8 @@ class GenerateModelCommand extends Command
     {
         if (in_array('SoftDeletes', $this->config['model']['use']))
         {
-            $this->useNamespace .= "use Wildside\Userstamps\Userstamps;\r\n";
-            $this->use .= "use Userstamps;\r\n";
+            $this->useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
+            $this->useInClass .= "use Userstamps;" . PHP_EOL;
         }
     }
 
@@ -59,7 +53,7 @@ class GenerateModelCommand extends Command
         if (in_array('SoftDeletes', $this->config['model']['use']))
         {
             $this->useNamespace .= "use Illuminate\Database\Eloquent\SoftDeletes;\r\n";
-            $this->use .= "use SoftDeletes;\r\n";
+            $this->useInClass .= "use SoftDeletes;\r\n";
         }
     }
 
@@ -67,7 +61,7 @@ class GenerateModelCommand extends Command
     {
         $this->stub = $this->getNamespace();
         $this->stub = str_replace(':useNamespace:', $this->useNamespace, $this->stub);
-        $this->stub = str_replace(':use:', $this->use, $this->stub);
+        $this->stub = str_replace(':useInClass:', $this->useInClass, $this->stub);
         $this->stub = $this->searchService->get($this->config, $this->stub);
         $this->stub = $this->modelRelationship->get(Field::config($this->config)->getRelationships(), $this->stub);
         $this->stub = $this->getPath();
@@ -76,12 +70,9 @@ class GenerateModelCommand extends Command
 
     private function getNamespace (): string
     {
-        $namespace = explode('\\', Text::config($this->config)->namespace('model'));
-        array_pop($namespace);
-
         return str_replace(
             ':namespace:',
-            implode("\\", $namespace),
+            Text::config($this->config)->namespaceFolder('model'),
             $this->stub
         );
     }
@@ -89,14 +80,6 @@ class GenerateModelCommand extends Command
     private function getPath (): string
     {
         return str_replace(':path:', $this->config['route']['path'], $this->stub);
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfig (): array
-    {
-        return $this->config;
     }
 
 }

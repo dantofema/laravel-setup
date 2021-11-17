@@ -6,7 +6,9 @@ use Dantofema\LaravelSetup\Facades\Before;
 use Dantofema\LaravelSetup\Facades\Delete;
 use Dantofema\LaravelSetup\Facades\Replace;
 use Dantofema\LaravelSetup\Facades\Route;
+use Dantofema\LaravelSetup\Facades\Text;
 use Exception;
+use Illuminate\Support\Facades\File;
 
 trait CommandTrait
 {
@@ -16,6 +18,8 @@ trait CommandTrait
     private string $jetstreamPath = '/../Stubs/view/jetstream/basic.blade.php';
     private string $tailwindPath = '/../Stubs/view/tailwind/basic.blade.php';
     private string $stub;
+    private string $type;
+    private string $path;
     private Delete $delete;
 
     /**
@@ -31,6 +35,7 @@ trait CommandTrait
      */
     protected function init (string $type): bool
     {
+        $this->type = $type;
         Before::setup();
 
         $this->configFileExists();
@@ -49,23 +54,34 @@ trait CommandTrait
 
         $this->exists($type);
 
-        $this->getStub($type);
+        $this->setStub();
 
         return true;
     }
 
-    protected function getStub (string $type): void
+    protected function setStub (): void
     {
-        if ($type !== 'view')
+        if ($this->type !== 'view')
         {
-            $path = self::STUB_PATH;
+            $this->path = self::STUB_PATH;
         } else
         {
-            $path = $this->config['view']['jetstream']
+            $this->path = $this->config['view']['jetstream']
                 ? $this->jetstreamPath
                 : $this->tailwindPath;
         }
-        $this->stub = Replace::config($this->config, file_get_contents(__DIR__ . $path));
+//        $this->stub = Replace::config($this->config)->stub(file_get_contents(__DIR__ . $path))->type($type)->default();
+        $this->stub = file_get_contents(__DIR__ . $this->path);
+    }
+
+    protected function put (string $content): bool|int
+    {
+        $replaceContent = Replace::config($this->config)
+            ->stub($content)
+            ->type($this->type)
+            ->default();
+
+        return File::put(Text::config($this->config)->path($this->type), $replaceContent);
     }
 
 }

@@ -21,7 +21,7 @@ class EditService
 
     public function get (array $config, string $stub): string
     {
-        $editStub = Replace::config($config, File::get(self::EDIT_STUB));
+        $editStub = Replace::config($config)->stub(self::EDIT_STUB)->type('test')->default();
         $string = '';
 
         foreach ($config['fields'] as $field)
@@ -33,17 +33,17 @@ class EditService
 
             if ($field['form']['input'])
             {
-                $string .= Replace::field($field, $editStub);
+                $string .= Replace::config($config)->stub($editStub)->type('test')->default();
                 $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
             }
         }
 
-        return $stub . Replace::end($string);
+        return $stub . Replace::config($config)->stub($string)->type('test')->default();
     }
 
     public function file (array $config, string $stub): string
     {
-        $editStub = Replace::config($config, File::get(self::EDIT_FILE_STUB));
+        $editStub = Replace::config($config)->stub(File::get(self::EDIT_FILE_STUB))->type('test')->default();
         $string = '';
 
         foreach ($config['fields'] as $field)
@@ -53,11 +53,11 @@ class EditService
                 continue;
             }
 
-            $string .= Replace::field($field, $editStub);
+            $string .= Replace::config($config)->stub($editStub)->field($field);
             $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
         }
 
-        return $stub . Replace::end($string);
+        return $stub . Replace::config($config)->stub($string)->type('test')->default();
     }
 
 }

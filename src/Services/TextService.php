@@ -44,6 +44,13 @@ class TextService
         return $this->name->$type($this->config)->get();
     }
 
+    public function namespaceFolder (string $type): string
+    {
+        $name = $this->name($type);
+        $namespace = $this->path->$type($this->config)->namespace($name);
+        return substr(str_replace($name, '', $namespace), 0, -2);
+    }
+
     public function renderView (): string
     {
         $name = 'livewire.';

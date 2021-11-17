@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static config(array $config)
  * @method static path(string $string)
  * @method static route()
+ * @method static renderView()
  */
 class Text extends Facade
 {

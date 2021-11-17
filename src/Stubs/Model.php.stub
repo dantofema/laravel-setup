@@ -2,16 +2,17 @@
 
 namespace :namespace:;
 
+:useDefault:
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 :useNamespace:
-:useRelationships:
+
 
 class :modelName: extends Model
 {
     use HasFactory;
-    :use:
+    :useInClass:
 
     :search:
 

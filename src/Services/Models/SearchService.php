@@ -17,14 +17,6 @@ class SearchService
         $searchableFields = Field::config($config)->getSearchable();
         foreach ($searchableFields as $key => $field)
         {
-//            if ($key === array_key_first($searchableFields))
-//            {
-//                $query .= array_key_exists('relationships', $field)
-//                    ? "\$query->whereHas('{$field['relationships']['name']}', fn(\$q) => \$q->where('{$field['relationships']['searchable']}', 'like',
-//                '%' . \$search . '%'))\r\n"
-//                    : "\$query->where('{$field['name']}', 'like', '%' . \$search . '%')\r\n";
-//                continue;
-//            }
             $query .= array_key_exists('relationships', $field)
                 ? "->orWhereHas('{$field['relationships']['name']}', fn(\$q) => \$q->where('{$field['relationships']['searchable']}', 'like',
                 '%' . \$search . '%'))->with('{$field['relationships']['name']}')\r\n"

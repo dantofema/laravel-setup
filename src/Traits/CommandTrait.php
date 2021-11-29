@@ -2,10 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
-use Dantofema\LaravelSetup\Facades\Before;
 use Dantofema\LaravelSetup\Facades\Delete;
+use Dantofema\LaravelSetup\Facades\Generate;
 use Dantofema\LaravelSetup\Facades\Replace;
-use Dantofema\LaravelSetup\Facades\Route;
 use Dantofema\LaravelSetup\Facades\Text;
 use Exception;
 use Illuminate\Support\Facades\File;
@@ -19,7 +18,6 @@ trait CommandTrait
     private string $tailwindPath = '/../Stubs/view/tailwind/basic.blade.php';
     private string $stub;
     private string $type;
-    private string $path;
     private Delete $delete;
 
     /**
@@ -36,7 +34,7 @@ trait CommandTrait
     protected function init (string $type): bool
     {
         $this->type = $type;
-        Before::setup();
+        Generate::setup();
 
         $this->configFileExists();
 
@@ -44,12 +42,12 @@ trait CommandTrait
 
         if ($this->option('force'))
         {
-            Delete::type($type)->config($this->config);
+            Generate::delete($this->config, $type);
         }
 
         if ($type == 'livewire')
         {
-            Route::add($this->config);
+            Generate::addRoute($this->config);
         }
 
         $this->exists($type);
@@ -63,15 +61,15 @@ trait CommandTrait
     {
         if ($this->type !== 'view')
         {
-            $this->path = self::STUB_PATH;
+            $path = self::STUB_PATH;
         } else
         {
-            $this->path = $this->config['view']['jetstream']
+            $path = $this->config['view']['jetstream']
                 ? $this->jetstreamPath
                 : $this->tailwindPath;
         }
-//        $this->stub = Replace::config($this->config)->stub(file_get_contents(__DIR__ . $path))->type($type)->default();
-        $this->stub = file_get_contents(__DIR__ . $this->path);
+
+        $this->stub = file_get_contents(__DIR__ . $path);
     }
 
     protected function put (string $content): bool|int

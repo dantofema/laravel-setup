@@ -1,12 +1,10 @@
 <?php
 
-:useDefault:
 use App\Models\User;
 use function Pest\Livewire\livewire;
 use function Pest\Faker\faker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-:use:
-
+:use: :useDefault:
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
@@ -20,7 +18,6 @@ it('has :table: page', function () {
 });
 
 it('can edit an single row from :table:', function () {
-
     $model = :model:::factory()->create();
     :actingAs:
 
@@ -32,9 +29,6 @@ it('can edit an single row from :table:', function () {
 
     $this->assertEquals('foo', :model:::first()->:field:);
 });
-
-:required:
-
-:edit-slug:
+:required: :edit-slug:
 
 

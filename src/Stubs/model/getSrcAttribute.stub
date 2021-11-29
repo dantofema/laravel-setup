@@ -1,0 +1,6 @@
+public function getSrcAttribute (): string
+{
+    return empty($this->image)
+        ? 'https://via.placeholder.com/450/000000/FFFFFF/?text=imagen'
+        : Storage::disk(':disk:')->url($this->image);
+}

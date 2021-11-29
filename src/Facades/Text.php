@@ -19,4 +19,5 @@ class Text extends Facade
     {
         return 'text';
     }
+
 }

@@ -19,7 +19,7 @@ class SeederService
         {
             $content = str_replace(
                 "Seeders;",
-                "Seeders;\r\nuse " . $use . "\r\n",
+                "Seeders;" . PHP_EOL . "use " . $use . PHP_EOL,
                 $content
             );
         }
@@ -34,11 +34,6 @@ class SeederService
                 $content
             );
         }
-
-//        $content = str_replace(
-//            "\r\n\r\n",
-//            "", $content
-//        );
 
         File::put($this->databaseSeeder, $content);
     }

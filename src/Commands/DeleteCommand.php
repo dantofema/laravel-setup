@@ -3,79 +3,53 @@
 namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Facades\Delete;
-use Dantofema\LaravelSetup\Facades\Route;
+use Dantofema\LaravelSetup\Facades\Generate;
 use Illuminate\Console\Command;
 
 class DeleteCommand extends Command
 {
     public $signature = 'generate:delete 
                         {path : path to the config file}
-                        {--all}
-                        {--factory}
-                        {--migration}
-                        {--model}
-                        {--seeder}
-                        {--test}
-                        {--view}';
+                        {type : type of file to delete, if you want to delete all files pass the argument "all" }';
 
     public $description = 'Delete files generated';
     private array $config;
+    private array $types = [
+        'factory',
+        'livewire',
+        'migration',
+        'model',
+        'test',
+        'view',
+    ];
 
     public function handle (): bool
     {
         $this->config = include $this->argument('path');
 
-        if ($this->option('all'))
+        if ($this->argument('type') === 'route')
         {
-            $this->factory();
-            $this->livewire();
-            $this->migration();
-            $this->model();
-            $this->test();
-            $this->view();
             $this->route();
-            $this->seeder();
+            return true;
         }
+
+        if ($this->argument('type') === 'all')
+        {
+            foreach ($this->types as $type)
+            {
+                Generate::delete($this->config, $type);
+            }
+            $this->route();
+            return true;
+        }
+
+        Generate::delete($this->config, $this->argument('type'));
         return true;
-    }
-
-    private function factory ()
-    {
-        Delete::type('factory')->config($this->config);
-    }
-
-    private function livewire ()
-    {
-        Delete::type('livewire')->config($this->config);
-    }
-
-    private function migration ()
-    {
-        Delete::type('migration')->config($this->config);
-    }
-
-    private function model ()
-    {
-        Delete::type('model')->config($this->config);
-    }
-
-    private function test ()
-    {
-        Delete::type('test')->config($this->config);
-    }
-
-    private function view ()
-    {
-        Delete::type('view')->config($this->config);
     }
 
     private function route ()
     {
-        Route::delete($this->config);
-    }
-
-    private function seeder ()
-    {
+        Generate::removeRoute($this->config);
     }
 
 }

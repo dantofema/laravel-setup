@@ -8,7 +8,7 @@ class Create:className:Table extends Migration
 {
     public function up()
     {
-        Schema::create(':tableName:', function (Blueprint $table) {
+        Schema::create(':table:', function (Blueprint $table) {
             $table->id();
             :fields:
             $table->timestamps();

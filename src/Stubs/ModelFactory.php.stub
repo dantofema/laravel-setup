@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 :useDefault:
 use Illuminate\Database\Eloquent\Factories\Factory;
-:use:
+
 
 class :factory: extends Factory
 {

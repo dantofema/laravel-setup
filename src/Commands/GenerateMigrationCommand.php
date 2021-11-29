@@ -3,10 +3,8 @@
 namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class GenerateMigrationCommand extends Command
@@ -22,16 +20,13 @@ class GenerateMigrationCommand extends Command
     {
         $this->init('migration');
 
-        $this->create();
+        $rows = $this->getFields();
+        $this->stub = str_replace(':fields:', $rows, $this->stub);
+        $this->stub = str_replace(':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(),
+            $this->stub);
+        $this->put($this->stub);
 
         return true;
-    }
-
-    public function create (): void
-    {
-        $rows = $this->getFields();
-        $content = $this->replace($rows);
-        File::put(Text::config($this->config)->path('migration'), $content);
     }
 
     public function getFields (): string
@@ -54,32 +49,31 @@ class GenerateMigrationCommand extends Command
                 $row = sprintf("\$table->foreignId('%s')%s->constrained('%s');\r\n",
                     $field['name'],
                     ! empty($rules['nullable']) ? '->nullable()' : null,
-                    $relationship['relationships']['table'],
+                    $relationship['relationship']['table'],
                 );
             }
             $rows .= $row;
         }
 
-        if (in_array('SoftDeletes', $this->config['model']['use']))
+        if (array_key_exists('use', $this->config['model']))
         {
-            $rows .= "\$table->softDeletes();\r\n";
-        }
-
-        if (in_array('Userstamps', $this->config['model']['use']))
-        {
-            $rows .= "\$table->unsignedBigInteger('created_by')->nullable();\r\n";
-            $rows .= "\$table->unsignedBigInteger('updated_by')->nullable();\r\n";
             if (in_array('SoftDeletes', $this->config['model']['use']))
             {
-                $rows .= "\$table->unsignedBigInteger('deleted_by')->nullable();\r\n";
+                $rows .= "\$table->softDeletes();\r\n";
+            }
+
+            if (in_array('Userstamps', $this->config['model']['use']))
+            {
+                $rows .= "\$table->unsignedBigInteger('created_by')->nullable();\r\n";
+                $rows .= "\$table->unsignedBigInteger('updated_by')->nullable();\r\n";
+                if (in_array('SoftDeletes', $this->config['model']['use']))
+                {
+                    $rows .= "\$table->unsignedBigInteger('deleted_by')->nullable();\r\n";
+                }
             }
         }
+
         return $rows;
     }
 
-    private function replace (string $rows): string|array
-    {
-        $this->stub = str_replace(':fields:', $rows, $this->stub);
-        return str_replace(':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(), $this->stub);
-    }
 }

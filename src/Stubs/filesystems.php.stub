@@ -1,0 +1,6 @@
+'modelLower' => [
+    'driver' => 'local',
+    'root' => storage_path('app/modelLower'),
+    'url' => env('APP_URL') . '/modelLower',
+    'visibility' => 'public',
+],

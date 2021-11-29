@@ -23,6 +23,8 @@ class BeforeService
         'resources/views/livewire/backend/',
         'resources/views/livewire/frontend/',
         'resources/views/components/',
+        'resources/views/layouts/',
+        'storage/app/public/notas',
     ];
     private FileService $file;
 

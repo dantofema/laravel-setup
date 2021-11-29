@@ -81,7 +81,7 @@ return [
             'rules' => [
                 'nullable' => true,
             ],
-            'relationships' => [
+            'relationship' => [
                 'type' => 'belongsTo',
                 'name' => 'author',
                 'model' => 'Author',
@@ -96,7 +96,6 @@ return [
             'type' => 'string',
             'label' => 'Foto',
             'nullable' => true,
-            'disk' => 'notas',
             'form' => [
                 'input' => 'file',
             ],
@@ -126,6 +125,29 @@ return [
             ],
             'rules' => [
                 'nullable' => true,
+            ],
+        ],
+        [
+            'name' => 'tags',
+            'label' => 'Etiquetas',
+            'nullable' => true,
+            'searchable' => true,
+            'index' => true,
+            'sortable' => false,
+            'form' => [
+                'input' => 'text',
+            ],
+            'rules' => [
+                'nullable' => true,
+            ],
+            'relationship' => [
+                'type' => 'belongsToMany',
+                'name' => 'tags',
+                'model' => 'Tag',
+                'searchable' => 'name',
+                'table' => 'tags',
+                'label' => 'Etiquetas',
+                'namespace' => 'App\Models\\',
             ],
         ],
     ],

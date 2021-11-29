@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Tests\CreateService;
 use Dantofema\LaravelSetup\Services\Tests\EditService;
@@ -40,88 +39,65 @@ class GenerateTestCommand extends Command
     {
         $this->init('test');
 
-        return $this->create();
-    }
-
-    public function create (): bool
-    {
-        return File::put(
-            Text::config($this->config)->path('test'),
-            $this->replace());
-    }
-
-    private function replace (): string
-    {
-        $this->stub = $this->getUse();
-        $this->stub = $this->getUri();
-        $this->stub = $this->getField();
+        $this->getUse();
+        $this->getUri();
+        $this->getField();
+        $this->editSlug();
+        $this->getDisk();
         $this->stub = $this->requiredService->get($this->config, $this->stub);
-        $this->stub = $this->editSlug();
-        $this->stub = $this->getDisk();
         $this->stub = $this->saveService->get($this->config, $this->stub);
-        $this->stub = $this->editService->get($this->config, $this->stub);
         $this->stub = $this->editService->file($this->config, $this->stub);
-        return $this->stub . File::get(__DIR__ . '/../Stubs/tests/extra-methods.stub');
+        $this->stub = $this->stub . File::get(__DIR__ . '/../Stubs/tests/extra-methods.stub');
+        $this->put($this->stub);
+
+        return true;
     }
 
-    private function getUse (): string|array
+    private function getUse (): void
     {
-        $replace = 'use ' . Text::config($this->config)->namespace('model') . PHP_EOL;
-        $replace .= 'use ' . Text::config($this->config)->namespace('livewire') . PHP_EOL;
-
-        $fields = Field::config($this->config)->getRelationships();
-
-        if ( ! empty($fields))
-        {
-            $replace .= 'use Illuminate\Http\UploadedFile;' . PHP_EOL;
-
-            foreach ($fields as $field)
-            {
-                $replace .= 'use ' . $field['relationships']['namespace'] . $field['relationships']['model'] . ';' . PHP_EOL;
-            }
-        }
-        return str_replace(':use:', $replace, $this->stub);
+        $replace = 'use ' . Text::config($this->config)->namespace('livewire') . PHP_EOL;
+        $this->stub = str_replace(':use:', $replace, $this->stub);
     }
 
-    private function getUri (): string
+    private function getUri (): void
     {
         $uri = $this->config['backend'] ? 'sistema/' : '';
-        return str_replace(
+        $this->stub = str_replace(
             ':uri:',
             $uri . $this->config['route']['path'],
             $this->stub);
     }
 
-    private function getField (): string
+    private function getField (): void
     {
         $field = $this->config['fields'][0];
 
-        return str_replace(
+        $this->stub = str_replace(
             ':field:',
             $field['name'],
             $this->stub);
     }
 
-    private function editSlug (): string
+    private function editSlug (): void
     {
-        return str_replace(
+        $this->stub = str_replace(
             ':edit-slug:',
             $this->editSlugService->get($this->config),
             $this->stub);
     }
 
-    private function getDisk (): string
+    private function getDisk (): void
     {
         $disk = '';
         foreach ($this->config['fields'] as $field)
         {
-            if ( ! empty($field['disk']))
+            if ($field['form']['input'] === 'file')
             {
-                $disk = "Storage::fake('" . $field['disk'] . "');";
+                $disk = "Storage::fake(':disk:');";
                 $disk .= "\$this->newFile = '';";
             }
         }
-        return str_replace(':disk:', $disk, $this->stub);
+        $this->stub = str_replace(':disk:', $disk, $this->stub);
     }
 
 }

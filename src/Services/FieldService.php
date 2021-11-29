@@ -4,7 +4,7 @@ namespace Dantofema\LaravelSetup\Services;
 
 class FieldService
 {
-    protected const KEY_DISK = 'disk';
+
     protected const KEY_SLUG = 'slug';
     protected const KEY_SEARCHABLE = 'searchable';
     protected const KEY_RELATIONSHIPS = 'relationships';
@@ -21,7 +21,7 @@ class FieldService
     {
         foreach ($this->config['fields'] as $field)
         {
-            if (array_key_exists(self::KEY_DISK, $field))
+            if ($field['form']['input'] === 'file')
             {
                 return $field;
             }
@@ -89,7 +89,7 @@ class FieldService
 
     public function getRelationship (array $field): array
     {
-        return array_key_exists('relationships', $field)
+        return array_key_exists('relationship', $field)
             ? $field
             : [];
     }

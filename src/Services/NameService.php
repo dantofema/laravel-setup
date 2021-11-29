@@ -64,4 +64,10 @@ class NameService
     {
         return $this->name . '.php';
     }
+
+    public function disk (array $config): NameService
+    {
+        $this->name = strtolower($config['model']['name']);
+        return $this;
+    }
 }

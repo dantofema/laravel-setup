@@ -16,6 +16,7 @@ function clearDirectories ()
 
     File::delete('routes/web.php');
     File::copy('routes/_web.php', 'routes/web.php');
+    File::copy('config/_filesystems.php', 'config/filesystems.php');
 
     $directories = [
         'database/migrations',

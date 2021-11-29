@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see ReplaceService
- * @method static setup()
- * @method static default(array $config, string $get)
- * @method static field(mixed $field, string $stub)
+ *
+ * @method static default()
+ * @method static field(array $field)
  * @method static config(array $config)
+ * @method static stub(string $string)
  */
 class Replace extends Facade
 {

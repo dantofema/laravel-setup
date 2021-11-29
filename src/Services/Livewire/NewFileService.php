@@ -3,6 +3,7 @@
 namespace Dantofema\LaravelSetup\Services\Livewire;
 
 use Dantofema\LaravelSetup\Facades\Field;
+use Dantofema\LaravelSetup\Facades\Text;
 
 class NewFileService
 {
@@ -28,7 +29,7 @@ class NewFileService
         if ($field)
         {
             $name = $field['name'];
-            $disk = $field['disk'];
+            $disk = Text::config($config)->name('disk');
 
             $replace = "\$this->setNewFile('$name', '$disk');";
         }
@@ -37,7 +38,7 @@ class NewFileService
 
         return str_replace(
             ':newFile:',
-            empty ($field) ? 'public $newFile;' : '',
+            empty ($field) ? '' : 'public $newFile;',
             $stub
         );
     }

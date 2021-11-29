@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static getSearchable()
  * @method static getIndex()
  * @method static getRelationships()
+ * @method static getFile()
  */
 class Field extends Facade
 {

@@ -22,12 +22,13 @@ class CreateService
 
     public function get (array $config, string $stub): string
     {
-        $saveStub = Replace::config($config)->stub(File::get(self::SAVE_STUB))->type('test')->default();
+        $saveStub = File::get(self::SAVE_STUB);
         $saveStub = $this->replaceNewFileSection($config, $saveStub);
         $saveStub = $this->replaceVarSection($config, $saveStub);
         $saveStub = $this->replaceSetSection($config, $saveStub);
         $saveStub = $this->replaceAssertDatabaseSection($config, $saveStub);
         $saveStub = $this->replaceAssertExistsSection($config, $saveStub);
+        $saveStub = Replace::config($config)->stub($saveStub)->type('test')->default();
 
         return $stub . str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $saveStub);
     }
@@ -51,7 +52,7 @@ class CreateService
 
         foreach ($config['fields'] as $field)
         {
-            if ( ! empty($field['disk']))
+            if ($field['form']['input'] === 'file')
             {
                 continue;
             }
@@ -71,7 +72,7 @@ class CreateService
 
         foreach ($config['fields'] as $field)
         {
-            if ( ! empty($field['disk']))
+            if ($field['form']['input'] === 'file')
             {
                 continue;
             }
@@ -92,7 +93,7 @@ class CreateService
             $string = '$this->assertDatabaseHas(:table:, :data:);' . PHP_EOL;
             $data = '[';
 
-            if ( ! empty($field['disk']))
+            if ($field['form']['input'] === 'file')
             {
                 continue;
             } else if ($field['name'] == 'slug')
@@ -113,19 +114,17 @@ class CreateService
     private function replaceAssertExistsSection (array $config, string $stub): string
     {
         $replace = '';
-
-        foreach ($config['fields'] as $field)
+        $field = Field::config($config)->getFile();
+        if ( ! empty($field))
         {
-            $string = "Storage::disk(':disk:')->assertExists(:model:::first()->:fieldName:);";
-
-            if ( ! empty($field['disk']))
-            {
-                $string = str_replace(':disk:', $field['disk'], $string);
-                $string = str_replace(':model:', Text::config($config)->name('model'), $string);
-                $replace = str_replace(':fieldName:', $field['name'], $string);
-            }
+            $replace = Replace::config($config)
+                ->stub("Storage::disk(':disk:')->assertExists(:model:::first()->:field:);")
+                ->field($field);
         }
-        return str_replace(':assertExists:', $replace, $stub);
+
+        return str_replace(':assertExists:',
+            $replace,
+            $stub);
     }
 
 }

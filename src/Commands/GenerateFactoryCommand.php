@@ -2,12 +2,10 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Seeder;
-use Dantofema\LaravelSetup\Facades\Text;
+use Dantofema\LaravelSetup\Facades\Generate;
 use Dantofema\LaravelSetup\Services\FakerService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 
 class GenerateFactoryCommand extends Command
 {
@@ -29,19 +27,14 @@ class GenerateFactoryCommand extends Command
     {
         $this->init('factory');
 
-        $this->create();
+        $this->stub = str_replace(':vars:', $this->getVarsFromColumns(), $this->stub);
+        $this->stub = str_replace(':return:', $this->getReturnFromColumns(), $this->stub);
+
+        $this->put($this->stub);
+
+        Generate::addSeeder($this->config);
+
         return true;
-    }
-
-    public function create ()
-    {
-        $vars = $this->getVarsFromColumns();
-        $definition = $this->getReturnFromColumns();
-
-        $content = $this->replace($vars, $definition);
-
-        File::put(Text::config($this->config)->path('factory'), $content);
-        Seeder::add($this->config);
     }
 
     public function getVarsFromColumns (): string
@@ -55,6 +48,7 @@ class GenerateFactoryCommand extends Command
                 $this->faker->get($field)
             );
         }
+
         return $vars;
     }
 
@@ -71,12 +65,6 @@ class GenerateFactoryCommand extends Command
         }
 
         return $return . PHP_EOL . "];" . PHP_EOL;
-    }
-
-    private function replace (string $vars, string $return): string
-    {
-        $this->stub = str_replace(':vars:', $vars, $this->stub);
-        return str_replace(':return:', $return, $this->stub);
     }
 
 }

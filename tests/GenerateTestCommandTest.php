@@ -42,7 +42,8 @@ it('replace table', closure: function () {
 it('test file check syntax', closure: function () {
     Artisan::call('generate:test tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
-//    dd(File::get(Text::config($config)->path('test')));
+
+//    dump(File::get(Text::config($config)->path('test')));
     expect(shell_exec("php -l -f " . Text::config($config)->path('test')))->toContain('No syntax errors detected');
 });
 

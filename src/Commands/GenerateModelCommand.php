@@ -4,7 +4,7 @@ namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
-use Dantofema\LaravelSetup\Services\Models\RelationshipService;
+use Dantofema\LaravelSetup\Services\Models\RelationshipsService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
@@ -19,13 +19,13 @@ class GenerateModelCommand extends Command
     protected array $config;
     protected string $useInClass = '';
     protected string $useNamespace = '';
-    private RelationshipService $modelRelationship;
+    private RelationshipsService $modelRelationship;
     private SearchService $searchService;
 
     public function __construct ()
     {
         parent::__construct();
-        $this->modelRelationship = new RelationshipService();
+        $this->modelRelationship = new RelationshipsService();
         $this->searchService = new SearchService();
     }
 
@@ -34,8 +34,14 @@ class GenerateModelCommand extends Command
         $this->init('model');
         $this->getUserstamps();
         $this->getSoftDelete();
-
-        $this->put($this->replace());
+        $this->getNamespace();
+        $this->stub = str_replace(':useNamespace:', $this->useNamespace, $this->stub);
+        $this->stub = str_replace(':useInClass:', $this->useInClass, $this->stub);
+        $this->stub = $this->searchService->get($this->config, $this->stub);
+        $this->stub = $this->modelRelationship->get(Field::config($this->config)->getRelationships(), $this->stub);
+        $this->getPath();
+        $this->getSrcAttribute();
+        $this->put($this->stub);
         return true;
     }
 
@@ -57,29 +63,29 @@ class GenerateModelCommand extends Command
         }
     }
 
-    private function replace (): string
+    private function getNamespace (): void
     {
-        $this->stub = $this->getNamespace();
-        $this->stub = str_replace(':useNamespace:', $this->useNamespace, $this->stub);
-        $this->stub = str_replace(':useInClass:', $this->useInClass, $this->stub);
-        $this->stub = $this->searchService->get($this->config, $this->stub);
-        $this->stub = $this->modelRelationship->get(Field::config($this->config)->getRelationships(), $this->stub);
-        $this->stub = $this->getPath();
-        return str_replace(':modelName:', Text::config($this->config)->name('model'), $this->stub);
-    }
-
-    private function getNamespace (): string
-    {
-        return str_replace(
+        $this->stub = str_replace(
             ':namespace:',
             Text::config($this->config)->namespaceFolder('model'),
             $this->stub
         );
     }
 
-    private function getPath (): string
+    private function getPath (): void
     {
-        return str_replace(':path:', $this->config['route']['path'], $this->stub);
+        $this->stub = str_replace(':path:', $this->config['route']['path'], $this->stub);
+    }
+
+    protected function getSrcAttribute ()
+    {
+        $this->stub = str_replace(
+            ':getSrcAttribute:',
+            empty(Field::config($this->config)->getFile())
+                ? ''
+                : file_get_contents(__DIR__ . '/../Stubs/model/getSrcAttribute.stub'),
+            $this->stub
+        );
     }
 
 }

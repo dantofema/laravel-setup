@@ -26,7 +26,7 @@ class EditService
 
         foreach ($config['fields'] as $field)
         {
-            if ( ! empty($field['disk']))
+            if ($field['form']['input'] === 'file')
             {
                 continue;
             }
@@ -48,7 +48,7 @@ class EditService
 
         foreach ($config['fields'] as $field)
         {
-            if (empty($field['disk']))
+            if ($field['form']['input'] !== 'file')
             {
                 continue;
             }

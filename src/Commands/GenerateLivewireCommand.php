@@ -4,6 +4,7 @@ namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
+use Dantofema\LaravelSetup\Services\FileSystemService;
 use Dantofema\LaravelSetup\Services\Livewire\NewFileService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Exception;
@@ -19,11 +20,13 @@ class GenerateLivewireCommand extends Command
     public $description = 'Livewire file generator';
     protected array $config;
     private NewFileService $newFileService;
+    private FileSystemService $filesystem;
 
     public function __construct ()
     {
         parent::__construct();
         $this->newFileService = new NewFileService();
+        $this->filesystem = new FileSystemService();
     }
 
     /**
@@ -101,7 +104,7 @@ class GenerateLivewireCommand extends Command
         $rules = "\$rules = [\r\n";
         foreach ($this->config['fields'] as $field)
         {
-            if ( ! array_key_exists('disk', $field))
+            if ($field['form']['input'] !== 'file')
             {
                 $rules .= array_key_exists('editing', $field['rules'])
                     ? "'" . $field['name'] . "' => " . Field::getRulesToString($field['rules'])
@@ -115,6 +118,7 @@ class GenerateLivewireCommand extends Command
         $fieldFile = Field::config($this->config)->getFile();
         if ( ! empty($fieldFile))
         {
+            $this->filesystem->execute($this->config);
             $fileRules = Field::getRulesToString($fieldFile['rules']);
             $rules .= <<<EOT
         if (\$this->createAction)

@@ -30,11 +30,11 @@ class ReplaceService
 
     public function field (array $field): string
     {
-        if ( ! empty($field['disk']))
-        {
-            $this->stub = str_replace(':disk:', $field['disk'], $this->stub);
-            $this->stub = str_replace(':testFakerFile:', "UploadedFile::fake()->image('file.jpg')", $this->stub);
+        $this->stub = str_replace(':disk:', Text::config($this->config)->name('disk'), $this->stub);
+        $this->stub = str_replace(':testFakerFile:', "UploadedFile::fake()->image('file.jpg')", $this->stub);
 
+        if ($field['form']['input'] === 'file')
+        {
             if ( ! str_contains($this->stub, "use Illuminate\Http\UploadedFile;"))
             {
                 str_replace(
@@ -47,9 +47,11 @@ class ReplaceService
 
         $this->stub = str_replace(':field:', $field['name'], $this->stub);
         $this->stub = str_replace(':label:', $field['label'], $this->stub);
+
         $this->stub = empty($field['type'])
             ? $this->stub
             : str_replace(':type:', $field['type'], $this->stub);
+
         return str_replace(':formInput:', $field['form']['input'], $this->stub);
     }
 
@@ -63,6 +65,7 @@ class ReplaceService
         $this->replaceModel();
         $this->replaceUse();
         $this->clearPhpEol();
+        $this->replaceDisk();
 
         return $this->stub;
     }
@@ -115,16 +118,27 @@ class ReplaceService
 
         if ($this->type !== 'model')
         {
-            $useString .= 'use ' . Text::config($this->config)->namespace('model') . ";" . PHP_EOL;
+            $useString .= 'use ' . Text::config($this->config)->namespace('model') . PHP_EOL;
         }
 
         $useString .= str_contains($this->stub, 'Carbon::')
             ? "use Carbon\Carbon;" . PHP_EOL
             : null;
 
+        $useString .= str_contains($this->stub, 'UploadedFile::')
+            ? "use Illuminate\Http\UploadedFile;" . PHP_EOL
+            : null;
+
         $useString .= str_contains($this->stub, 'Str::')
             ? "use Illuminate\Support\Str;" . PHP_EOL
             : null;
+
+        if ($this->type !== 'test')
+        {
+            $useString .= str_contains($this->stub, 'Storage::')
+                ? "use Storage;" . PHP_EOL
+                : null;
+        }
 
         $this->stub = str_replace(':useDefault:', $useString, $this->stub);
     }
@@ -134,6 +148,11 @@ class ReplaceService
         $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
         $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
         $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
+    }
+
+    private function replaceDisk (): void
+    {
+        $this->stub = str_replace(':disk:', Text::config($this->config)->name('disk'), $this->stub);
     }
 
 }

@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Generate;
 use Dantofema\LaravelSetup\Services\FakerService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Illuminate\Console\Command;
@@ -23,9 +22,10 @@ class GenerateFactoryCommand extends Command
         $this->faker = new FakerService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
-<<<<<<< HEAD
+        <<<<
+        <<< HEAD
         $this->init('factory');
 =======
         if (! $this->configFileExists()) {

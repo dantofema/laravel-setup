@@ -2,7 +2,8 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-<<<<<<< HEAD
+<<<<
+<<< HEAD
 use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 =======

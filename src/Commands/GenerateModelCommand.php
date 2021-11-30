@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Models\RelationshipsService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
@@ -29,9 +27,10 @@ class GenerateModelCommand extends Command
         $this->searchService = new SearchService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
-<<<<<<< HEAD
+        <<<<
+        <<< HEAD
         $this->init('model');
         $this->getUserstamps();
         $this->getSoftDelete();

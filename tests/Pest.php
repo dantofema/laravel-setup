@@ -5,11 +5,11 @@ use Dantofema\LaravelSetup\Tests\TestCase;
 use Illuminate\Support\Facades\File;
 
 uses(TestCase::class)
-    ->beforeEach(fn () => clearDirectories())
-    ->afterEach(fn () => clearDirectories())
+    ->beforeEach(fn() => clearDirectories())
+    ->afterEach(fn() => clearDirectories())
     ->in(__DIR__);
 
-function clearDirectories()
+function clearDirectories ()
 {
     File::delete('database/seeders/DatabaseSeeder.php');
     File::copy('database/seeders/_DatabaseSeeder.php', 'database/seeders/DatabaseSeeder.php');
@@ -30,14 +30,17 @@ function clearDirectories()
         'app/Http/Livewire/Traits',
     ];
 
-    foreach ($directories as $directory) {
+    foreach ($directories as $directory)
+    {
         collect(File::files($directory))
             ->contains(function ($value) {
                 File::delete($value);
             });
     }
 }
-<<<<<<< HEAD
+
+<<<<
+<<< HEAD
 
 function actingAs (User $user, string $driver = null): Tests\TestCase
 {

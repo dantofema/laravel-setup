@@ -8,8 +8,12 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+<<<<<<< HEAD
 
     public function getEnvironmentSetUp ($app)
+=======
+    public function getEnvironmentSetUp($app)
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     {
         config()->set('database.default', 'testing');
         /*
@@ -18,16 +22,16 @@ class TestCase extends Orchestra
         */
     }
 
-    protected function setUp (): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'Dantofema\\LaravelSetup\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Dantofema\\LaravelSetup\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
-    protected function getPackageProviders ($app)
+    protected function getPackageProviders($app)
     {
         return [
             LaravelSetupServiceProvider::class,

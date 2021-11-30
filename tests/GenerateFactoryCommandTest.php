@@ -27,6 +27,7 @@ it('generate fields', function () {
 
     $content = File::files('database/factories')[0]->getContents();
 
+<<<<<<< HEAD
     expect(Str::contains($content, [
         "\$title = \$this->faker->unique()->sentence(\$maxNbChars = 10);",
         "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);",
@@ -40,6 +41,26 @@ it('generate fields', function () {
 
 it('if factory file exist return exception and exit', function () {
     $this->expectException(Exception::class);
+=======
+    expect(Str::contains($content, "\$title = \$this->faker->sentence(\$maxNbChars = 10);"))->toBeTrue();
+    expect(Str::contains($content, "\$this->faker->sentence(\$nbWords = 350, \$variableNbWords = true);"))->toBeTrue();
+    expect(Str::contains($content, "\$this->faker->sentence();"))->toBeTrue();
+    expect(Str::contains($content, "\$this->faker->name()->unique();"))->toBeTrue();
+});
+
+it('generate foreign keys', function () {
+    expect(Artisan::call('generate:factory config/example1.php'))->toEqual(1);
+
+    $content = File::files('database/factories')[0]->getContents();
+
+    expect(Str::contains($content, "'user_id' => User::inRandomOrder()->first() ?? User::factory()->create();"))
+        ->toBeTrue();
+    expect(Str::contains($content, "'author_id' => Author::inRandomOrder()->first() ?? Author::factory()->create();"))
+        ->toBeTrue();
+    expect(Str::contains($content, "'key_id' => Key::inRandomOrder()->first() ?? Key::factory()->create();"))
+        ->toBeTrue();
+});
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 
     Artisan::call('generate:factory tests/config/default.php');
     $file = File::files('database/factories')[0];
@@ -59,6 +80,7 @@ it('if config file not found return exception and exit', function () {
     expect(Artisan::call('generate:factory config/not-found.php'))->toEqual(0);
 
     expect(count(File::files('database/factories')))->toEqual(0);
+<<<<<<< HEAD
 });
 
 it('generate factory with --force return true', closure: function () {
@@ -89,6 +111,9 @@ it('update DatabaseSeeder', closure: function () {
 
     expect(Str::contains($content, "Post::factory(10)->create();"))->toBeTrue();
     expect(Str::contains($content, "use App\Models\Post;"))->toBeTrue();
+=======
+    ;
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 });
 
 it('factory file check syntax', closure: function () {

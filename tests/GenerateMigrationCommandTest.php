@@ -54,6 +54,10 @@ it('if config file not found return error and exit', function () {
     expect(Artisan::call('generate:migration config/not-found.php'))->toEqual(0);
 
     expect(count(File::files('database/migrations')))->toEqual(0);
+<<<<<<< HEAD
+=======
+    ;
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 });
 
 it('migration file check syntax', closure: function () {

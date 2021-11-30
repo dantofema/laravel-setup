@@ -29,8 +29,9 @@ class GenerateModelCommand extends Command
         $this->searchService = new SearchService();
     }
 
-    public function handle (): bool
+    public function handle(): bool
     {
+<<<<<<< HEAD
         $this->init('model');
         $this->getUserstamps();
         $this->getSoftDelete();
@@ -51,9 +52,22 @@ class GenerateModelCommand extends Command
         {
             $this->useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
             $this->useInClass .= "use Userstamps;" . PHP_EOL;
+=======
+        if ($this->configFileExists()) {
+            return false;
+        };
+        $this->config = $this->getConfig();
+
+        if (File::exists(self::DIRECTORY . $this->getFileName())) {
+            $this->error('The migration file "' . $this->getFileName() . '" already exists ');
+            $this->error('Exit');
+
+            return false;
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         }
     }
 
+<<<<<<< HEAD
     protected function getSoftDelete ()
     {
         if (in_array('SoftDeletes', $this->config['model']['use']))
@@ -64,6 +78,14 @@ class GenerateModelCommand extends Command
     }
 
     private function getNamespace (): void
+=======
+        $this->create();
+
+        return true;
+    }
+
+    private function getFileName(): string
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     {
         $this->stub = str_replace(
             ':namespace:',
@@ -72,6 +94,7 @@ class GenerateModelCommand extends Command
         );
     }
 
+<<<<<<< HEAD
     private function getPath (): void
     {
         $this->stub = str_replace(':path:', $this->config['route']['path'], $this->stub);
@@ -88,4 +111,28 @@ class GenerateModelCommand extends Command
         );
     }
 
+=======
+    public function create()
+    {
+        $vars = $this->getVarsFromColumns();
+        $definition = $this->getReturnFromColumns();
+        $stub = $this->getStub();
+        if (! $stub) {
+            $this->error('Error get stub');
+            $this->error('Exit');
+
+            return false;
+        }
+        $use = $this->getUse($vars);
+        $content = $this->replace($stub, $use, $vars, $definition);
+        $filename = $this->getFileName();
+        File::put(self::DIRECTORY . $filename, $content);
+    }
+
+//    private function replace (): string
+//    {
+////        $stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $stub);
+////        return str_replace(':modelName:', $this->getModelName(), $stub);
+//    }
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 }

@@ -20,7 +20,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelSetupServiceProvider extends PackageServiceProvider
 {
-    public function configurePackage (Package $package): void
+    public function configurePackage(Package $package): void
     {
         /*
          * This class is a Package Service Provider

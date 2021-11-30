@@ -7,7 +7,7 @@ class FieldService
 
     protected const KEY_SLUG = 'slug';
     protected const KEY_SEARCHABLE = 'searchable';
-    protected const KEY_RELATIONSHIPS = 'relationships';
+    protected const KEY_RELATIONSHIPS = 'relationship';
     protected const KEY_INDEX = 'index';
     private array $config;
 

@@ -142,20 +142,19 @@ EOT;
         $fields = Field::config($this->config)->getRelationships();
         foreach ($fields as $field)
         {
-            $response .= "public Collection $" . $field['relationships']['table'] . ";" . PHP_EOL;
+            $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
         }
         $this->stub = str_replace(':properties:', $response, $this->stub);
     }
 
     private function getUseCollection (): void
     {
-        $response = '';
-        if ( ! empty(Field::config($this->config)->getRelationships()))
-        {
-            $response = 'use Illuminate\Support\Collection;';
-        }
-
-        $this->stub = str_replace(':useCollection:', $response, $this->stub);
+        $this->stub = str_replace(
+            ':useCollection:',
+            empty(Field::config($this->config)->getRelationships())
+                ? ''
+                : 'use Illuminate\Support\Collection;' . PHP_EOL
+            , $this->stub);
     }
 
     private function getQueryRelationships (): void
@@ -164,7 +163,7 @@ EOT;
         $fields = Field::config($this->config)->getRelationships();
         foreach ($fields as $field)
         {
-            $response .= "\$this->" . $field['relationships']['table'] . " = " . $field['relationships']['model'] . "::all();" .
+            $response .= "\$this->" . $field['relationship']['table'] . " = " . $field['relationship']['model'] . "::all();" .
                 PHP_EOL;
         }
         $this->stub = str_replace(':queryRelationships:', $response, $this->stub);

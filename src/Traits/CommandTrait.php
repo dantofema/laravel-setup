@@ -20,9 +20,6 @@ trait CommandTrait
     private string $type;
     private Delete $delete;
 
-    /**
-     * @return array
-     */
     public function getConfig (): array
     {
         return $this->config;

@@ -106,14 +106,18 @@ class ReplaceService
         $useString = '';
         foreach ($this->config['fields'] as $field)
         {
-            if (array_key_exists('relationships', $field))
+            if (array_key_exists('relationship', $field))
             {
-                $useString .= "use App\Models\\" . $field['relationships']['model'] . ";" . PHP_EOL;
+                $useString .= "use App\Models\\" . $field['relationship']['model'] . ";" . PHP_EOL;
             }
         }
 
         $useString .= str_contains($this->stub, 'BelongsTo')
             ? "use Illuminate\Database\Eloquent\Relations\BelongsTo;" . PHP_EOL
+            : null;
+
+        $useString .= str_contains($this->stub, 'BelongsToMany')
+            ? "use Illuminate\Database\Eloquent\Relations\BelongsToMany;" . PHP_EOL
             : null;
 
         if ($this->type !== 'model')

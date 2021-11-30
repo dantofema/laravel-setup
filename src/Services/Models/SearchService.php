@@ -13,14 +13,18 @@ class SearchService
     {
         $searchStub = file_get_contents(self::SEARCH_STUB);
 
-        $query = "\$query";
-        $searchableFields = Field::config($config)->getSearchable();
-        foreach ($searchableFields as $key => $field)
+        $query = "\$query" . PHP_EOL;
+
+        foreach (Field::config($config)->getSearchable() as $searchableField)
         {
-            $query .= array_key_exists('relationships', $field)
-                ? "->orWhereHas('{$field['relationships']['name']}', fn(\$q) => \$q->where('{$field['relationships']['searchable']}', 'like',
-                '%' . \$search . '%'))->with('{$field['relationships']['name']}')\r\n"
-                : "->orWhere('{$field['name']}', 'like', '%' . \$search . '%')\r\n";
+            if (array_key_exists('relationship', $searchableField) and $searchableField['relationship']['type'] === 'belongsToMany')
+            {
+                $query .= "->orWhereHas('{$searchableField['relationship']['name']}', fn(\$q) => \$q->where('{$searchableField['relationship']['table']}.{$searchableField['relationship']['searchable']}', 'like',
+                '%' . \$search . '%'))->with('{$searchableField['relationship']['name']}')" . PHP_EOL;
+                continue;
+            }
+
+            $query .= "->orWhere('{$searchableField['name']}', 'like', '%' . \$search . '%')" . PHP_EOL;
         }
 
         $searchStub = str_replace(':query:', $query, $searchStub);

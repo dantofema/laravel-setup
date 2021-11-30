@@ -148,6 +148,9 @@ return [
                 'table' => 'tags',
                 'label' => 'Etiquetas',
                 'namespace' => 'App\Models\\',
+                'pivot' => [
+                    'table' => 'post_tag',
+                ],
             ],
         ],
     ],

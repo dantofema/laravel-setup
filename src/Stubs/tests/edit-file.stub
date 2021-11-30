@@ -1,0 +1,16 @@
+
+
+it('edit :table:.:field:', function () {
+    $model = :model:::factory()->create();
+    $newValue = :testFakerFile:;
+
+    :actingAs:
+
+    Livewire::test(:livewire:::class)
+        ->call('edit', $model->id)
+        ->set('newFile', $newValue)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    Storage::disk(':disk:')->assertExists(:model:::first()->:field:);
+});

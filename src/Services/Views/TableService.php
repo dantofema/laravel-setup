@@ -57,7 +57,7 @@ class TableService
 
             $cell = array_key_exists('relationships', $field)
                 ? str_replace(':field:',
-                    "optional(\$row->{$field['relationships']['name']})->{$field['relationships']['searchable']}",
+                    "optional(\$row->{$field['relationship']['name']})->{$field['relationship']['searchable']}",
                     $cell)
                 : str_replace(':field:',
                     "\$row->{$field['name']}",

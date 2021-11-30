@@ -16,7 +16,7 @@ class FakerService
 
     public function get (array $field): string
     {
-        if (array_key_exists('relationships', $field))
+        if (array_key_exists('relationship', $field))
         {
             return $this->getForeignKeys($field);
         }
@@ -25,8 +25,8 @@ class FakerService
 
     private function getForeignKeys (array $field): string
     {
-        return $field['relationships']['model'] . "::inRandomOrder()->first() ?? "
-            . $field['relationships']['model'] . "::factory()->create()";
+        return $field['relationship']['model'] . "::inRandomOrder()->first() ?? "
+            . $field['relationship']['model'] . "::factory()->create()";
     }
 
     private function faker (array $field): string

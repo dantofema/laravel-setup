@@ -40,6 +40,11 @@ class DeleteService
                 {
                     File::delete($file);
                 }
+
+                if (Str::contains($file, Str::singular($tableName)) and Str::contains($file, 'pivot'))
+                {
+                    File::delete($file);
+                }
             });
     }
 

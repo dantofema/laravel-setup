@@ -79,10 +79,10 @@ class FormModalService
         $stub = File::get(self::SELECT_PATH);
 
         $stub = str_replace(':field:', $field['name'], $stub);
-        $stub = str_replace(':label:', $field['relationships']['label'], $stub);
-        $stub = str_replace(':arrayItems:', $field['relationships']['table'], $stub);
-        $stub = str_replace(':modelLower:', strtolower($field['relationships']['model']), $stub);
-        return str_replace(':optionField:', $field['relationships']['searchable'], $stub);
+        $stub = str_replace(':label:', $field['relationship']['label'], $stub);
+        $stub = str_replace(':arrayItems:', $field['relationship']['table'], $stub);
+        $stub = str_replace(':modelLower:', strtolower($field['relationship']['model']), $stub);
+        return str_replace(':optionField:', $field['relationship']['searchable'], $stub);
     }
 
 }

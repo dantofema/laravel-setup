@@ -81,6 +81,7 @@ it('if config file not found return exception and exit', function () {
 
     expect(count(File::files('database/factories')))->toEqual(0);
 <<<<<<< HEAD
+<<<<<<< HEAD
 });
 
 it('generate factory with --force return true', closure: function () {
@@ -88,6 +89,9 @@ it('generate factory with --force return true', closure: function () {
 
     expect(Artisan::call('generate:factory tests/config/default.php --force'))
         ->toEqual(1);
+=======
+    ;
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 });
 
 it('if factory file exist when call with --force return true', closure: function () {

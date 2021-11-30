@@ -22,12 +22,15 @@ class GenerateFactoryCommand extends Command
         $this->faker = new FakerService();
     }
 
-    public function handle (): bool
+    public function handle(): bool
     {
+<<<<<<< HEAD
         <<<<
         <<< HEAD
         $this->init('factory');
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         if (! $this->configFileExists()) {
             return false;
         };
@@ -37,12 +40,15 @@ class GenerateFactoryCommand extends Command
         $this->stub = str_replace(':return:', $this->getReturnFromColumns(), $this->stub);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->put($this->stub);
 
         Generate::addSeeder($this->config);
 
         return true;
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         if ($this->fileExists()) {
             return false;
         };
@@ -74,6 +80,7 @@ class GenerateFactoryCommand extends Command
     {
         $vars = '';
 <<<<<<< HEAD
+<<<<<<< HEAD
         foreach ($this->config['fields'] as $field)
         {
             $vars .= sprintf(
@@ -81,6 +88,8 @@ class GenerateFactoryCommand extends Command
                 $field['name'],
                 $this->faker->get($field)
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         foreach ($this->config['table']['columns'] as $column) {
             $row = sprintf(
                 "$%s = %s % s,\r\n",
@@ -91,9 +100,12 @@ class GenerateFactoryCommand extends Command
             );
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         return $vars;
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 
         return $vars;
     }
@@ -145,6 +157,7 @@ class GenerateFactoryCommand extends Command
     private function getReturnFromColumns(): string
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         $return = PHP_EOL . "return [" . PHP_EOL;
         foreach ($this->config['fields'] as $field)
         {
@@ -157,6 +170,8 @@ class GenerateFactoryCommand extends Command
 
         return $return . PHP_EOL . "];" . PHP_EOL;
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         $return = "\r\nreturn [\r\n";
         foreach ($this->config['table']['columns'] as $column) {
             $row = sprintf(

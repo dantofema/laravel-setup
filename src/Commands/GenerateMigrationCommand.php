@@ -2,11 +2,14 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+<<<<<<< HEAD
 <<<<
 <<< HEAD
 use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 use Dantofema\LaravelSetup\Traits\Config;
 >>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 use Illuminate\Console\Command;
@@ -18,11 +21,14 @@ class GenerateMigrationCommand extends Command
     use CommandTrait;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     const STUB_PATH = '/../Stubs/migration.php.stub';
     const STUB_PATH_PIVOT = '/../Stubs/pivot.php.stub';
 
     public $signature = 'generate:migration {path : path to the config file } {--force}';
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     public const STUB_PATH = '/../Stubs/create_setup_table.php.stub';
     protected const DIRECTORY = 'database/migrations/';
     public $signature = 'generate:migration {path : path to the config file }';
@@ -32,8 +38,11 @@ class GenerateMigrationCommand extends Command
     public function handle(): bool
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         $this->init('migration');
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         if (! $this->configFileExists()) {
             return false;
         };
@@ -101,6 +110,7 @@ class GenerateMigrationCommand extends Command
             $this->createPivotMigrationFile($field['relationship']['pivot']['table']);
         }
 
+<<<<<<< HEAD
         if ($field['relationship']['type'] === 'belongsTo')
         {
             return sprintf("\$table->foreignId('%s')%s->constrained('%s');" . PHP_EOL,
@@ -108,6 +118,8 @@ class GenerateMigrationCommand extends Command
                 ! empty($rules['nullable']) ? '->nullable()' : null,
                 $field['relationship']['table'],
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         if ($this->migrationFileExists()) {
             return false;
         }
@@ -171,6 +183,7 @@ class GenerateMigrationCommand extends Command
             );
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         return '';
     }
 
@@ -202,6 +215,8 @@ class GenerateMigrationCommand extends Command
             'database/migrations/' . now()->format('Y_m_d_His') . '_create_' . $table . '_pivot_table.php',
             $pivotStub);
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 
         return $rows;
     }

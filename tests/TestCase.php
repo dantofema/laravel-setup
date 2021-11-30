@@ -9,8 +9,12 @@ use Orchestra\Testbench\TestCase as Orchestra;
 class TestCase extends Orchestra
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     public function getEnvironmentSetUp ($app)
+=======
+    public function getEnvironmentSetUp($app)
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 =======
     public function getEnvironmentSetUp($app)
 >>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392

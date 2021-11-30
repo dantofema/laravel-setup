@@ -27,8 +27,9 @@ class GenerateModelCommand extends Command
         $this->searchService = new SearchService();
     }
 
-    public function handle (): bool
+    public function handle(): bool
     {
+<<<<<<< HEAD
         <<<<
         <<< HEAD
         $this->init('model');
@@ -52,6 +53,8 @@ class GenerateModelCommand extends Command
             $this->useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
             $this->useInClass .= "use Userstamps;" . PHP_EOL;
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         if ($this->configFileExists()) {
             return false;
         };
@@ -84,6 +87,7 @@ class GenerateModelCommand extends Command
     }
 
     private function getFileName(): string
+<<<<<<< HEAD
 >>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     {
         $this->stub = str_replace(
@@ -95,10 +99,13 @@ class GenerateModelCommand extends Command
 
 <<<<<<< HEAD
     private function getPath (): void
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     {
         $this->stub = str_replace(':path:', $this->config['route']['path'], $this->stub);
     }
 
+<<<<<<< HEAD
     protected function getSrcAttribute ()
     {
         $this->stub = str_replace(
@@ -111,6 +118,8 @@ class GenerateModelCommand extends Command
     }
 
 =======
+=======
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     public function create()
     {
         $vars = $this->getVarsFromColumns();
@@ -133,5 +142,8 @@ class GenerateModelCommand extends Command
 ////        $stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $stub);
 ////        return str_replace(':modelName:', $this->getModelName(), $stub);
 //    }
+<<<<<<< HEAD
+>>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
+=======
 >>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
 }

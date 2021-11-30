@@ -15,10 +15,8 @@ use Illuminate\Support\Facades\Facade;
  */
 class Replace extends Facade
 {
-
-    protected static function getFacadeAccessor (): string
+    protected static function getFacadeAccessor(): string
     {
         return 'replace';
     }
-
 }

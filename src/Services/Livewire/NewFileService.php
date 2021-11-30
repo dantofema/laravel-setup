@@ -7,27 +7,25 @@ use Dantofema\LaravelSetup\Facades\Text;
 
 class NewFileService
 {
-
-    public function get (array $config, string $stub): string
+    public function get(array $config, string $stub): string
     {
         $field = Field::config($config)->getFile();
 
         $stub = str_replace(
             ':editNewFile:',
-            ! empty ($field) ? '$this->newFile = "";' : '',
+            ! empty($field) ? '$this->newFile = "";' : '',
             $stub
         );
 
         $stub = str_replace(
             ':createNewFile:',
-            ! empty ($field) ? '$this->newFile = null;' : '',
+            ! empty($field) ? '$this->newFile = null;' : '',
             $stub
         );
 
         $replace = '';
 
-        if ($field)
-        {
+        if ($field) {
             $name = $field['name'];
             $disk = Text::config($config)->name('disk');
 
@@ -38,7 +36,7 @@ class NewFileService
 
         return str_replace(
             ':newFile:',
-            empty ($field) ? '' : 'public $newFile;',
+            empty($field) ? '' : 'public $newFile;',
             $stub
         );
     }

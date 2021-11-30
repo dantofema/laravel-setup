@@ -9,30 +9,27 @@ use JetBrains\PhpStorm\Pure;
 
 class EditService
 {
-
     protected const EDIT_STUB = __DIR__ . '/../../Stubs/tests/edit.stub';
     protected const EDIT_FILE_STUB = __DIR__ . '/../../Stubs/tests/edit-file.stub';
     public FakerService $fakerService;
 
-    #[Pure] public function __construct ()
-    {
-        $this->fakerService = new FakerService();
-    }
+    #[Pure]
+ public function __construct()
+ {
+     $this->fakerService = new FakerService();
+ }
 
-    public function get (array $config, string $stub): string
+    public function get(array $config, string $stub): string
     {
         $editStub = Replace::config($config)->stub(self::EDIT_STUB)->type('test')->default();
         $string = '';
 
-        foreach ($config['fields'] as $field)
-        {
-            if ($field['form']['input'] === 'file')
-            {
+        foreach ($config['fields'] as $field) {
+            if ($field['form']['input'] === 'file') {
                 continue;
             }
 
-            if ($field['form']['input'])
-            {
+            if ($field['form']['input']) {
                 $string .= Replace::config($config)->stub($editStub)->type('test')->default();
                 $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
             }
@@ -41,15 +38,13 @@ class EditService
         return $stub . Replace::config($config)->stub($string)->type('test')->default();
     }
 
-    public function file (array $config, string $stub): string
+    public function file(array $config, string $stub): string
     {
         $editStub = Replace::config($config)->stub(File::get(self::EDIT_FILE_STUB))->type('test')->default();
         $string = '';
 
-        foreach ($config['fields'] as $field)
-        {
-            if ($field['form']['input'] !== 'file')
-            {
+        foreach ($config['fields'] as $field) {
+            if ($field['form']['input'] !== 'file') {
                 continue;
             }
 
@@ -59,5 +54,4 @@ class EditService
 
         return $stub . Replace::config($config)->stub($string)->type('test')->default();
     }
-
 }

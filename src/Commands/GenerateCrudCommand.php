@@ -19,10 +19,9 @@ class GenerateCrudCommand extends Command
 
     public $description = 'CRUD generator';
 
-    public function handle (): bool
+    public function handle(): bool
     {
-        if ($this->option('all'))
-        {
+        if ($this->option('all')) {
             $this->factory();
             $this->livewire();
             $this->migration();
@@ -30,55 +29,67 @@ class GenerateCrudCommand extends Command
             $this->test();
             $this->view();
         }
+
         return true;
     }
 
-    protected function factory (): void
+    protected function factory(): void
     {
-        $this->call('generate:factory', [
+        $this->call(
+            'generate:factory',
+            [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
+                '--force' => $this->option('force'), ]
         );
     }
 
-    protected function livewire (): void
+    protected function livewire(): void
     {
-        $this->call('generate:livewire', [
+        $this->call(
+            'generate:livewire',
+            [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
+                '--force' => $this->option('force'), ]
         );
     }
 
-    protected function migration (): void
+    protected function migration(): void
     {
-        $this->call('generate:migration', [
+        $this->call(
+            'generate:migration',
+            [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
+                '--force' => $this->option('force'), ]
         );
     }
 
-    protected function model (): void
+    protected function model(): void
     {
-        $this->call('generate:model', [
+        $this->call(
+            'generate:model',
+            [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
+                '--force' => $this->option('force'), ]
         );
     }
 
-    protected function test (): void
+    protected function test(): void
     {
-        $this->call('generate:test', [
+        $this->call(
+            'generate:test',
+            [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
+                '--force' => $this->option('force'), ]
         );
     }
 
-    protected function view (): void
+    protected function view(): void
     {
-        $this->call('generate:view', [
+        $this->call(
+            'generate:view',
+            [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force')]
+                '--force' => $this->option('force'), ]
         );
     }
 }
-

@@ -19,8 +19,7 @@ use Illuminate\Support\Facades\Facade;
  */
 class Field extends Facade
 {
-
-    protected static function getFacadeAccessor (): string
+    protected static function getFacadeAccessor(): string
     {
         return 'field';
     }

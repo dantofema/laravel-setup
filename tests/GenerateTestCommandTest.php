@@ -46,4 +46,3 @@ it('test file check syntax', closure: function () {
 //    dump(File::get(Text::config($config)->path('test')));
     expect(shell_exec("php -l -f " . Text::config($config)->path('test')))->toContain('No syntax errors detected');
 });
-

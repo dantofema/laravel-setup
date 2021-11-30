@@ -47,4 +47,3 @@ it('model file check syntax', closure: function () {
 
     expect(shell_exec("php -l -f " . Text::config($config)->path('model')))->toContain('No syntax errors detected');
 });
-

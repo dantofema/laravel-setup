@@ -11,7 +11,6 @@ use Exception;
 use Illuminate\Console\Command;
 
 class GenerateLivewireCommand extends Command
-
 {
     use CommandTrait;
 
@@ -22,7 +21,7 @@ class GenerateLivewireCommand extends Command
     private NewFileService $newFileService;
     private FileSystemService $filesystem;
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->newFileService = new NewFileService();
@@ -32,7 +31,7 @@ class GenerateLivewireCommand extends Command
     /**
      * @throws Exception
      */
-    public function handle (): bool
+    public function handle(): bool
     {
         $this->init('livewire');
 
@@ -51,7 +50,7 @@ class GenerateLivewireCommand extends Command
         return true;
     }
 
-    private function getNamespace (): void
+    private function getNamespace(): void
     {
         $this->stub = str_replace(
             ':namespace:',
@@ -60,7 +59,7 @@ class GenerateLivewireCommand extends Command
         );
     }
 
-    private function sortField (): void
+    private function sortField(): void
     {
         $this->stub = str_replace(
             ':sortField:',
@@ -69,43 +68,38 @@ class GenerateLivewireCommand extends Command
         );
     }
 
-    private function getDetach (): void
+    private function getDetach(): void
     {
         $response = '';
 
-        foreach ($this->config['fields'] as $field)
-        {
-            if (array_key_exists('belongsToMany', $field))
-            {
+        foreach ($this->config['fields'] as $field) {
+            if (array_key_exists('belongsToMany', $field)) {
                 $response .= "\$this->editing->" . $field['name'] . "()->detach();\r\n";
             }
         }
         $this->stub = str_replace(':detach:', $response, $this->stub);
     }
 
-    private function getSaveSlug (): void
+    private function getSaveSlug(): void
     {
         $slug = '';
-        foreach ($this->config['fields'] as $field)
-        {
-            if ($field['name'] == 'slug')
-            {
+        foreach ($this->config['fields'] as $field) {
+            if ($field['name'] == 'slug') {
                 $slug = "\$this->setSlug('" . $field['source'] . "');";
             }
         }
-        $this->stub = str_replace(':saveSlug:',
+        $this->stub = str_replace(
+            ':saveSlug:',
             $slug,
             $this->stub
         );
     }
 
-    private function getRules (): void
+    private function getRules(): void
     {
         $rules = "\$rules = [\r\n";
-        foreach ($this->config['fields'] as $field)
-        {
-            if ($field['form']['input'] !== 'file')
-            {
+        foreach ($this->config['fields'] as $field) {
+            if ($field['form']['input'] !== 'file') {
                 $rules .= array_key_exists('editing', $field['rules'])
                     ? "'" . $field['name'] . "' => " . Field::getRulesToString($field['rules'])
                     : "'editing." . $field['name'] . "' => " . Field::getRulesToString($field['rules']);
@@ -116,8 +110,7 @@ class GenerateLivewireCommand extends Command
         $rules .= "];\r\n";
 
         $fieldFile = Field::config($this->config)->getFile();
-        if ( ! empty($fieldFile))
-        {
+        if (! empty($fieldFile)) {
             $this->filesystem->execute($this->config);
             $fileRules = Field::getRulesToString($fieldFile['rules']);
             $rules .= <<<EOT
@@ -130,39 +123,39 @@ EOT;
 
         $rules .= "\r\n return \$rules;\r\n";
 
-        $this->stub = str_replace(':rules:',
+        $this->stub = str_replace(
+            ':rules:',
             $rules,
             $this->stub
         );
     }
 
-    private function getProperties (): void
+    private function getProperties(): void
     {
         $response = '';
         $fields = Field::config($this->config)->getRelationships();
-        foreach ($fields as $field)
-        {
+        foreach ($fields as $field) {
             $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
         }
         $this->stub = str_replace(':properties:', $response, $this->stub);
     }
 
-    private function getUseCollection (): void
+    private function getUseCollection(): void
     {
         $this->stub = str_replace(
             ':useCollection:',
             empty(Field::config($this->config)->getRelationships())
                 ? ''
-                : 'use Illuminate\Support\Collection;' . PHP_EOL
-            , $this->stub);
+                : 'use Illuminate\Support\Collection;' . PHP_EOL,
+            $this->stub
+        );
     }
 
-    private function getQueryRelationships (): void
+    private function getQueryRelationships(): void
     {
         $response = '';
         $fields = Field::config($this->config)->getRelationships();
-        foreach ($fields as $field)
-        {
+        foreach ($fields as $field) {
             $response .= "\$this->" . $field['relationship']['table'] . " = " . $field['relationship']['model'] . "::all();" .
                 PHP_EOL;
         }

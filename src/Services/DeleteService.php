@@ -12,51 +12,48 @@ class DeleteService
     private string $type;
     private RouteService $route;
 
-    #[Pure] public function __construct ()
-    {
-        $this->route = new RouteService();
-    }
+    #[Pure]
+ public function __construct()
+ {
+     $this->route = new RouteService();
+ }
 
-    public function config (array $config): void
+    public function config(array $config): void
     {
-        if ($this->type == 'migration')
-        {
+        if ($this->type == 'migration') {
             $this->deleteMigrationFile($config['table']['name']);
         }
 
-        if ($this->type == 'livewire')
-        {
+        if ($this->type == 'livewire') {
             $this->route->delete($config);
         }
 
         $this->deleteFile($config);
     }
 
-    protected function deleteMigrationFile (string $tableName): void
+    protected function deleteMigrationFile(string $tableName): void
     {
         collect(File::files('database/migrations/'))
             ->contains(function ($file) use ($tableName) {
-                if (Str::contains($file, '_create_' . $tableName . '_table.php'))
-                {
+                if (Str::contains($file, '_create_' . $tableName . '_table.php')) {
                     File::delete($file);
                 }
 
-                if (Str::contains($file, Str::singular($tableName)) and Str::contains($file, 'pivot'))
-                {
+                if (Str::contains($file, Str::singular($tableName)) and Str::contains($file, 'pivot')) {
                     File::delete($file);
                 }
             });
     }
 
-    protected function deleteFile (array $config): void
+    protected function deleteFile(array $config): void
     {
         File::delete(Text::config($config)->path($this->type));
     }
 
-    public function type (string $type): DeleteService
+    public function type(string $type): DeleteService
     {
         $this->type = $type;
+
         return $this;
     }
-
 }

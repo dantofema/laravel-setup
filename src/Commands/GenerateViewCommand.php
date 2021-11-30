@@ -12,7 +12,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class GenerateViewCommand extends Command
-
 {
     use CommandTrait;
 
@@ -23,7 +22,7 @@ class GenerateViewCommand extends Command
     private DeleteModalService $deleteModal;
     private TableService $tableService;
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->formModal = new FormModalService();
@@ -31,21 +30,22 @@ class GenerateViewCommand extends Command
         $this->tableService = new TableService();
     }
 
-    public function handle (): bool
+    public function handle(): bool
     {
         $this->init('view');
 
         return $this->create();
     }
 
-    public function create (): bool
+    public function create(): bool
     {
         return File::put(
             Text::config($this->config)->path('view'),
-            $this->replace());
+            $this->replace()
+        );
     }
 
-    private function replace (): string
+    private function replace(): string
     {
         $this->stub = $this->getTitle();
         $this->stub = $this->formModal->get($this->config, $this->stub);
@@ -57,16 +57,19 @@ class GenerateViewCommand extends Command
         );
 
         $this->stub = $this->tableService->getCells(
-            Field::config($this->config)->getIndex(), $this->stub
+            Field::config($this->config)->getIndex(),
+            $this->stub
         );
+
         return $this->stub;
     }
 
-    private function getTitle (): string
+    private function getTitle(): string
     {
-        return str_replace(':title:',
+        return str_replace(
+            ':title:',
             $this->config['view']['title'] ?: '',
-            $this->stub);
+            $this->stub
+        );
     }
-
 }

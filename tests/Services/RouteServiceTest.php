@@ -7,8 +7,10 @@ use Illuminate\Support\Str;
 it('PostsLivewire not found', closure: function () {
     $content = File::get('routes/web.php');
 
-    expect(Str::contains($content,
-        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"))
+    expect(Str::contains(
+        $content,
+        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"
+    ))
         ->toBeFalse();
 });
 
@@ -19,12 +21,16 @@ it('add PostsLivewire route', closure: function () {
 
     $content = File::get('routes/web.php');
 
-    expect(Str::contains($content,
-        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"))
+    expect(Str::contains(
+        $content,
+        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"
+    ))
         ->toBeTrue();
 
-    expect(Str::contains($content,
-        "<?php"))
+    expect(Str::contains(
+        $content,
+        "<?php"
+    ))
         ->toBeTrue();
 });
 
@@ -35,12 +41,16 @@ it('delete PostsLivewire route', closure: function () {
 
     $content = File::get('routes/web.php');
 
-    expect(Str::contains($content,
-        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"))
+    expect(Str::contains(
+        $content,
+        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"
+    ))
         ->toBeFalse();
 
-    expect(Str::contains($content,
-        "<?php"))
+    expect(Str::contains(
+        $content,
+        "<?php"
+    ))
         ->toBeTrue();
 });
 
@@ -52,12 +62,16 @@ it('delete PostsLivewire route bucle', closure: function () {
 
     $content = File::get('routes/web.php');
 
-    expect(Str::contains($content,
-        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"))
+    expect(Str::contains(
+        $content,
+        "Route::get('/notas', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');"
+    ))
         ->toBeTrue();
 
-    expect(Str::contains($content,
-        "<?php"))
+    expect(Str::contains(
+        $content,
+        "<?php"
+    ))
         ->toBeTrue();
 });
 
@@ -70,4 +84,3 @@ it('seeder file check syntax', closure: function () {
     $route->delete(include(__DIR__ . '/../config/default.php'));
     expect(shell_exec("php -l -f database/seeders/DatabaseSeeder.php"))->toContain('No syntax errors detected');
 });
-

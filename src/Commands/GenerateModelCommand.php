@@ -2,6 +2,8 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
+use Dantofema\LaravelSetup\Facades\Field;
+use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Models\RelationshipsService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
@@ -27,11 +29,8 @@ class GenerateModelCommand extends Command
         $this->searchService = new SearchService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
-<<<<<<< HEAD
-        <<<<
-        <<< HEAD
         $this->init('model');
         $this->getUserstamps();
         $this->getSoftDelete();
@@ -52,24 +51,9 @@ class GenerateModelCommand extends Command
         {
             $this->useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
             $this->useInClass .= "use Userstamps;" . PHP_EOL;
-=======
-=======
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
-        if ($this->configFileExists()) {
-            return false;
-        };
-        $this->config = $this->getConfig();
-
-        if (File::exists(self::DIRECTORY . $this->getFileName())) {
-            $this->error('The migration file "' . $this->getFileName() . '" already exists ');
-            $this->error('Exit');
-
-            return false;
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
         }
     }
 
-<<<<<<< HEAD
     protected function getSoftDelete ()
     {
         if (in_array('SoftDeletes', $this->config['model']['use']))
@@ -80,15 +64,6 @@ class GenerateModelCommand extends Command
     }
 
     private function getNamespace (): void
-=======
-        $this->create();
-
-        return true;
-    }
-
-    private function getFileName(): string
-<<<<<<< HEAD
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     {
         $this->stub = str_replace(
             ':namespace:',
@@ -97,15 +72,11 @@ class GenerateModelCommand extends Command
         );
     }
 
-<<<<<<< HEAD
     private function getPath (): void
-=======
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
     {
         $this->stub = str_replace(':path:', $this->config['route']['path'], $this->stub);
     }
 
-<<<<<<< HEAD
     protected function getSrcAttribute ()
     {
         $this->stub = str_replace(
@@ -117,15 +88,13 @@ class GenerateModelCommand extends Command
         );
     }
 
-=======
-=======
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
-    public function create()
+    public function create ()
     {
         $vars = $this->getVarsFromColumns();
         $definition = $this->getReturnFromColumns();
         $stub = $this->getStub();
-        if (! $stub) {
+        if ( ! $stub)
+        {
             $this->error('Error get stub');
             $this->error('Exit');
 
@@ -134,16 +103,16 @@ class GenerateModelCommand extends Command
         $use = $this->getUse($vars);
         $content = $this->replace($stub, $use, $vars, $definition);
         $filename = $this->getFileName();
-        File::put(self::DIRECTORY . $filename, $content);
+        $this->put($content);
     }
 
-//    private function replace (): string
-//    {
-////        $stub = str_replace(':classFactory:', $this->getModelName() . 'Factory', $stub);
-////        return str_replace(':modelName:', $this->getModelName(), $stub);
-//    }
-<<<<<<< HEAD
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
-=======
->>>>>>> 0fcc104187b2328a8856ac256be39a8f89dc7392
+    private function getFileName (): string
+    {
+        $this->stub = str_replace(
+            ':namespace:',
+            Text::config($this->config)->namespaceFolder('model'),
+            $this->stub
+        );
+    }
+
 }

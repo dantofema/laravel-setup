@@ -33,6 +33,7 @@ trait FileExistsTrait
         return collect(File::files('database/migrations/'))
             ->contains(function ($file) {
                 $name = $this->config['table']['name'];
+
                 if (Str::contains($file, '_create_' . $name . '_table.php'))
                 {
                     throw new Exception('Migration file exists');
@@ -49,9 +50,8 @@ trait FileExistsTrait
         {
             return true;
         }
-        $this->error('Not found "' . $this->argument('path') . '"');
-        $this->error('Exit');
-        throw new Exception('Migration file exists');
+
+        throw new Exception('Not found "' . $this->argument('path') . '"');
     }
 
 }

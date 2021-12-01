@@ -13,29 +13,55 @@ class SeederService
     {
         $content = File::get($this->databaseSeeder);
 
-        $use = Text::config($config)->namespace('model');
+        $content = $this->addUse($config, $content);
 
-        if ( ! str_contains($content, $use))
+        $factory = Text::config($config)->name('model') . "::factory(10)->create()";
+
+        foreach ($config['fields'] as $field)
         {
-            $content = str_replace(
-                "Seeders;",
-                "Seeders;" . PHP_EOL . "use " . $use . PHP_EOL,
-                $content
-            );
+            if (isset($field['relationship']) and $field['relationship']['type'] === 'belongsToMany')
+            {
+                $factory .= "->each(function(\$model) { \$model->" . $field['relationship']['name']
+                    . "()->attach(" . $field['relationship']['model'] . "::factory(3)->create()); })";
+            }
         }
-
-        $factory = Text::config($config)->name('model') . "::factory(10)->create();";
 
         if ( ! str_contains($content, $factory))
         {
             $content = str_replace(
                 "User::factory(10)->create();",
-                "User::factory(10)->create();\r\n" . $factory . "\r\n",
+                "User::factory(10)->create();" . PHP_EOL . $factory . ';' . PHP_EOL,
                 $content
             );
         }
 
         File::put($this->databaseSeeder, $content);
+    }
+
+    private function addUse (array $config, string $content): string|array
+    {
+        $useModel = "use " . Text::config($config)->namespace('model');
+        $use = str_contains($content, $useModel)
+            ? ''
+            : $useModel . PHP_EOL;
+
+        foreach ($config['fields'] as $field)
+        {
+            if (isset($field['relationship']) and $field['relationship']['type'] === 'belongsToMany')
+            {
+                $useRelationship = "use " . $field['relationship']['namespace'] . $field['relationship']['model'] . ';';
+
+                $use .= str_contains($content, $useRelationship)
+                    ? ''
+                    : $useRelationship . PHP_EOL;
+            }
+        }
+
+        return str_replace(
+            "Seeders;",
+            "Seeders;" . PHP_EOL . $use,
+            $content
+        );
     }
 
     public function delete (array $config)

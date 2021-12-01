@@ -14,14 +14,12 @@ class FileService
         'WithSetup',
     ];
 
-    public function copy ()
+    public function copy()
     {
         File::ensureDirectoryExists(self::LIVEWIRE_TRAITS_PATH);
 
-        foreach ($this->files as $file)
-        {
-            if ( ! File::exists(self::LIVEWIRE_TRAITS_PATH . $file))
-            {
+        foreach ($this->files as $file) {
+            if (! File::exists(self::LIVEWIRE_TRAITS_PATH . $file)) {
                 $content = File::get(__DIR__ . self::LIVEWIRE_TRAITS_PATH_SOURCE . $file . '.stub');
                 File::put(self::LIVEWIRE_TRAITS_PATH . $file . '.php', $content);
             }
@@ -29,5 +27,4 @@ class FileService
 
         File::copyDirectory(__DIR__ . self::COMPONENT_PATH_SOURCE, self::COMPONENT_PATH);
     }
-
 }

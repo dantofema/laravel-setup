@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Facade;
  */
 class Generate extends Facade
 {
-    protected static function getFacadeAccessor (): string
+    protected static function getFacadeAccessor(): string
     {
         return 'generate';
     }

@@ -17,5 +17,3 @@ it('edit slug', closure: function () {
     ]))
         ->toBeFalse();
 });
-
-

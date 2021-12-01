@@ -35,4 +35,3 @@ it('view file check syntax', closure: function () {
 
     expect(shell_exec("php -l -f " . Text::config($config)->path('view')))->toContain('No syntax errors detected');
 });
-

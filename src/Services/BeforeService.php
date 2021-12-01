@@ -28,16 +28,16 @@ class BeforeService
     ];
     private FileService $file;
 
-    #[Pure] public function __construct ()
-    {
-        $this->pest = new PestService();
-        $this->file = new FileService();
-    }
+    #[Pure]
+ public function __construct()
+ {
+     $this->pest = new PestService();
+     $this->file = new FileService();
+ }
 
-    public function setup ()
+    public function setup()
     {
-        foreach ($this->directories as $directory)
-        {
+        foreach ($this->directories as $directory) {
             File::ensureDirectoryExists($directory);
         }
 
@@ -45,5 +45,4 @@ class BeforeService
 
         $this->pest->actingAs();
     }
-
 }

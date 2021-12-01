@@ -14,17 +14,15 @@ class FileSystemService
     protected const FILESYSTEM_PHP = 'config/filesystems.php';
     protected const FILESYSTEM_STUB = __DIR__ . '/../Stubs/filesystems.php.stub';
 
-    public function execute (array $config)
+    public function execute(array $config)
     {
-        if (empty(Field::config($config)->getFile()))
-        {
+        if (empty(Field::config($config)->getFile())) {
             return;
         }
 
         $disk = strtolower(Text::config($config)->name('model'));
 
-        if (Str::contains(File::get(self::FILESYSTEM_PHP), $disk))
-        {
+        if (Str::contains(File::get(self::FILESYSTEM_PHP), $disk)) {
             return;
         }
 
@@ -35,15 +33,16 @@ class FileSystemService
         File::put(self::FILESYSTEM_PHP, $content);
     }
 
-    private function replaceLinks (string $disk): string
+    private function replaceLinks(string $disk): string
     {
         $links = str_replace("'storage'", "'" . $disk . "'", self::ORIGINAL_LINKS);
         $links = str_replace("/public'", "/" . $disk . "'", $links);
         $links = self::ORIGINAL_LINKS . PHP_EOL . $links;
+
         return str_replace(self::ORIGINAL_LINKS, $links, File::get(self::FILESYSTEM_PHP));
     }
 
-    private function replaceDisks (string $disk, string $content): string|array
+    private function replaceDisks(string $disk, string $content): string|array
     {
         $stub = self::ORIGINAL_DISKS
             . PHP_EOL
@@ -51,5 +50,4 @@ class FileSystemService
 
         return str_replace(self::ORIGINAL_DISKS, $stub, $content);
     }
-
 }

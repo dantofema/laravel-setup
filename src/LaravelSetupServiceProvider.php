@@ -42,7 +42,7 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
             ->hasCommand(GenerateFactoryCommand::class);
     }
 
-    public function packageRegistered ()
+    public function packageRegistered()
     {
         $this->app->bind('generate', function () {
             return new GenerateService();
@@ -64,6 +64,4 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
             return new ReplaceService();
         });
     }
-
 }
-

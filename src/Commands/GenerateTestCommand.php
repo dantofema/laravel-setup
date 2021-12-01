@@ -12,7 +12,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class GenerateTestCommand extends Command
-
 {
     use CommandTrait;
 
@@ -26,7 +25,7 @@ class GenerateTestCommand extends Command
     private CreateService $saveService;
     private EditService $editService;
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->editSlugService = new EditSlugService();
@@ -35,7 +34,7 @@ class GenerateTestCommand extends Command
         $this->editService = new EditService();
     }
 
-    public function handle (): bool
+    public function handle(): bool
     {
         $this->init('test');
 
@@ -53,51 +52,51 @@ class GenerateTestCommand extends Command
         return true;
     }
 
-    private function getUse (): void
+    private function getUse(): void
     {
         $replace = 'use ' . Text::config($this->config)->namespace('livewire') . PHP_EOL;
         $this->stub = str_replace(':use:', $replace, $this->stub);
     }
 
-    private function getUri (): void
+    private function getUri(): void
     {
         $uri = $this->config['backend'] ? 'sistema/' : '';
         $this->stub = str_replace(
             ':uri:',
             $uri . $this->config['route']['path'],
-            $this->stub);
+            $this->stub
+        );
     }
 
-    private function getField (): void
+    private function getField(): void
     {
         $field = $this->config['fields'][0];
 
         $this->stub = str_replace(
             ':field:',
             $field['name'],
-            $this->stub);
+            $this->stub
+        );
     }
 
-    private function editSlug (): void
+    private function editSlug(): void
     {
         $this->stub = str_replace(
             ':edit-slug:',
             $this->editSlugService->get($this->config),
-            $this->stub);
+            $this->stub
+        );
     }
 
-    private function getDisk (): void
+    private function getDisk(): void
     {
         $disk = '';
-        foreach ($this->config['fields'] as $field)
-        {
-            if ($field['form']['input'] === 'file')
-            {
+        foreach ($this->config['fields'] as $field) {
+            if ($field['form']['input'] === 'file') {
                 $disk = "Storage::fake(':disk:');";
                 $disk .= "\$this->newFile = '';";
             }
         }
         $this->stub = str_replace(':disk:', $disk, $this->stub);
     }
-
 }

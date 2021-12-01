@@ -12,13 +12,13 @@ class GenerateMigrationCommand extends Command
 {
     use CommandTrait;
 
-    const STUB_PATH = '/../Stubs/migration.php.stub';
-    const STUB_PATH_PIVOT = '/../Stubs/pivot.php.stub';
+    public const STUB_PATH = '/../Stubs/migration.php.stub';
+    public const STUB_PATH_PIVOT = '/../Stubs/pivot.php.stub';
     protected const DIRECTORY = 'database/migrations/';
     public $signature = 'generate:migration {path : path to the config file } {--force}';
     public $description = 'Migration file generator';
 
-    public function handle (): bool
+    public function handle(): bool
     {
         $this->init('migration');
 
@@ -27,50 +27,46 @@ class GenerateMigrationCommand extends Command
         $this->stub = str_replace(':fields:', $rows, $this->stub);
 
         $this->stub = str_replace(
-            ':className:', Str::of($this->config['table']['name'])->camel()->ucfirst(),
-            $this->stub);
+            ':className:',
+            Str::of($this->config['table']['name'])->camel()->ucfirst(),
+            $this->stub
+        );
 
         $this->put($this->stub);
 
         return true;
     }
 
-    public function getFields (): string
+    public function getFields(): string
     {
         $rows = '';
-        foreach ($this->config['fields'] as $field)
-        {
+        foreach ($this->config['fields'] as $field) {
             $relationship = Field::getRelationship($field);
             $rules = Field::getRules($field);
 
-            if (empty($relationship))
-            {
-                $row = sprintf("\$table->%s('%s')%s%s;\r\n",
+            if (empty($relationship)) {
+                $row = sprintf(
+                    "\$table->%s('%s')%s%s;\r\n",
                     $field['type'],
                     $field['name'],
                     ! empty($rules['nullable']) ? '->nullable()' : null,
                     ! empty($rules['unique']) ? '->unique()' : null
                 );
-            } else
-            {
+            } else {
                 $row = $this->fieldWithRelationship($field);
             }
             $rows .= $row;
         }
 
-        if (array_key_exists('use', $this->config['model']))
-        {
-            if (in_array('SoftDeletes', $this->config['model']['use']))
-            {
+        if (array_key_exists('use', $this->config['model'])) {
+            if (in_array('SoftDeletes', $this->config['model']['use'])) {
                 $rows .= "\$table->softDeletes();\r\n";
             }
 
-            if (in_array('Userstamps', $this->config['model']['use']))
-            {
+            if (in_array('Userstamps', $this->config['model']['use'])) {
                 $rows .= "\$table->unsignedBigInteger('created_by')->nullable();\r\n";
                 $rows .= "\$table->unsignedBigInteger('updated_by')->nullable();\r\n";
-                if (in_array('SoftDeletes', $this->config['model']['use']))
-                {
+                if (in_array('SoftDeletes', $this->config['model']['use'])) {
                     $rows .= "\$table->unsignedBigInteger('deleted_by')->nullable();\r\n";
                 }
             }
@@ -79,24 +75,25 @@ class GenerateMigrationCommand extends Command
         return $rows;
     }
 
-    private function fieldWithRelationship ($field): string
+    private function fieldWithRelationship($field): string
     {
-        if ($field['relationship']['type'] === 'belongsToMany')
-        {
+        if ($field['relationship']['type'] === 'belongsToMany') {
             $this->createPivotMigrationFile($field['relationship']['pivot']['table']);
         }
 
-        if ($field['relationship']['type'] === 'belongsTo')
-        {
-            return sprintf("\$table->foreignId('%s')%s->constrained('%s');" . PHP_EOL,
+        if ($field['relationship']['type'] === 'belongsTo') {
+            return sprintf(
+                "\$table->foreignId('%s')%s->constrained('%s');" . PHP_EOL,
                 $field['name'],
                 ! empty($rules['nullable']) ? '->nullable()' : null,
-                $field['relationship']['table']);
+                $field['relationship']['table']
+            );
         }
+
         return '';
     }
 
-    private function createPivotMigrationFile ($table): void
+    private function createPivotMigrationFile($table): void
     {
         $pivotStub = file_get_contents(__DIR__ . '/../Stubs/pivot.php.stub');
         $explode = explode('_', $table);
@@ -110,7 +107,8 @@ class GenerateMigrationCommand extends Command
         $pivotStub = str_replace(
             ':className:',
             ucfirst($explode[0]) . ucfirst($explode[1]),
-            $pivotStub);
+            $pivotStub
+        );
 
         $fields = "\$table->unsignedInteger('" . $explode[0] . "_id');" . PHP_EOL;
         $fields .= "\$table->unsignedInteger('" . $explode[1] . "_id');" . PHP_EOL;
@@ -118,11 +116,12 @@ class GenerateMigrationCommand extends Command
         $pivotStub = str_replace(
             ':fields:',
             $fields,
-            $pivotStub);
+            $pivotStub
+        );
 
         File::put(
             'database/migrations/' . now()->format('Y_m_d_His') . '_create_' . $table . '_pivot_table.php',
-            $pivotStub);
+            $pivotStub
+        );
     }
-
 }

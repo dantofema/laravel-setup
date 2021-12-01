@@ -17,13 +17,13 @@ class GenerateFactoryCommand extends Command
     public $description = 'Factory file generator';
     private FakerService $faker;
 
-    public function __construct ()
+    public function __construct()
     {
         parent::__construct();
         $this->faker = new FakerService();
     }
 
-    public function handle (): bool
+    public function handle(): bool
     {
         $this->init('factory');
 
@@ -37,35 +37,33 @@ class GenerateFactoryCommand extends Command
         return true;
     }
 
-    private function getVarsFromColumns (): string
+    private function getVarsFromColumns(): string
     {
         $vars = '';
 
-        foreach ($this->config['fields'] as $field)
-        {
-            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
-            {
+        foreach ($this->config['fields'] as $field) {
+            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany') {
                 continue;
             }
             $vars .= sprintf(
                 "$%s = %s;" . PHP_EOL,
                 $field['name'],
-                $this->faker->get($field));
+                $this->faker->get($field)
+            );
         }
 
         return $vars;
     }
 
-    private function getReturnFromColumns (): string
+    private function getReturnFromColumns(): string
     {
         $response = PHP_EOL . "return [" . PHP_EOL;
-        foreach ($this->config['fields'] as $field)
-        {
-            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
-            {
+        foreach ($this->config['fields'] as $field) {
+            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany') {
                 continue;
             }
-            $response .= sprintf("'%s' => $%s," . PHP_EOL,
+            $response .= sprintf(
+                "'%s' => $%s," . PHP_EOL,
                 $field['name'],
                 $field['name'],
             );
@@ -73,6 +71,4 @@ class GenerateFactoryCommand extends Command
 
         return $response . PHP_EOL . "];" . PHP_EOL;
     }
-
 }
-

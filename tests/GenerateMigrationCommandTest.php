@@ -18,19 +18,19 @@ it('generate migration file', closure: function () {
     expect(Str::contains($file->getFilenameWithoutExtension(), 'posts_table'))->toBeTrue();
 });
 
-function getMigrationFile (): \Symfony\Component\Finder\SplFileInfo
+function getMigrationFile(): \Symfony\Component\Finder\SplFileInfo
 {
     $config = include(__DIR__ . '/config/default.php');
     $files = File::files('database/migrations');
     $migration = null;
-    foreach ($files as $file)
-    {
-        if (Str::contains($file, $config['table']))
-        {
+    foreach ($files as $file) {
+        if (Str::contains($file, $config['table'])) {
             $migration = $file;
+
             break;
         }
     }
+
     return $migration;
 }
 

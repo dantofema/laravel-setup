@@ -12,15 +12,13 @@ trait FileExistsTrait
     /**
      * @throws Exception
      */
-    protected function exists (string $type): bool
+    protected function exists(string $type): bool
     {
-        if ($type == 'migration')
-        {
+        if ($type == 'migration') {
             $this->migrationFileExists();
         }
 
-        if (File::exists(Text::config($this->config)->path($type)))
-        {
+        if (File::exists(Text::config($this->config)->path($type))) {
             $this->error('The ' . $type . ' file "' . Text::config($this->config)->filename($type) . '" already exists ');
             $this->error('Exit');
 
@@ -30,14 +28,13 @@ trait FileExistsTrait
         return false;
     }
 
-    protected function migrationFileExists (): bool
+    protected function migrationFileExists(): bool
     {
         return collect(File::files('database/migrations/'))
             ->contains(function ($file) {
                 $name = $this->config['table']['name'];
 
-                if (Str::contains($file, '_create_' . $name . '_table.php'))
-                {
+                if (Str::contains($file, '_create_' . $name . '_table.php')) {
                     throw new Exception('Migration file exists');
                 }
             });
@@ -46,13 +43,13 @@ trait FileExistsTrait
     /**
      * @throws Exception
      */
-    protected function configFileExists (): bool
+    protected function configFileExists(): bool
     {
-        if (File::exists($this->argument('path')))
-        {
+        if (File::exists($this->argument('path'))) {
             return true;
         }
         $this->error('Not found "' . $this->argument('path') . '"');
+
         throw new Exception('Not found "' . $this->argument('path') . '"');
     }
 }

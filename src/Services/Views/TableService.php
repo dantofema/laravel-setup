@@ -14,24 +14,21 @@ class TableService
 
     protected string $class = 'class="w-full"';
 
-    public function getHeadings (array $fields, string $stub): string
+    public function getHeadings(array $fields, string $stub): string
     {
         $headings = '';
-        foreach ($fields as $key => $field)
-        {
+        foreach ($fields as $key => $field) {
             $heading = $this->heading;
 
             $class = 'class="w-1/4"';
-            if ($key === array_key_first($fields))
-            {
+            if ($key === array_key_first($fields)) {
                 $class = $this->class;
             }
             $heading = str_replace(':class:', $class, $heading);
             $heading = str_replace(':label:', $field['label'], $heading);
 
             $sortable = '';
-            if ( ! empty($field['sortable']))
-            {
+            if (! empty($field['sortable'])) {
                 $sortable = str_replace(':sortBy:', $field['name'], $this->sortable);
             }
             $heading = str_replace(':sortable:', $sortable, $heading);
@@ -46,11 +43,10 @@ class TableService
         );
     }
 
-    public function getCells (array $fields, string $stub): string
+    public function getCells(array $fields, string $stub): string
     {
         $cells = '';
-        foreach ($fields as $key => $field)
-        {
+        foreach ($fields as $key => $field) {
             $cell = '<x-table.cell> :field: </x-table.cell>';
 
             $row = explode('.', $key);
@@ -73,10 +69,9 @@ class TableService
         );
     }
 
-    private function relationshipCell ($relationship, string $cell): string
+    private function relationshipCell($relationship, string $cell): string
     {
-        $replace = match ($relationship['type'])
-        {
+        $replace = match ($relationship['type']) {
             'belongsToMany' => "@foreach(\$row->" . $relationship['name'] . " as \$item) <x-table.badge color='blue'>{{ \$item->name }}</x-table.badge> @endforeach",
             'belongsTo' => "{{ optional(\$row->{$relationship['name']})->{$relationship['searchable']} }}"
         };

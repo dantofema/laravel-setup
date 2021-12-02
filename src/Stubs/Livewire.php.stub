@@ -42,7 +42,6 @@ class :livewire: extends Component
         $this->createAction = false;
         $this->titleFormModal = 'Editar';
         $this->editing = $model;
-        :editBelongsToMany:
         :editNewFile:
         $this->showFormModal = true;
     }

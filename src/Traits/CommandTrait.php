@@ -20,7 +20,7 @@ trait CommandTrait
     private string $type;
     private Delete $delete;
 
-    public function getConfig(): array
+    public function getConfig (): array
     {
         return $this->config;
     }
@@ -28,7 +28,7 @@ trait CommandTrait
     /**
      * @throws Exception
      */
-    protected function init(string $type): bool
+    protected function init (string $type): bool
     {
         $this->type = $type;
         Generate::setup();
@@ -37,11 +37,13 @@ trait CommandTrait
 
         $this->config = include $this->argument('path');
 
-        if ($this->option('force')) {
+        if ($this->option('force'))
+        {
             Generate::delete($this->config, $type);
         }
 
-        if ($type == 'livewire') {
+        if ($type == 'livewire')
+        {
             Generate::addRoute($this->config);
         }
 
@@ -52,11 +54,13 @@ trait CommandTrait
         return true;
     }
 
-    protected function setStub(): void
+    protected function setStub (): void
     {
-        if ($this->type !== 'view') {
+        if ($this->type !== 'view')
+        {
             $path = self::STUB_PATH;
-        } else {
+        } else
+        {
             $path = $this->config['view']['jetstream']
                 ? $this->jetstreamPath
                 : $this->tailwindPath;
@@ -65,7 +69,7 @@ trait CommandTrait
         $this->stub = file_get_contents(__DIR__ . $path);
     }
 
-    protected function put(string $content): bool|int
+    protected function put (string $content): bool|int
     {
         $replaceContent = Replace::config($this->config)
             ->stub($content)

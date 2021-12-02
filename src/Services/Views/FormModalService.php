@@ -16,7 +16,7 @@ class FormModalService
     protected const TEXT_AREA_PATH = __DIR__ . '/../../Stubs/view/jetstream/text-area.blade.php.stub';
     protected const SELECT_PATH = __DIR__ . '/../../Stubs/view/jetstream/select.blade.php.stub';
 
-    public function get(array $config, string $stub): string
+    public function get (array $config, string $stub): string
     {
         $form = File::get(self::STUB_PATH);
 
@@ -32,11 +32,13 @@ class FormModalService
     /**
      * @throws Exception
      */
-    private function fields(array $config): string
+    private function fields (array $config): string
     {
         $fields = '';
-        foreach ($config['fields'] as $field) {
-            $fields .= match ($field['form']['input']) {
+        foreach ($config['fields'] as $field)
+        {
+            $fields .= match ($field['form']['input'])
+            {
                 'text' => $this->inputText($field),
                 'textarea' => $this->textarea($field),
                 'file' => $this->inputFile($field),
@@ -50,7 +52,7 @@ class FormModalService
         return $fields;
     }
 
-    private function inputText(array $field): string
+    private function inputText (array $field): string
     {
         $stub = File::get(self::INPUT_TEXT_PATH);
         $stub = str_replace(':label:', $field['label'], $stub);
@@ -62,7 +64,7 @@ class FormModalService
         return str_replace(':field:', $field['name'], $stub);
     }
 
-    private function textarea(array $field): string
+    private function textarea (array $field): string
     {
         $stub = File::get(self::TEXT_AREA_PATH);
 
@@ -71,7 +73,7 @@ class FormModalService
         return str_replace(':field:', $field['name'], $stub);
     }
 
-    private function inputFile(array $field): string
+    private function inputFile (array $field): string
     {
         $stub = File::get(self::INPUT_FILE_PATH);
 
@@ -80,7 +82,7 @@ class FormModalService
         return str_replace(':field:', 'newFile', $stub);
     }
 
-    private function inputSelect(array $field): string
+    private function inputSelect (array $field): string
     {
         $stub = File::get(self::SELECT_PATH);
 

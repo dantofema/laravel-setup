@@ -4,7 +4,7 @@ namespace Dantofema\LaravelSetup\Services;
 
 class FakerService
 {
-    public function toTest($field): string
+    public function toTest ($field): string
     {
         $string = $this->get($field);
         $string = str_replace('first()', 'first()->id', $string);
@@ -13,27 +13,29 @@ class FakerService
         return str_replace('$this->faker', 'faker()', $string);
     }
 
-    public function get(array $field): string
+    public function get (array $field): string
     {
-        if (array_key_exists('relationship', $field)) {
+        if (array_key_exists('relationship', $field))
+        {
             return $this->getForeignKeys($field);
         }
 
         return $this->faker($field);
     }
 
-    private function getForeignKeys(array $field): string
+    private function getForeignKeys (array $field): string
     {
         return $field['relationship']['model'] . "::inRandomOrder()->first() ?? "
             . $field['relationship']['model'] . "::factory()->create()";
     }
 
-    private function faker(array $field): string
+    private function faker (array $field): string
     {
         $preFaker = '$this->faker->';
         $preFaker .= in_array('unique', $field) ? 'unique()->' : null;
 
-        return match ($field['name']) {
+        return match ($field['name'])
+        {
             'name' => $preFaker . 'name()',
             'last_name' => $preFaker . 'lastName()',
             'slug' => "Str::slug($" . $field['source'] . ")",

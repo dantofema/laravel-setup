@@ -13,6 +13,7 @@ class FormModalService
     protected const STUB_PATH = __DIR__ . '/../../Stubs/view/jetstream/form-modal.blade.php.stub';
     protected const INPUT_FILE_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-file.blade.php.stub';
     protected const INPUT_TEXT_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-text.blade.php.stub';
+    protected const INPUT_TEXT_BELONGS_TO_MANY_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-text-belongs-to-many.blade.php.stub';
     protected const TEXT_AREA_PATH = __DIR__ . '/../../Stubs/view/jetstream/text-area.blade.php.stub';
     protected const SELECT_PATH = __DIR__ . '/../../Stubs/view/jetstream/select.blade.php.stub';
 
@@ -39,7 +40,9 @@ class FormModalService
         {
             $fields .= match ($field['form']['input'])
             {
-                'text' => $this->inputText($field),
+                'text' => $this->isBelongsToMany($field)
+                    ? $this->inputTextBelongsToMany($field)
+                    : $this->inputText($field),
                 'textarea' => $this->textarea($field),
                 'file' => $this->inputFile($field),
                 'select' => $this->inputSelect($field),
@@ -52,31 +55,51 @@ class FormModalService
         return $fields;
     }
 
+    private function isBelongsToMany (array $field): bool
+    {
+        return array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany';
+    }
+
+    private function inputTextBelongsToMany (array $field): string
+    {
+        $stub = File::get(self::INPUT_TEXT_BELONGS_TO_MANY_PATH);
+        $stub = str_replace(':label:', $field['label'], $stub);
+
+        $stub = str_replace(
+            ':name:',
+            $field['relationship']['name'],
+            $stub
+        );
+
+        $stub = str_replace(
+            ':searchable:',
+            $field['relationship']['searchable'],
+            $stub
+        );
+
+        $stub = str_replace(
+            ':model:',
+            $field['relationship']['model'],
+            $stub
+        );
+
+        $stub = str_replace(
+            ':modelLower:',
+            strtolower($field['relationship']['model']),
+            $stub
+        );
+
+        return str_replace(':field:', 'new' . $field['relationship']['model'], $stub);
+    }
+
     private function inputText (array $field): string
     {
         $stub = File::get(self::INPUT_TEXT_PATH);
         $stub = str_replace(':label:', $field['label'], $stub);
 
-        $stub = str_replace(
-            ':belongsToMany:',
-            $this->isBelongsToMany($field)
-                ? "@foreach( \$this->" . $field['relationship']['name'] . " as \$item)<x-table.badge color='blue'>{{ \$item->name }}</x-table.badge>@endforeach"
-                : '',
-            $stub
-        );
+        $stub = str_replace(':editing:', 'editing.', $stub);
 
-        $stub = $this->isBelongsToMany($field)
-            ? str_replace(':editing:', '', $stub)
-            : str_replace(':editing:', 'editing.', $stub);
-
-        return $this->isBelongsToMany($field)
-            ? str_replace(':field:', 'new' . $field['relationship']['model'], $stub)
-            : str_replace(':field:', $field['name'], $stub);
-    }
-
-    private function isBelongsToMany (array $field): bool
-    {
-        return array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany';
+        return str_replace(':field:', $field['name'], $stub);
     }
 
     private function textarea (array $field): string

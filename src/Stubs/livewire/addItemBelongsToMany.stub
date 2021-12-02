@@ -1,0 +1,6 @@
+public function add:model: (:model: $model)
+{
+    $this->:table:->push($model);
+    $this->new:model: = '';
+    $this->:modelLower:Options = collect([]);
+}

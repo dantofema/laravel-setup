@@ -1,0 +1,6 @@
+public function updatedNew:model: (string $value)
+{
+    $this->:modelLower:Options = :model:::where('name', 'like', '%' . $value . '%')
+        ->whereNotIn('id', $this->:name:->pluck('id'))
+        ->take(5)->get();
+}

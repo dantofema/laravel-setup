@@ -1,13 +1,1 @@
-if ($this->:relationshipName: === '')
-{
-    $this->editing->:relationshipName:()->detach();
- } else
- {
-    $items = explode(',', $this->:relationshipName:);
-    $syncItems = [];
-    foreach ($items as $item)
-    {
-        $syncItems[] = :relationshipModel:::firstOrCreate(['name' => $item, 'slug' => Str::slug($item)])->id;
-    }
-    $this->editing->:relationshipName:()->sync($syncItems);
-}
+$this->editing->:name:()->sync($this->:name:);

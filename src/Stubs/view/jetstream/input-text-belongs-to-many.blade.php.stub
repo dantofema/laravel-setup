@@ -1,0 +1,51 @@
+<div class="space-y-2">
+    <x-jet-label class="space-y-2">
+        <div class="w-1/2">:label:</div>
+        <div x-data="{isTyped: false}">
+            <div>
+                <div class="relative">
+                    <x-jet-input
+                        wire:model.debounce.500ms=":field:"
+                        placeholder="{{__('Buscar...')}}"
+                        x-on:input.debounce.400ms="isTyped = ($event.target.value != '')"
+                        autocomplete="off"
+                        type="text"
+                        class="w-full"/>
+                </div>
+                {{-- search box --}}
+                    <div x-show="isTyped" x-cloak>
+
+                            <div class="border-gray-400 rounded-md shadow-sm w-full bg-gray-100">
+                                @foreach($:modelLower:Options as $item)
+                                    <div wire:click='addTag({{ $item->id }})'
+                                        class='cursor-pointer hover:bg-gray-200 py-2 pl-3'>
+                                        {{ $item->:searchable: }}
+                                    </div>
+                                @endforeach
+
+                                @if(!empty($newTag))
+                                     <div wire:click="createTag('{{ $newTag }}')"
+                                            class='cursor-pointer bg-blue-400 hover:bg-blue-600 py-2 pl-3 text-white font-weight'>
+                                            Crear
+                                     </div>
+                                @endif
+
+                            </div>
+
+                    </div>
+            </div>
+
+        </div>
+    </x-jet-label>
+
+        <div>
+            @foreach( $this->:name: as $key => $item)
+
+                   <x-badge.with-remove-button
+                        :text='$item->name'
+                        :id='$key'
+                        :method="'remove:model:'"/>
+                   @endforeach
+        </div>
+
+</div>

@@ -81,6 +81,8 @@ class :livewire: extends Component
         ]);
     }
 
+    :belongsToManyMethods:
+
     public function mount ()
     {
         $this->editing = :model:::make();

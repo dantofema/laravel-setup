@@ -1,0 +1,4 @@
+public function remove:model: (int $key)
+{
+    $this->:table:->forget($key);
+}

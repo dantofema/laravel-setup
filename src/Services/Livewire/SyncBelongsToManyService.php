@@ -19,18 +19,10 @@ class SyncBelongsToManyService
         $response = '';
         foreach ($fields as $field)
         {
-            $syncStub = file_get_contents(__DIR__ . '/../../Stubs/livewire/syncBelongsToMany.stub');
-
-            $syncStub = str_replace(
-                ':relationshipName:',
-                $field['relationship']['name'],
-                $syncStub
-            );
-
             $response .= str_replace(
-                ':relationshipModel:',
-                $field['relationship']['model'],
-                $syncStub
+                ':name:',
+                $field['relationship']['name'],
+                file_get_contents(__DIR__ . '/../../Stubs/livewire/syncBelongsToMany.stub')
             );
         }
 

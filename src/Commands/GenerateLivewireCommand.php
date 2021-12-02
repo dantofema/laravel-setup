@@ -162,7 +162,8 @@ EOT;
         {
             if ($field['relationship']['type'] === 'belongsToMany')
             {
-                $response .= "public string $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                $response .= "public string \$new" . $field['relationship']['model'] . "='';" . PHP_EOL;
             }
 
             if ($field['relationship']['type'] === 'belongsTo')
@@ -193,6 +194,13 @@ EOT;
             if ($field['relationship']['type'] === 'belongsTo')
             {
                 $response .= "\$this->" . $field['relationship']['table'] . " = " . $field['relationship']['model'] . "::all();" .
+                    PHP_EOL;
+            }
+
+            if ($field['relationship']['type'] === 'belongsToMany')
+            {
+                $response .= "\$this->" . $field['relationship']['table'] . " = "
+                    . " collect([]);" .
                     PHP_EOL;
             }
         }

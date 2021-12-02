@@ -57,11 +57,26 @@ class FormModalService
         $stub = File::get(self::INPUT_TEXT_PATH);
         $stub = str_replace(':label:', $field['label'], $stub);
 
-        $stub = (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
+        $stub = str_replace(
+            ':belongsToMany:',
+            $this->isBelongsToMany($field)
+                ? "@foreach( \$this->" . $field['relationship']['name'] . " as \$item)<x-table.badge color='blue'>{{ \$item->name }}</x-table.badge>@endforeach"
+                : '',
+            $stub
+        );
+
+        $stub = $this->isBelongsToMany($field)
             ? str_replace(':editing:', '', $stub)
             : str_replace(':editing:', 'editing.', $stub);
 
-        return str_replace(':field:', $field['name'], $stub);
+        return $this->isBelongsToMany($field)
+            ? str_replace(':field:', 'new' . $field['relationship']['model'], $stub)
+            : str_replace(':field:', $field['name'], $stub);
+    }
+
+    private function isBelongsToMany (array $field): bool
+    {
+        return array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany';
     }
 
     private function textarea (array $field): string

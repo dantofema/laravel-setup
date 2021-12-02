@@ -19,21 +19,14 @@ class EditBelongsToManyService
         $response = '';
         foreach ($fields as $field)
         {
-            $editStub = "\$this->:relationshipName: = "
-                . "\$this->editing->:relationshipName:;";
-//                . "->pluck(':searchable:')->implode(',');";
+            $response .= "\$this->"
+                . $field['relationship']['name']
+                . " = \$this->editing->"
+                . $field['relationship']['name'] . ';' . PHP_EOL;
 
-            $editStub = str_replace(
-                ':relationshipName:',
-                $field['relationship']['name'],
-                $editStub
-            );
-
-            $response .= str_replace(
-                ':searchable:',
-                $field['relationship']['searchable'],
-                $editStub
-            );
+            $response .= "\$this->new"
+                . $field['relationship']['model']
+                . " = '';";
         }
 
         return str_replace(

@@ -42,6 +42,7 @@ class :livewire: extends Component
         $this->createAction = false;
         $this->titleFormModal = 'Editar';
         $this->editing = $model;
+        :editBelongsToMany:
         :editNewFile:
         $this->showFormModal = true;
     }
@@ -62,6 +63,7 @@ class :livewire: extends Component
         :saveSlug:
         $this->validate();
         $this->editing->save();
+        :syncBelongsToMany:
         $this->showFormModal = false;
     }
 

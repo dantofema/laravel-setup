@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\File;
 
 class DeleteModalService
 {
-    protected const STUB_PATH = __DIR__ . '/../../Stubs/view/jetstream/delete-modal.blade.php';
+    protected const STUB_PATH = __DIR__ . '/../../Stubs/view/jetstream/delete-modal.blade.php.stub';
 
-    public function get(string $stub): string
+    public function get (string $stub): string
     {
         $form = File::get(self::STUB_PATH);
 

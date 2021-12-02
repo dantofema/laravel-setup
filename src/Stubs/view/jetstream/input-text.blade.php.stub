@@ -1,0 +1,11 @@
+<x-jet-label class="space-y-2">
+    <div class="w-1/2">:label:</div>
+    <x-jet-input wire:model=":editing::field:" type="text" class="w-full"/>
+
+{{--
+    @foreach( $editing->:field: as $item)
+        <x-table.badge color='blue'>{{ $item->name }}</x-table.badge>
+    @endforeach
+--}}
+
+</x-jet-label>

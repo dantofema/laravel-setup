@@ -32,18 +32,18 @@ trait WithSetup
         $this->sortField = $field;
     }
 
-        public function setNewFile (string $field, string $disk)
+    public function setNewFile (string $field, string $disk)
+    {
+        if ($this->newFile)
         {
-            if ($this->newFile)
-            {
-                Storage::disk($disk)->delete($this->editing->$field);
-                $this->editing->$field = $this->newFile->store('/', $disk);
-            }
+            Storage::disk($disk)->delete($this->editing->$field);
+            $this->editing->$field = $this->newFile->store('/', $disk);
         }
+    }
 
-        public function setSlug (string $field)
-        {
-            $this->editing->slug = Str::slug($this->editing->$field);
-        }
+    public function setSlug (string $field)
+    {
+        $this->editing->slug = Str::slug($this->editing->$field);
+    }
 
 }

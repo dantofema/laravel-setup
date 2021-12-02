@@ -86,14 +86,22 @@ it('update DatabaseSeeder', closure: function () {
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
     expect(Str::contains($content, "Post::factory(10)->create();"))->toBeFalse();
-    expect(Str::contains($content, "use App\Models\Post;"))->toBeFalse();
+
+    expect(Str::contains($content, [
+        "use App\Models\Post;",
+    ]))->toBeFalse();
 
     Artisan::call('generate:factory tests/config/default.php');
 
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
-    expect(Str::contains($content, "Post::factory(10)->create();"))->toBeTrue();
-    expect(Str::contains($content, "use App\Models\Post;"))->toBeTrue();
+    expect(Str::contains($content, [
+        "Post::factory(10)->create()->each(function (\$model) {\$model->tags()->attach(Tag::factory(3)->create());});",
+        "use App\Models\Post;",
+        "use App\Models\Tag;",
+        "<?php",
+        "class DatabaseSeeder extends Seeder",
+    ]))->toBeTrue();
 });
 
 it('factory file check syntax', closure: function () {

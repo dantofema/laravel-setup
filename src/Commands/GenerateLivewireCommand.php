@@ -5,7 +5,7 @@ namespace Dantofema\LaravelSetup\Commands;
 use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\FileSystemService;
-use Dantofema\LaravelSetup\Services\Livewire\EditBelongsToManyService;
+use Dantofema\LaravelSetup\Services\Livewire\BelongsToManyService;
 use Dantofema\LaravelSetup\Services\Livewire\NewFileService;
 use Dantofema\LaravelSetup\Services\Livewire\SyncBelongsToManyService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
@@ -23,7 +23,7 @@ class GenerateLivewireCommand extends Command
     private NewFileService $newFileService;
     private FileSystemService $filesystem;
     private SyncBelongsToManyService $syncBelongsToMany;
-    private EditBelongsToManyService $editBelongsToMany;
+    private BelongsToManyService $editBelongsToMany;
 
     public function __construct ()
     {
@@ -31,7 +31,7 @@ class GenerateLivewireCommand extends Command
         $this->newFileService = new NewFileService();
         $this->filesystem = new FileSystemService();
         $this->syncBelongsToMany = new SyncBelongsToManyService();
-        $this->editBelongsToMany = new EditBelongsToManyService();
+        $this->editBelongsToMany = new BelongsToManyService();
     }
 
     /**
@@ -163,6 +163,8 @@ EOT;
             if ($field['relationship']['type'] === 'belongsToMany')
             {
                 $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                $response .= "public Collection \$"
+                    . strtolower($field['relationship']['model']) . "Options;" . PHP_EOL;
                 $response .= "public string \$new" . $field['relationship']['model'] . "='';" . PHP_EOL;
             }
 
@@ -200,6 +202,10 @@ EOT;
             if ($field['relationship']['type'] === 'belongsToMany')
             {
                 $response .= "\$this->" . $field['relationship']['table'] . " = "
+                    . " collect([]);" .
+                    PHP_EOL;
+                $response .= "\$this->"
+                    . strtolower($field['relationship']['model']) . "Options = "
                     . " collect([]);" .
                     PHP_EOL;
             }

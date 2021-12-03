@@ -1,0 +1,6 @@
+public function create:model: (string $value)
+{
+    $this->:name:->push(:model:::firstOrCreate([':searchable:' => $value, 'slug' => Str::slug($value)]));
+    $this->new:model: = '';
+    $this->:modelLower:Options = collect([]);
+}

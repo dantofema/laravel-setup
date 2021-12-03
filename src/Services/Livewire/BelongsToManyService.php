@@ -25,6 +25,7 @@ class BelongsToManyService
             $belongsToManyMethods .= $this->getUpdatedNew($field['relationship']);
             $belongsToManyMethods .= $this->getAddItem($field['relationship']);
             $belongsToManyMethods .= $this->getRemoveItem($field['relationship']);
+            $belongsToManyMethods .= $this->getCreateItem($field['relationship']);
         }
 
         $stub = str_replace(
@@ -66,6 +67,12 @@ class BelongsToManyService
         $stub = str_replace(
             ':name:',
             $relationship['name'],
+            $stub
+        );
+
+        $stub = str_replace(
+            ':searchable:',
+            $relationship['searchable'],
             $stub
         );
 
@@ -112,6 +119,35 @@ class BelongsToManyService
         return str_replace(
             ':table:',
             strtolower($relationship['table']),
+            $stub
+        );
+    }
+
+    private function getCreateItem (array $relationship): string
+    {
+        $stub = file_get_contents(__DIR__ . '/../../Stubs/livewire/createItemBelongsToMany.stub');
+
+        $stub = str_replace(
+            ':model:',
+            $relationship['model'],
+            $stub
+        );
+
+        $stub = str_replace(
+            ':searchable:',
+            $relationship['searchable'],
+            $stub
+        );
+
+        $stub = str_replace(
+            ':modelLower:',
+            strtolower($relationship['model']),
+            $stub
+        );
+
+        return str_replace(
+            ':name:',
+            strtolower($relationship['name']),
             $stub
         );
     }

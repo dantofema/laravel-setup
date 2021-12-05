@@ -78,8 +78,9 @@ class :livewire: extends Component
             'rows' => :model:::search($this->search)
                 ->orderBy($this->sortField, $this->sortDirection ? 'desc' : 'asc')
                 ->paginate($this->perPage),
-        ]);
+        ]):layout:;
     }
+
 
     :belongsToManyMethods:
 

@@ -23,7 +23,7 @@ class GenerateLivewireCommand extends Command
     private NewFileService $newFileService;
     private FileSystemService $filesystem;
     private SyncBelongsToManyService $syncBelongsToMany;
-    private BelongsToManyService $editBelongsToMany;
+    private BelongsToManyService $belongsToMany;
 
     public function __construct ()
     {
@@ -31,7 +31,7 @@ class GenerateLivewireCommand extends Command
         $this->newFileService = new NewFileService();
         $this->filesystem = new FileSystemService();
         $this->syncBelongsToMany = new SyncBelongsToManyService();
-        $this->editBelongsToMany = new BelongsToManyService();
+        $this->belongsToMany = new BelongsToManyService();
     }
 
     /**
@@ -44,14 +44,14 @@ class GenerateLivewireCommand extends Command
         $this->getNamespace();
         $this->sortField();
         $this->stub = $this->newFileService->get($this->config, $this->stub);
-        $this->getDetach();
         $this->getSaveSlug();
         $this->getRules();
         $this->getProperties();
         $this->getUseCollection();
         $this->getQueryRelationships();
+        $this->getLayout();
         $this->stub = $this->syncBelongsToMany->get($this->config, $this->stub);
-        $this->stub = $this->editBelongsToMany->get($this->config, $this->stub);
+        $this->stub = $this->belongsToMany->get($this->config, $this->stub);
 
         $this->put($this->stub);
 
@@ -74,20 +74,6 @@ class GenerateLivewireCommand extends Command
             $this->config['livewire']['properties']['sortField'],
             $this->stub
         );
-    }
-
-    private function getDetach (): void
-    {
-        $response = '';
-
-        foreach ($this->config['fields'] as $field)
-        {
-            if (array_key_exists('belongsToMany', $field))
-            {
-                $response .= "\$this->editing->" . $field['name'] . "()->detach();\r\n";
-            }
-        }
-        $this->stub = str_replace(':detach:', $response, $this->stub);
     }
 
     private function getSaveSlug (): void
@@ -211,5 +197,16 @@ EOT;
             }
         }
         $this->stub = str_replace(':queryRelationships:', $response, $this->stub);
+    }
+
+    private function getLayout (): void
+    {
+        $layout = '';
+
+        if ($this->config['backend'] and $this->config['view']['layout'] === 'tailwind')
+        {
+            $layout = "->layout('layouts.tailwind.backend.app')";
+        }
+        $this->stub = str_replace(':layout:', $layout, $this->stub);
     }
 }

@@ -6,31 +6,34 @@ class BelongsToManyService
 {
     public function get (array $config, string $stub): string
     {
-        $fields = [];
+        $editBelongsToMany = '';
+        $belongsToManyMethods = '';
+        $detach = '';
 
         foreach ($config['fields'] as $field)
         {
             if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
             {
-                $fields[] = $field;
+                $editBelongsToMany .= $this->getEditBelongsToMany($field['relationship']);
+
+                $belongsToManyMethods .= $this->getUpdatedNew($field['relationship']);
+                $belongsToManyMethods .= $this->getAddItem($field['relationship']);
+                $belongsToManyMethods .= $this->getRemoveItem($field['relationship']);
+                $belongsToManyMethods .= $this->getCreateItem($field['relationship']);
+
+                $detach .= $this->getDetach($field['relationship']);
             }
-        }
-        $editBelongsToMany = '';
-        $belongsToManyMethods = '';
-
-        foreach ($fields as $field)
-        {
-            $editBelongsToMany .= $this->getEditBelongsToMany($field['relationship']);
-
-            $belongsToManyMethods .= $this->getUpdatedNew($field['relationship']);
-            $belongsToManyMethods .= $this->getAddItem($field['relationship']);
-            $belongsToManyMethods .= $this->getRemoveItem($field['relationship']);
-            $belongsToManyMethods .= $this->getCreateItem($field['relationship']);
         }
 
         $stub = str_replace(
             ':belongsToManyMethods:',
             $belongsToManyMethods,
+            $stub
+        );
+
+        $stub = str_replace(
+            ':detach:',
+            $detach,
             $stub
         );
 
@@ -150,5 +153,10 @@ class BelongsToManyService
             strtolower($relationship['name']),
             $stub
         );
+    }
+
+    private function getDetach (array $relationship): string
+    {
+        return "\$this->editing->" . $relationship['name'] . "()->detach();";
     }
 }

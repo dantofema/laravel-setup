@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
-use Dantofema\LaravelSetup\Facades\Delete;
 use Dantofema\LaravelSetup\Facades\Generate;
 use Dantofema\LaravelSetup\Facades\Replace;
 use Dantofema\LaravelSetup\Facades\Text;
@@ -14,11 +13,8 @@ trait CommandTrait
     use FileExistsTrait;
 
     protected array $config;
-    private string $jetstreamPath = '/../Stubs/view/jetstream/basic.blade.php.stub';
-    private string $tailwindPath = '/../Stubs/view/tailwind/basic.blade.php.stub';
-    private string $stub;
+    private array $stubs;
     private string $type;
-    private Delete $delete;
 
     public function getConfig (): array
     {
@@ -49,24 +45,26 @@ trait CommandTrait
 
         $this->exists($type);
 
-        $this->setStub();
+        $this->setStubs($type);
 
         return true;
     }
 
-    protected function setStub (): void
+    protected function setStubs (string $type): void
     {
-        if ($this->type !== 'view')
+        if ( ! $this->config['modal'] and ($type === 'view' or $type === 'livewire'))
         {
-            $path = self::STUB_PATH;
-        } else
-        {
-            $path = $this->config['view']['jetstream']
-                ? $this->jetstreamPath
-                : $this->tailwindPath;
+            $this->stubs = [
+                $type . '.collection' => file_get_contents(Generate::getStub($type) . '.collection'),
+                $type . '.model' => file_get_contents(Generate::getStub($type) . '.model'),
+            ];
+
+            return;
         }
 
-        $this->stub = file_get_contents(__DIR__ . $path);
+        $this->stubs = [
+            $type => file_get_contents(Generate::getStub($type)),
+        ];
     }
 
     protected function put (string $content): bool|int

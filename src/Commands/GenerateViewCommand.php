@@ -22,7 +22,7 @@ class GenerateViewCommand extends Command
     private DeleteModalService $deleteModal;
     private TableService $tableService;
 
-    public function __construct()
+    public function __construct ()
     {
         parent::__construct();
         $this->formModal = new FormModalService();
@@ -30,14 +30,14 @@ class GenerateViewCommand extends Command
         $this->tableService = new TableService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
         $this->init('view');
 
         return $this->create();
     }
 
-    public function create(): bool
+    public function create (): bool
     {
         return File::put(
             Text::config($this->config)->path('view'),
@@ -45,7 +45,7 @@ class GenerateViewCommand extends Command
         );
     }
 
-    private function replace(): string
+    private function replace (): string
     {
         $this->stub = $this->getTitle();
         $this->stub = $this->formModal->get($this->config, $this->stub);
@@ -64,7 +64,7 @@ class GenerateViewCommand extends Command
         return $this->stub;
     }
 
-    private function getTitle(): string
+    private function getTitle (): string
     {
         return str_replace(
             ':title:',

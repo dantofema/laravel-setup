@@ -11,19 +11,17 @@ class GenerateFactoryCommand extends Command
 {
     use CommandTrait;
 
-    protected const STUB_PATH = '/../Stubs/ModelFactory.php.stub';
-
     public $signature = 'generate:factory {path : path to the config file } {--force}';
     public $description = 'Factory file generator';
     private FakerService $faker;
 
-    public function __construct()
+    public function __construct ()
     {
         parent::__construct();
         $this->faker = new FakerService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
         $this->init('factory');
 
@@ -37,12 +35,14 @@ class GenerateFactoryCommand extends Command
         return true;
     }
 
-    private function getVarsFromColumns(): string
+    private function getVarsFromColumns (): string
     {
         $vars = '';
 
-        foreach ($this->config['fields'] as $field) {
-            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany') {
+        foreach ($this->config['fields'] as $field)
+        {
+            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
+            {
                 continue;
             }
             $vars .= sprintf(
@@ -55,11 +55,13 @@ class GenerateFactoryCommand extends Command
         return $vars;
     }
 
-    private function getReturnFromColumns(): string
+    private function getReturnFromColumns (): string
     {
         $response = PHP_EOL . "return [" . PHP_EOL;
-        foreach ($this->config['fields'] as $field) {
-            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany') {
+        foreach ($this->config['fields'] as $field)
+        {
+            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
+            {
                 continue;
             }
             $response .= sprintf(

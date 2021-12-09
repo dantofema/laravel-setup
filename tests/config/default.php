@@ -2,6 +2,7 @@
 
 return [
     'backend' => true,
+    'modal' => false,
     'route' => [
         'path' => 'notas',
     ],
@@ -18,7 +19,7 @@ return [
         ],
     ],
     'view' => [
-        'jetstream' => true,
+        'layout' => 'tailwind',
         'title' => false,
     ],
 
@@ -123,6 +124,9 @@ return [
             'label' => 'Cuerpo',
             'form' => [
                 'input' => 'textarea',
+                'richText' => [
+                    'name' => 'trix',
+                ],
             ],
             'rules' => [
                 'nullable' => true,

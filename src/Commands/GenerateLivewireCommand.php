@@ -16,7 +16,6 @@ class GenerateLivewireCommand extends Command
 {
     use CommandTrait;
 
-    protected const STUB_PATH = '/../Stubs/Livewire.php.stub';
     public $signature = 'generate:livewire {path : path to the config file } {--force}';
     public $description = 'Livewire file generator';
     protected array $config;
@@ -41,42 +40,48 @@ class GenerateLivewireCommand extends Command
     {
         $this->init('livewire');
 
-        $this->getNamespace();
-        $this->sortField();
-        $this->stub = $this->newFileService->get($this->config, $this->stub);
-        $this->getSaveSlug();
-        $this->getRules();
-        $this->getProperties();
-        $this->getUseCollection();
-        $this->getQueryRelationships();
-        $this->getLayout();
-        $this->stub = $this->syncBelongsToMany->get($this->config, $this->stub);
-        $this->stub = $this->belongsToMany->get($this->config, $this->stub);
-
-        $this->put($this->stub);
+        foreach ($this->stubs as $stub)
+        {
+            $this->put($this->replace($stub));
+        }
 
         return true;
     }
 
-    private function getNamespace (): void
+    private function replace (string $stub): string
     {
-        $this->stub = str_replace(
+        $stub = $this->getNamespace($stub);
+        $stub = $this->sortField($stub);
+        $stub = $this->newFileService->get($this->config, $stub);
+        $stub = $this->getSaveSlug($stub);
+        $stub = $this->getRules($stub);
+        $stub = $this->getProperties($stub);
+        $stub = $this->getUseCollection($stub);
+        $stub = $this->getQueryRelationships($stub);
+        $stub = $this->getLayout($stub);
+        $stub = $this->syncBelongsToMany->get($this->config, $stub);
+        return $this->belongsToMany->get($this->config, $stub);
+    }
+
+    private function getNamespace (string $stub): string
+    {
+        return str_replace(
             ':namespace:',
             Text::config($this->config)->namespaceFolder('livewire'),
-            $this->stub
+            $stub
         );
     }
 
-    private function sortField (): void
+    private function sortField (string $stub): string
     {
-        $this->stub = str_replace(
+        return str_replace(
             ':sortField:',
             $this->config['livewire']['properties']['sortField'],
-            $this->stub
+            $stub
         );
     }
 
-    private function getSaveSlug (): void
+    private function getSaveSlug (string $stub): string
     {
         $slug = '';
         foreach ($this->config['fields'] as $field)
@@ -86,14 +91,14 @@ class GenerateLivewireCommand extends Command
                 $slug = "\$this->setSlug('" . $field['source'] . "');";
             }
         }
-        $this->stub = str_replace(
+        return str_replace(
             ':saveSlug:',
             $slug,
-            $this->stub
+            $stub
         );
     }
 
-    private function getRules (): void
+    private function getRules (string $stub): string
     {
         $rules = "\$rules = [\r\n";
         foreach ($this->config['fields'] as $field)
@@ -126,10 +131,10 @@ EOT;
 
         $rules .= PHP_EOL . " return \$rules;" . PHP_EOL;
 
-        $this->stub = str_replace(
+        return str_replace(
             ':rules:',
             $rules,
-            $this->stub
+            $stub
         );
     }
 
@@ -140,7 +145,7 @@ EOT;
             : "'editing." . $field['name'] . "' => " . Field::getRulesToString($field['rules']);
     }
 
-    private function getProperties (): void
+    private function getProperties (string $stub): string
     {
         $response = '';
         $fields = Field::config($this->config)->getRelationships();
@@ -159,21 +164,21 @@ EOT;
                 $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
             }
         }
-        $this->stub = str_replace(':properties:', $response, $this->stub);
+        return str_replace(':properties:', $response, $stub);
     }
 
-    private function getUseCollection (): void
+    private function getUseCollection (string $stub): string
     {
-        $this->stub = str_replace(
+        return str_replace(
             ':useCollection:',
             empty(Field::config($this->config)->getRelationships())
                 ? ''
                 : 'use Illuminate\Support\Collection;' . PHP_EOL,
-            $this->stub
+            $stub
         );
     }
 
-    private function getQueryRelationships (): void
+    private function getQueryRelationships (string $stub): string
     {
         $response = '';
         $fields = Field::config($this->config)->getRelationships();
@@ -196,10 +201,10 @@ EOT;
                     PHP_EOL;
             }
         }
-        $this->stub = str_replace(':queryRelationships:', $response, $this->stub);
+        return str_replace(':queryRelationships:', $response, $stub);
     }
 
-    private function getLayout (): void
+    private function getLayout (string $stub): string
     {
         $layout = '';
 
@@ -207,6 +212,6 @@ EOT;
         {
             $layout = "->layout('layouts.tailwind.backend.app')";
         }
-        $this->stub = str_replace(':layout:', $layout, $this->stub);
+        return str_replace(':layout:', $layout, $stub);
     }
 }

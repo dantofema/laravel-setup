@@ -13,93 +13,70 @@ class PathService
     private const TEST = 'tests/Feature/';
     private const VIEW = 'resources/views/livewire/';
     private const ROUTE = 'routes/';
-    private string $file;
-    private string $path;
-    private array $config;
-    private NameService $name;
+    private NameService $nameService;
 
-    #[Pure]
-    public function __construct()
+    #[Pure] public function __construct ()
     {
-        $this->name = new NameService();
+        $this->nameService = new NameService();
     }
 
-    public function livewire(array $config): PathService
+    public function get (array $config, string $type): string
     {
-        $this->config = $config;
-        $this->file = $this->name->livewire($config)->file();
-        $this->path = self::LIVEWIRE . ($config['backend'] ? 'Backend/' : 'Frontend/');
-
-        return $this;
+        return $this->$type($config) . $this->nameService->get($config, $type, true);
     }
 
-    public function model(array $config): PathService
+    public function namespace (array $config, string $type, bool $withName = true): string
     {
-        $this->config = $config;
-        $this->file = $this->name->model($config)->file();
-        $this->path = self::MODEL;
-
-        return $this;
-    }
-
-    public function migration(array $config): PathService
-    {
-        $this->config = $config;
-        $this->file = $this->name->migration($config)->file();
-        $this->path = self::MIGRATION;
-
-        return $this;
-    }
-
-    public function view(array $config): PathService
-    {
-        $this->config = $config;
-        $this->file = $this->name->view($config)->file();
-        $this->path = self::VIEW . ($config['backend'] ? 'backend/' : 'frontend/');
-
-        return $this;
-    }
-
-    public function test(array $config): PathService
-    {
-        $this->config = $config;
-        $this->file = $this->name->test($config)->file();
-        $this->path = self::TEST . ($config['backend'] ? 'Backend/' : 'Frontend/');
-
-        return $this;
-    }
-
-    public function factory(array $config): PathService
-    {
-        $this->config = $config;
-        $this->file = $this->name->factory($config)->file();
-        $this->path = self::FACTORY;
-
-        return $this;
-    }
-
-    public function route(): PathService
-    {
-        $this->file = 'web.php';
-        $this->path = self::ROUTE;
-
-        return $this;
-    }
-
-    public function get(): string
-    {
-        return $this->path . $this->file;
-    }
-
-    public function namespace(string $name): string
-    {
-        $folders = explode('/', $this->path);
+        $folders = array_filter(explode('/', $this->$type($config)));
         $namespace = '';
 
-        foreach ($folders as $folder) {
-            $namespace .= $folder != '' ? ucfirst($folder) . '\\' : '';
+        foreach ($folders as $key => $folder)
+        {
+            $namespace .= ucfirst($folder);
+
+            if ($key !== array_key_last($folders))
+            {
+                $namespace .= "\\";
+            }
         }
 
-        return $namespace . $name . ';';
+        return $withName
+            ? $namespace . "\\" . $this->nameService->get($config, $type) . ';'
+            : $namespace . ';';
+    }
+
+    protected function livewire (array $config): string
+    {
+        return self::LIVEWIRE . ($config['backend'] ? 'Backend/' : 'Frontend/');
+    }
+
+    protected function model (): string
+    {
+        return self::MODEL;
+    }
+
+    protected function migration (): string
+    {
+        return self::MIGRATION;
+    }
+
+    protected function view (array $config): string
+    {
+        return self::VIEW . ($config['backend'] ? 'backend/' : 'frontend/');
+    }
+
+    protected function test (array $config): string
+    {
+        return self::TEST . ($config['backend'] ? 'Backend/' : 'Frontend/');
+    }
+
+    protected function factory (): string
+    {
+        return self::FACTORY;
+    }
+
+    protected function route (): string
+    {
+        return self::ROUTE . 'web.php';
     }
 }

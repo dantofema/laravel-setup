@@ -1,0 +1,55 @@
+<?php
+
+namespace :namespace:;
+
+:useDefault:
+use App\Http\Livewire\Traits\WithSetup;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Livewire\Component;
+use Livewire\WithPagination;
+:useCollection:
+
+class :livewire: extends Component
+{
+    use WithPagination;
+    use WithSetup;
+
+    public :model: $editing;
+    public string $sortField = ':sortField:';
+    :newFile:
+    :properties:
+
+    public function confirmDelete ()
+    {
+        :detach:
+        $this->editing->delete();
+        $this->showDeleteModal = false;
+    }
+
+    public function delete (:model: $model)
+    {
+        $this->bodyDeleteModal = 'Esta seguro de eliminar el item seleccionado?';
+        $this->editing = $model;
+        $this->showDeleteModal = true;
+    }
+
+    public function render (): Factory|View|Application
+    {
+        return view(':renderView:', [
+            'rows' => :model:::search($this->search)
+                ->orderBy($this->sortField, $this->sortDirection ? 'desc' : 'asc')
+                ->paginate($this->perPage),
+        ]):layout:;
+    }
+
+
+    :belongsToManyMethods:
+
+    public function mount ()
+    {
+        $this->editing = :model:::make();
+        :queryRelationships:
+    }
+}

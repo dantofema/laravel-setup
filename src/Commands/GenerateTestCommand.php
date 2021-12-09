@@ -15,8 +15,6 @@ class GenerateTestCommand extends Command
 {
     use CommandTrait;
 
-    protected const STUB_PATH = '/../Stubs/test.stub';
-
     public $signature = 'generate:test {path : path to the config file } {--force}';
     public $description = 'Test file generator';
     protected array $config;
@@ -25,7 +23,7 @@ class GenerateTestCommand extends Command
     private CreateService $saveService;
     private EditService $editService;
 
-    public function __construct()
+    public function __construct ()
     {
         parent::__construct();
         $this->editSlugService = new EditSlugService();
@@ -34,7 +32,7 @@ class GenerateTestCommand extends Command
         $this->editService = new EditService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
         $this->init('test');
 
@@ -52,13 +50,13 @@ class GenerateTestCommand extends Command
         return true;
     }
 
-    private function getUse(): void
+    private function getUse (): void
     {
         $replace = 'use ' . Text::config($this->config)->namespace('livewire') . PHP_EOL;
         $this->stub = str_replace(':use:', $replace, $this->stub);
     }
 
-    private function getUri(): void
+    private function getUri (): void
     {
         $uri = $this->config['backend'] ? 'sistema/' : '';
         $this->stub = str_replace(
@@ -68,7 +66,7 @@ class GenerateTestCommand extends Command
         );
     }
 
-    private function getField(): void
+    private function getField (): void
     {
         $field = $this->config['fields'][0];
 
@@ -79,7 +77,7 @@ class GenerateTestCommand extends Command
         );
     }
 
-    private function editSlug(): void
+    private function editSlug (): void
     {
         $this->stub = str_replace(
             ':edit-slug:',
@@ -88,11 +86,13 @@ class GenerateTestCommand extends Command
         );
     }
 
-    private function getDisk(): void
+    private function getDisk (): void
     {
         $disk = '';
-        foreach ($this->config['fields'] as $field) {
-            if ($field['form']['input'] === 'file') {
+        foreach ($this->config['fields'] as $field)
+        {
+            if ($field['form']['input'] === 'file')
+            {
                 $disk = "Storage::fake(':disk:');";
                 $disk .= "\$this->newFile = '';";
             }

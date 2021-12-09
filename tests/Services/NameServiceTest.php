@@ -6,24 +6,31 @@ it('get Text', closure: function () {
     $config = include(__DIR__ . '/../config/default.php');
     $name = new NameService();
 
-    expect($name->livewire($config)->get())->toEqual('PostsLivewire');
-    expect($name->livewire($config)->file())->toEqual('PostsLivewire.php');
+    expect($name->get($config, 'livewire'))->toEqual('PostsLivewire');
+    expect($name->get($config, 'livewire', true))->toEqual('PostsLivewire.php');
+    expect($name->get($config, 'livewireModel'))->toEqual('PostLivewire');
+    expect($name->get($config, 'livewireModel', true))->toEqual('PostLivewire.php');
 
-    expect($name->model($config)->get())->toEqual('Post');
-    expect($name->model($config)->file())->toEqual('Post.php');
+    expect($name->get($config, 'model'))->toEqual('Post');
+    expect($name->get($config, 'model', true))->toEqual('Post.php');
 
-    expect($name->table($config)->get())->toEqual('posts');
-    expect($name->seeder($config)->get())->toEqual('PostSeeder');
+    expect($name->get($config, 'seeder'))->toEqual('PostSeeder');
+    expect($name->get($config, 'seeder', true))->toEqual('PostSeeder.php');
 
-    expect($name->view($config)->get())->toEqual('posts.blade');
-    expect($name->view($config)->file())->toEqual('posts.blade.php');
+    expect($name->get($config, 'view'))->toEqual('posts.blade');
+    expect($name->get($config, 'view', true))->toEqual('posts.blade.php');
+    expect($name->get($config, 'viewModel'))->toEqual('post.blade');
+    expect($name->get($config, 'viewModel', true))->toEqual('post.blade.php');
 
-    expect($name->migration($config)->get())->toContain('create_posts_table');
-    expect($name->migration($config)->file())->toContain('create_posts_table.php');
+    expect($name->get($config, 'migration'))->toContain('create_posts_table');
+    expect($name->get($config, 'migration', true))->toContain('create_posts_table.php');
 
-    expect($name->factory($config)->get())->toEqual('PostFactory');
-    expect($name->factory($config)->file())->toEqual('PostFactory.php');
+    expect($name->get($config, 'factory'))->toEqual('PostFactory');
+    expect($name->get($config, 'factory', true))->toEqual('PostFactory.php');
 
-    expect($name->test($config)->get())->toEqual('PostsLivewireTest');
-    expect($name->test($config)->file())->toEqual('PostsLivewireTest.php');
+    expect($name->get($config, 'test'))->toEqual('PostsLivewireTest');
+    expect($name->get($config, 'test', true))->toEqual('PostsLivewireTest.php');
+
+    expect($name->get($config, 'testModel'))->toEqual('PostLivewireTest');
+    expect($name->get($config, 'testModel', true))->toEqual('PostLivewireTest.php');
 });

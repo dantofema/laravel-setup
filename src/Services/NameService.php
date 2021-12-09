@@ -4,79 +4,72 @@ namespace Dantofema\LaravelSetup\Services;
 
 class NameService
 {
-    protected string $name;
 
-    public function livewire(array $config): NameService
+    public function get (array $config, string $type, bool $whitExtension = false): string
     {
-        $this->name = ucfirst($config['table']['name']) . 'Livewire';
-
-        return $this;
+        return $whitExtension
+            ? $this->$type($config) . '.php'
+            : $this->$type($config);
     }
 
-    public function model(array $config): NameService
+    protected function disk (array $config): string
     {
-        $this->name = ucfirst($config['model']['name']);
-
-        return $this;
+        return strtolower($config['model']['name']);
     }
 
-    public function table(array $config): NameService
+    protected function livewire (array $config): string
     {
-        $this->name = $config['table']['name'];
-
-        return $this;
+        return ucfirst($config['table']['name']) . 'Livewire';
     }
 
-    public function view(array $config): NameService
+    protected function livewireModel (array $config): string
     {
-        $this->name = $config['table']['name'] . '.blade';
-
-        return $this;
+        return ucfirst($config['model']['name']) . 'Livewire';
     }
 
-    public function migration(array $config): NameService
+    protected function model (array $config): string
     {
-        $this->name = now()->format('Y_m_d_His') . '_create_'
+        return ucfirst($config['model']['name']);
+    }
+
+    protected function table (array $config): string
+    {
+        return $config['table']['name'];
+    }
+
+    protected function view (array $config): string
+    {
+        return $config['table']['name'] . '.blade';
+    }
+
+    protected function viewModel (array $config): string
+    {
+        return strtolower($config['model']['name']) . '.blade';
+    }
+
+    protected function migration (array $config): string
+    {
+        return now()->format('Y_m_d_His') . '_create_'
             . $config['table']['name'] . '_table';
-
-        return $this;
     }
 
-    public function factory(array $config): NameService
+    protected function factory (array $config): string
     {
-        $this->name = $config['model']['name'] . 'Factory';
-
-        return $this;
+        return $config['model']['name'] . 'Factory';
     }
 
-    public function seeder(array $config): NameService
+    protected function seeder (array $config): string
     {
-        $this->name = $config['model']['name'] . 'Seeder';
-
-        return $this;
+        return $config['model']['name'] . 'Seeder';
     }
 
-    public function test(array $config): NameService
+    protected function test (array $config): string
     {
-        $this->name = ucfirst($config['table']['name']) . 'LivewireTest';
-
-        return $this;
+        return ucfirst($config['table']['name']) . 'LivewireTest';
     }
 
-    public function get(): string
+    protected function testModel (array $config): string
     {
-        return $this->name;
-    }
-
-    public function file(): string
-    {
-        return $this->name . '.php';
-    }
-
-    public function disk(array $config): NameService
-    {
-        $this->name = strtolower($config['model']['name']);
-
-        return $this;
+        return ucfirst($config['model']['name']) . 'LivewireTest';
     }
 }

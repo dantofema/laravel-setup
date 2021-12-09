@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static setup()
  * @method static removeRoute(array $config)
  * @method static addSeeder(array $config)
+ * @method static getStub(string $type)
  *
  *  * @see GenerateService
  */
 class Generate extends Facade
 {
-    protected static function getFacadeAccessor(): string
+    protected static function getFacadeAccessor (): string
     {
         return 'generate';
     }

@@ -2,7 +2,7 @@
 
 return [
     'backend' => true,
-    'modal' => false,
+    'allInOne' => false,
     'route' => [
         'path' => 'notas',
     ],

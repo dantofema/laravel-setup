@@ -6,8 +6,8 @@ class StubService
 {
     private array $stubs = [
         'view' => '/../Stubs/view/jetstream/basic.blade.php.stub',
-        'view.collection' => '',
-        'view.model' => '',
+        'view.collection' => '/../Stubs/livewire/collection.php.stub',
+        'view.model' => '/../Stubs/livewire/model.php.stub',
         'livewire' => '/../Stubs/livewire/Livewire.php.stub',
         'livewire.collection' => '',
         'livewire.model' => '',

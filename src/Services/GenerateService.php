@@ -2,6 +2,8 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
+use JetBrains\PhpStorm\Pure;
+
 class GenerateService
 {
     public function delete (array $config, array $types)
@@ -54,6 +56,11 @@ class GenerateService
         return (new NameService())->get($config, $type, $whitExtension);
     }
 
+    #[Pure] public function getRoute (): string
+    {
+        return (new PathService())->route();
+    }
+
     public function getPath (array $config, string $type): string
     {
         return (new PathService())->get($config, $type);
@@ -67,6 +74,21 @@ class GenerateService
     public function getRenderView (array $config): string
     {
         return (new PathService())->renderView($config);
+    }
+
+    #[Pure] public function field (): FieldService
+    {
+        return new FieldService();
+    }
+
+    #[Pure] public function name (): NameService
+    {
+        return new NameService();
+    }
+
+    #[Pure] public function path (): PathService
+    {
+        return new PathService();
     }
 
 }

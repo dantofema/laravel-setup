@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -14,15 +12,17 @@ class FileSystemService
     protected const FILESYSTEM_PHP = 'config/filesystems.php';
     protected const FILESYSTEM_STUB = __DIR__ . '/../Stubs/filesystems.php.stub';
 
-    public function execute(array $config)
+    public function execute (array $config)
     {
-        if (empty(Field::config($config)->getFile())) {
+        if (empty(gen()->field()->getFile($config)))
+        {
             return;
         }
 
-        $disk = strtolower(Text::config($config)->name('model'));
+        $disk = strtolower(gen()->getName($config, 'model'));
 
-        if (Str::contains(File::get(self::FILESYSTEM_PHP), $disk)) {
+        if (Str::contains(File::get(self::FILESYSTEM_PHP), $disk))
+        {
             return;
         }
 
@@ -33,7 +33,7 @@ class FileSystemService
         File::put(self::FILESYSTEM_PHP, $content);
     }
 
-    private function replaceLinks(string $disk): string
+    private function replaceLinks (string $disk): string
     {
         $links = str_replace("'storage'", "'" . $disk . "'", self::ORIGINAL_LINKS);
         $links = str_replace("/public'", "/" . $disk . "'", $links);
@@ -42,7 +42,7 @@ class FileSystemService
         return str_replace(self::ORIGINAL_LINKS, $links, File::get(self::FILESYSTEM_PHP));
     }
 
-    private function replaceDisks(string $disk, string $content): string|array
+    private function replaceDisks (string $disk, string $content): string|array
     {
         $stub = self::ORIGINAL_DISKS
             . PHP_EOL

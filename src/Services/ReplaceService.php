@@ -70,17 +70,17 @@ class ReplaceService
     private function table (): void
     {
         $this->stub = str_replace(':tableName:', $this->config['table']['name'], $this->stub);
-        $this->stub = str_replace(':table:', Text::config($this->config)->name('table'), $this->stub);
+        $this->stub = str_replace(':table:', gen()->getName($this->config, 'table'), $this->stub);
     }
 
     private function livewire (): void
     {
-        $this->stub = str_replace(':livewire:', Text::config($this->config)->name('livewire'), $this->stub);
+        $this->stub = str_replace(':livewire:', gen()->getName($this->config, 'livewire'), $this->stub);
     }
 
     private function renderView (): void
     {
-        $this->stub = str_replace(':renderView:', Text::config($this->config)->renderView(), $this->stub);
+        $this->stub = str_replace(':renderView:', gen()->getRenderView($this->config), $this->stub);
     }
 
     private function actingAs (): void
@@ -90,12 +90,12 @@ class ReplaceService
 
     private function factory (): void
     {
-        $this->stub = str_replace(':factory:', Text::config($this->config)->name('model') . 'Factory', $this->stub);
+        $this->stub = str_replace(':factory:', gen()->getName($this->config, 'model') . 'Factory', $this->stub);
     }
 
     private function model (): void
     {
-        $this->stub = str_replace(':model:', Text::config($this->config)->name('model'), $this->stub);
+        $this->stub = str_replace(':model:', gen()->getName($this->config, 'model'), $this->stub);
     }
 
     private function use (): void
@@ -119,7 +119,7 @@ class ReplaceService
 
         if ($this->type !== 'model')
         {
-            $useString .= 'use ' . Text::config($this->config)->namespace('model') . PHP_EOL;
+            $useString .= 'use ' . gen()->getName($this->config, 'model') . ';' . PHP_EOL;
         }
 
         $useString .= str_contains($this->stub, 'Carbon::')
@@ -153,6 +153,6 @@ class ReplaceService
 
     private function disk (): void
     {
-        $this->stub = str_replace(':disk:', Text::config($this->config)->name('disk'), $this->stub);
+        $this->stub = str_replace(':disk:', gen()->getName($this->config, 'disk'), $this->stub);
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class GenerateMigrationCommand extends Command
 {
     use CommandTrait;
-    
+
     protected const DIRECTORY = 'database/migrations/';
     public $signature = 'generate:migration {path : path to the config file } {--force}';
     public $description = 'Migration file generator';
@@ -40,7 +40,7 @@ class GenerateMigrationCommand extends Command
         $rows = '';
         foreach ($this->config['fields'] as $field)
         {
-            $relationship = Field::getRelationship($field);
+            $relationship = gen()->field()->getRelationship($field);
             $rules = Field::getRules($field);
 
             if (empty($relationship))

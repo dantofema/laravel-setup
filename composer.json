@@ -29,6 +29,9 @@
     "vimeo/psalm": "^4.8"
   },
   "autoload": {
+    "files": [
+      "src/helpers.php"
+    ],
     "psr-4": {
       "Dantofema\\LaravelSetup\\": "src",
       "Dantofema\\LaravelSetup\\Database\\Factories\\": "database/factories"

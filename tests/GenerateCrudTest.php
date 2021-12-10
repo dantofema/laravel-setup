@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
 it('generate files', closure: function () {
-    Artisan::call('generate:crud tests/config/default.php --all');
+    Artisan::call('generate:crud tests/config/all-in-one.php --all');
     $config = include(__DIR__ . '/config/default.php');
 
     expect(File::exists(Text::config($config)->path('livewire')))->toBeTrue();

@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\FileSystemService;
 use Dantofema\LaravelSetup\Services\Livewire\BelongsToManyService;
 use Dantofema\LaravelSetup\Services\Livewire\NewFileService;
@@ -38,45 +36,44 @@ class GenerateLivewireCommand extends Command
      */
     public function handle (): bool
     {
-        if ($this->config['allInOne'])
-        {
-            $this->types = ['livewire'];
-        } else
-        {
-            $this->types = ['livewireCollection', 'livewireModel'];
-        }
+        $this->config = include $this->argument('path');
 
-        $this->init();
+        $types = $this->config['allInOne']
+            ? ['livewire']
+            : ['livewireCollection', 'livewireModel'];
 
-        foreach ($this->stubs as $stub)
+        $this->init($types);
+
+        foreach ($this->properties as $property)
         {
-            $this->put($this->replace($stub));
+            $this->put($this->replace($property));
+            gen()->addRoute($this->config);
         }
 
         return true;
     }
 
-    private function replace (string $stub): string
+    private function replace (array $property): string
     {
-        $stub = $this->getNamespace($stub);
-        $stub = $this->sortField($stub);
-        $stub = $this->newFileService->get($this->config, $stub);
-        $stub = $this->getSaveSlug($stub);
-        $stub = $this->getRules($stub);
-        $stub = $this->getProperties($stub);
-        $stub = $this->getUseCollection($stub);
-        $stub = $this->getQueryRelationships($stub);
-        $stub = $this->getLayout($stub);
-        $stub = $this->syncBelongsToMany->get($this->config, $stub);
-        return $this->belongsToMany->get($this->config, $stub);
+        $property['stub'] = $this->getNamespace($property);
+        $property['stub'] = $this->sortField($property['stub']);
+        $property['stub'] = $this->newFileService->get($this->config, $property['stub']);
+        $property['stub'] = $this->getSaveSlug($property['stub']);
+        $property['stub'] = $this->getRules($property['stub']);
+        $property['stub'] = $this->getProperties($property['stub']);
+        $property['stub'] = $this->getUseCollection($property['stub']);
+        $property['stub'] = $this->getQueryRelationships($property['stub']);
+        $property['stub'] = $this->getLayout($property['stub']);
+        $property['stub'] = $this->syncBelongsToMany->get($this->config, $property['stub']);
+        return $this->belongsToMany->get($this->config, $property['stub']);
     }
 
-    private function getNamespace (string $stub): string
+    private function getNamespace (array $property): string
     {
         return str_replace(
             ':namespace:',
-            Text::config($this->config)->namespaceFolder('livewire'),
-            $stub
+            gen()->getNamespace($this->config, $property['type'], $property['stub']),
+            $property['stub']
         );
     }
 
@@ -116,19 +113,19 @@ class GenerateLivewireCommand extends Command
                 continue;
             }
             $rules .= isset($field['relationship'])
-                ? $this->getRulesForRelationship($field)
-                : "'editing." . $field['name'] . "' => " . Field::getRulesToString($field['rules']);
+                ? gen()->field()->getRulesForRelationship($field)
+                : "'editing." . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules']);
 
             $rules .= ',' . PHP_EOL;
         }
         $rules .= "];\r\n";
 
-        $fieldFile = Field::config($this->config)->getFile();
+        $fieldFile = gen()->field()->getFile($this->config);
 
         if ( ! empty($fieldFile))
         {
             $this->filesystem->execute($this->config);
-            $fileRules = Field::getRulesToString($fieldFile['rules']);
+            $fileRules = gen()->field()->getRulesToString($fieldFile['rules']);
             $rules .= <<<EOT
         if (\$this->createAction)
         {
@@ -146,17 +143,10 @@ EOT;
         );
     }
 
-    private function getRulesForRelationship (array $field): string
-    {
-        return $field['relationship']['type'] === 'belongsToMany'
-            ? "'" . $field['name'] . "' => " . Field::getRulesToString($field['rules'])
-            : "'editing." . $field['name'] . "' => " . Field::getRulesToString($field['rules']);
-    }
-
     private function getProperties (string $stub): string
     {
         $response = '';
-        $fields = Field::config($this->config)->getRelationships();
+        $fields = gen()->field()->getRelationships($this->config);
         foreach ($fields as $field)
         {
             if ($field['relationship']['type'] === 'belongsToMany')
@@ -179,7 +169,7 @@ EOT;
     {
         return str_replace(
             ':useCollection:',
-            empty(Field::config($this->config)->getRelationships())
+            empty(gen()->field()->getRelationships($this->config))
                 ? ''
                 : 'use Illuminate\Support\Collection;' . PHP_EOL,
             $stub
@@ -189,7 +179,7 @@ EOT;
     private function getQueryRelationships (string $stub): string
     {
         $response = '';
-        $fields = Field::config($this->config)->getRelationships();
+        $fields = gen()->field()->getRelationships($this->config);
         foreach ($fields as $field)
         {
             if ($field['relationship']['type'] === 'belongsTo')

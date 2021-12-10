@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 it('generate model file', closure: function () {
     expect(count(File::files('app/Models')))->toEqual(0);
 
-    expect(Artisan::call('generate:model tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:model tests/config/all-in-one.php'))->toEqual(1);
 
     $files = File::files('app/Models');
 
@@ -18,7 +18,7 @@ it('generate model file', closure: function () {
 });
 
 it('add namespace', function () {
-    Artisan::call('generate:model tests/config/default.php');
+    Artisan::call('generate:model tests/config/all-in-one.php');
 
     $content = File::files('app/Models')[0]->getContents();
 
@@ -42,7 +42,7 @@ it('add namespace', function () {
 });
 
 it('model file check syntax', closure: function () {
-    Artisan::call('generate:model tests/config/default.php');
+    Artisan::call('generate:model tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
     expect(shell_exec("php -l -f " . Text::config($config)->path('model')))->toContain('No syntax errors detected');

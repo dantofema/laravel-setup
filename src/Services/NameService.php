@@ -17,14 +17,19 @@ class NameService
         return strtolower($config['model']['name']);
     }
 
-    protected function livewire (array $config): string
-    {
-        return ucfirst($config['table']['name']) . 'Livewire';
-    }
-
     protected function livewireModel (array $config): string
     {
         return ucfirst($config['model']['name']) . 'Livewire';
+    }
+
+    protected function livewireCollection (array $config): string
+    {
+        return $this->livewire($config);
+    }
+
+    protected function livewire (array $config): string
+    {
+        return ucfirst($config['table']['name']) . 'Livewire';
     }
 
     protected function model (array $config): string

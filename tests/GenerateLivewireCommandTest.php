@@ -1,6 +1,5 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -10,8 +9,8 @@ it('livewire directory is empty', closure: function () {
         ->toEqual(0);
 });
 
-it('generate livewire file', closure: function () {
-    expect(Artisan::call('generate:livewire tests/config/default.php'))
+it('allInOne - generate livewire file', closure: function () {
+    expect(Artisan::call('generate:livewire tests/config/all-in-one.php'))
         ->toEqual(1);
 
     $files = File::files('app/Http/Livewire/Backend');
@@ -23,11 +22,27 @@ it('generate livewire file', closure: function () {
         ->toEqual('PostsLivewire');
 });
 
-it('replaces', closure: function () {
+it('generate livewire file', closure: function () {
     expect(Artisan::call('generate:livewire tests/config/default.php'))
         ->toEqual(1);
 
-    $config = include __DIR__ . '/config/default.php';
+    $files = File::files('app/Http/Livewire/Backend');
+
+    expect(count($files))
+        ->toEqual(2);
+
+    expect(in_array($files[0]->getFilenameWithoutExtension(), ['PostLivewire', 'PostsLivewire']))
+        ->toBeTrue();
+
+    expect(in_array($files[1]->getFilenameWithoutExtension(), ['PostLivewire', 'PostsLivewire']))
+        ->toBeTrue();
+});
+
+it('allInOne - replaces', closure: function () {
+    expect(Artisan::call('generate:livewire tests/config/all-in-one.php'))
+        ->toEqual(1);
+
+    $config = include __DIR__ . '/config/all-in-one.php';
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(Str::contains($content, [
@@ -39,7 +54,7 @@ it('replaces', closure: function () {
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
-        Text::config($config)->renderView(),
+        gen()->path()->renderView($config),
     ]))
         ->toBeTrue();
 
@@ -47,18 +62,95 @@ it('replaces', closure: function () {
         ->toBeFalse();
 });
 
-it('livewire file check syntax', closure: function () {
-    Artisan::call('generate:livewire tests/config/default.php');
-    $config = include(__DIR__ . '/config/default.php');
-//    dd(File::get(Text::config($config)->path('livewire')));
-    expect(shell_exec("php -l -f " . Text::config($config)->path('livewire')))
+it('replaces in livewireModel', closure: function () {
+    expect(Artisan::call('generate:livewire tests/config/default.php'))
+        ->toEqual(1);
+
+    $config = include __DIR__ . '/config/default.php';
+    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+
+    expect(Str::contains($content, [
+        $config['model']['name'],
+        $config['livewire']['properties']['sortField'],
+        'public $newFile;',
+        '$this->newFile = "";',
+        '$this->newFile = null;',
+        "\$this->setSlug('title');",
+        "namespace App\Http\Livewire\Backend",
+        "'author_id' =>",
+        gen()->path()->renderView($config),
+    ]))
+        ->toBeTrue();
+
+    expect(str_contains($content, ':namespace:'))
+        ->toBeFalse();
+});
+
+it('replaces in livewireCollection', closure: function () {
+    expect(Artisan::call('generate:livewire tests/config/default.php'))
+        ->toEqual(1);
+
+    $config = include __DIR__ . '/config/default.php';
+    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+
+    expect(Str::contains($content, [
+        $config['model']['name'],
+        $config['livewire']['properties']['sortField'],
+        'public $newFile;',
+        '$this->newFile = "";',
+        '$this->newFile = null;',
+        "\$this->setSlug('title');",
+        "namespace App\Http\Livewire\Backend",
+        "'author_id' =>",
+        gen()->path()->renderView($config),
+    ]))
+        ->toBeTrue();
+
+    expect(str_contains($content, ':namespace:'))
+        ->toBeFalse();
+});
+
+it('allInOne - livewire file check syntax', closure: function () {
+    Artisan::call('generate:livewire tests/config/all-in-one.php');
+    $config = include(__DIR__ . '/config/all-in-one.php');
+//    dump(File::get(gen()->getPath($config, 'livewire')));
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewire')))
         ->toContain('No syntax errors detected');
 });
 
-it('route file check syntax', closure: function () {
+it('livewireModel file check syntax', closure: function () {
     Artisan::call('generate:livewire tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
+//    dump(File::get(gen()->getPath($config, 'livewire')));
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewireModel')))
+        ->toContain('No syntax errors detected');
+});
 
-    expect(shell_exec("php -l -f " . Text::config($config)->path('route')))
+it('livewireCollection file check syntax', closure: function () {
+    Artisan::call('generate:livewire tests/config/default.php');
+    $config = include(__DIR__ . '/config/default.php');
+//    dump(File::get(gen()->getPath($config, 'livewire')));
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewireCollection')))
+        ->toContain('No syntax errors detected');
+});
+
+it('allInOne - route file check syntax', closure: function () {
+    Artisan::call('generate:livewire tests/config/all-in-one.php');
+
+    expect(shell_exec("php -l -f " . gen()->path()->route()))
+        ->toContain('No syntax errors detected');
+});
+
+it('livewireModel route file check syntax', closure: function () {
+    Artisan::call('generate:livewire tests/config/default.php');
+//    dump(File::get(gen()->path()->route()));
+    expect(shell_exec("php -l -f " . gen()->path()->route()))
+        ->toContain('No syntax errors detected');
+});
+
+it('livewireCollection route file check syntax', closure: function () {
+    Artisan::call('generate:livewire tests/config/default.php');
+
+    expect(shell_exec("php -l -f " . gen()->path()->route()))
         ->toContain('No syntax errors detected');
 });

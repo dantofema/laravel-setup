@@ -8,13 +8,13 @@ use Illuminate\Support\Str;
 it('generate factory file return true', closure: function () {
     expect(count(File::files('database/factories')))->toEqual(0);
 
-    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/all-in-one.php'))->toEqual(1);
 });
 
 it('generate factory file', closure: function () {
     expect(collect(File::files('database/factories'))->count())->toEqual(0);
 
-    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/all-in-one.php'))->toEqual(1);
 
     $files = collect(File::files('database/factories'));
 
@@ -23,7 +23,7 @@ it('generate factory file', closure: function () {
 });
 
 it('generate fields', function () {
-    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/all-in-one.php'))->toEqual(1);
 
     $content = File::files('database/factories')[0]->getContents();
 
@@ -49,7 +49,7 @@ it('if factory file exist return exception and exit', function () {
 });
 
 it('generate foreign keys', function () {
-    expect(Artisan::call('generate:factory tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:factory tests/config/all-in-one.php'))->toEqual(1);
 
     $content = File::files('database/factories')[0]->getContents();
 
@@ -69,16 +69,16 @@ it('if config file not found return exception and exit', function () {
 it('generate factory with --force return true', closure: function () {
     expect(count(File::files('database/factories')))->toEqual(0);
 
-    expect(Artisan::call('generate:factory tests/config/default.php --force'))
+    expect(Artisan::call('generate:factory tests/config/all-in-one.php --force'))
         ->toEqual(1);
 });
 
 it('if factory file exist when call with --force return true', closure: function () {
     expect(count(File::files('database/factories')))->toEqual(0);
 
-    Artisan::call('generate:factory tests/config/default.php');
+    Artisan::call('generate:factory tests/config/all-in-one.php');
 
-    expect(Artisan::call('generate:factory tests/config/default.php --force'))
+    expect(Artisan::call('generate:factory tests/config/all-in-one.php --force'))
         ->toEqual(1);
 });
 
@@ -91,7 +91,7 @@ it('update DatabaseSeeder', closure: function () {
         "use App\Models\Post;",
     ]))->toBeFalse();
 
-    Artisan::call('generate:factory tests/config/default.php');
+    Artisan::call('generate:factory tests/config/all-in-one.php');
 
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
@@ -105,7 +105,7 @@ it('update DatabaseSeeder', closure: function () {
 });
 
 it('factory file check syntax', closure: function () {
-    Artisan::call('generate:factory tests/config/default.php');
+    Artisan::call('generate:factory tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
 //    dd(File::get(Text::config($config)->path('factory')));

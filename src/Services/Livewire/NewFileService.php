@@ -2,14 +2,11 @@
 
 namespace Dantofema\LaravelSetup\Services\Livewire;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
-
 class NewFileService
 {
-    public function get(array $config, string $stub): string
+    public function get (array $config, string $stub): string
     {
-        $field = Field::config($config)->getFile();
+        $field = gen()->field()->getFile($config);
 
         $stub = str_replace(
             ':editNewFile:',
@@ -25,9 +22,10 @@ class NewFileService
 
         $replace = '';
 
-        if ($field) {
+        if ($field)
+        {
             $name = $field['name'];
-            $disk = Text::config($config)->name('disk');
+            $disk = gen()->name()->get($config, 'disk');
 
             $replace = "\$this->setNewFile('$name', '$disk');";
         }

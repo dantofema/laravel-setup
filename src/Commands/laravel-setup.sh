@@ -75,6 +75,8 @@ mkdir storage/app/public/images
 ./vendor/bin/sail ./vendor/bin/pest
 ./vendor/bin/sail dusk --stop-on-failure;
 
+sudo chown -R dantofema ./
+
 git init;
 git add .;
 git commit -m "first commit";

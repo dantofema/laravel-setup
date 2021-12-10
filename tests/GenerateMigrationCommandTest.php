@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 it('generate migration file', closure: function () {
     expect(collect(File::files('database/migrations'))->count())->toEqual(0);
 
-    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:migration tests/config/all-in-one.php'))->toEqual(1);
 
     $files = collect(File::files('database/migrations'));
 
@@ -18,13 +18,15 @@ it('generate migration file', closure: function () {
     expect(Str::contains($file->getFilenameWithoutExtension(), 'posts_table'))->toBeTrue();
 });
 
-function getMigrationFile(): \Symfony\Component\Finder\SplFileInfo
+function getMigrationFile (): \Symfony\Component\Finder\SplFileInfo
 {
     $config = include(__DIR__ . '/config/default.php');
     $files = File::files('database/migrations');
     $migration = null;
-    foreach ($files as $file) {
-        if (Str::contains($file, $config['table'])) {
+    foreach ($files as $file)
+    {
+        if (Str::contains($file, $config['table']))
+        {
             $migration = $file;
 
             break;
@@ -35,7 +37,7 @@ function getMigrationFile(): \Symfony\Component\Finder\SplFileInfo
 }
 
 it('generate fields', function () {
-    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(1);
+    expect(Artisan::call('generate:migration tests/config/all-in-one.php'))->toEqual(1);
 
     $migration = getMigrationFile();
 
@@ -55,13 +57,13 @@ it('generate fields', function () {
 it('if migration file exist return exception and exit', function () {
     $this->expectException(Exception::class);
 
-    Artisan::call('generate:migration tests/config/default.php');
+    Artisan::call('generate:migration tests/config/all-in-one.php');
 
     sleep(1);
 
     $file = getMigrationFile();
 
-    expect(Artisan::call('generate:migration tests/config/default.php'))->toEqual(0);
+    expect(Artisan::call('generate:migration tests/config/all-in-one.php'))->toEqual(0);
 
     $newFiles = File::files('database/migrations');
 
@@ -80,7 +82,7 @@ it('if config file not found return error and exit', function () {
 });
 
 it('migration file check syntax', closure: function () {
-    Artisan::call('generate:migration tests/config/default.php');
+    Artisan::call('generate:migration tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
     expect(shell_exec("php -l -f " . Text::config($config)->path('migration')))->toContain('No syntax errors detected');

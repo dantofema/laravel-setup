@@ -11,7 +11,7 @@ it('backend directory is empty', closure: function () {
 });
 
 it('generate livewire file', closure: function () {
-    expect(Artisan::call('generate:test tests/config/default.php'))
+    expect(Artisan::call('generate:test tests/config/all-in-one.php'))
         ->toEqual(1);
 
     $files = File::files('tests/Feature/Backend');
@@ -24,7 +24,7 @@ it('generate livewire file', closure: function () {
 });
 
 it('replace table', closure: function () {
-    expect(Artisan::call('generate:test tests/config/default.php'))
+    expect(Artisan::call('generate:test tests/config/all-in-one.php'))
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
@@ -40,7 +40,7 @@ it('replace table', closure: function () {
 });
 
 it('test file check syntax', closure: function () {
-    Artisan::call('generate:test tests/config/default.php');
+    Artisan::call('generate:test tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
 //    dump(File::get(Text::config($config)->path('test')));

@@ -35,7 +35,8 @@ class PathService
 
     public function namespace (array $config, string $type, bool $withName = true): string
     {
-        $folders = array_filter(explode('/', $this->$type($config)));
+        $path = $this->$type($config);
+        $folders = array_filter(explode('/', $path));
         $namespace = '';
 
         foreach ($folders as $key => $folder)
@@ -53,9 +54,24 @@ class PathService
             : $namespace . ';';
     }
 
+    public function route (): string
+    {
+        return self::ROUTE . 'web.php';
+    }
+
+    #[Pure] protected function livewireCollection (array $config): string
+    {
+        return $this->livewire($config);
+    }
+
     protected function livewire (array $config): string
     {
         return self::LIVEWIRE . ($config['backend'] ? 'Backend/' : 'Frontend/');
+    }
+
+    #[Pure] protected function livewireModel (array $config): string
+    {
+        return $this->livewire($config);
     }
 
     protected function model (): string
@@ -81,10 +97,5 @@ class PathService
     protected function factory (): string
     {
         return self::FACTORY;
-    }
-
-    protected function route (): string
-    {
-        return self::ROUTE . 'web.php';
     }
 }

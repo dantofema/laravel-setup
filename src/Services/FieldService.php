@@ -2,25 +2,21 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
+use JetBrains\PhpStorm\Pure;
+
 class FieldService
 {
     protected const KEY_SLUG = 'slug';
     protected const KEY_SEARCHABLE = 'searchable';
     protected const KEY_RELATIONSHIPS = 'relationship';
     protected const KEY_INDEX = 'index';
-    private array $config;
 
-    public function config(array $config): FieldService
+    public function getFile (array $config): array
     {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    public function getFile(): array
-    {
-        foreach ($this->config['fields'] as $field) {
-            if ($field['form']['input'] === 'file') {
+        foreach ($config['fields'] as $field)
+        {
+            if ($field['form']['input'] === 'file')
+            {
                 return $field;
             }
         }
@@ -28,10 +24,12 @@ class FieldService
         return [];
     }
 
-    public function getSlug(): array
+    public function getSlug (array $config): array
     {
-        foreach ($this->config['fields'] as $field) {
-            if (array_key_exists(self::KEY_SLUG, $field)) {
+        foreach ($config['fields'] as $field)
+        {
+            if (array_key_exists(self::KEY_SLUG, $field))
+            {
                 return $field;
             }
         }
@@ -39,11 +37,13 @@ class FieldService
         return [];
     }
 
-    public function getSearchable(): array
+    public function getSearchable (array $config): array
     {
         $searchable = [];
-        foreach ($this->config['fields'] as $field) {
-            if (array_key_exists(self::KEY_SEARCHABLE, $field)) {
+        foreach ($config['fields'] as $field)
+        {
+            if (array_key_exists(self::KEY_SEARCHABLE, $field))
+            {
                 $searchable[] = $field;
             }
         }
@@ -51,11 +51,13 @@ class FieldService
         return $searchable;
     }
 
-    public function getIndex(): array
+    public function getIndex (array $config): array
     {
         $searchable = [];
-        foreach ($this->config['fields'] as $field) {
-            if (array_key_exists(self::KEY_INDEX, $field)) {
+        foreach ($config['fields'] as $field)
+        {
+            if (array_key_exists(self::KEY_INDEX, $field))
+            {
                 $searchable[] = $field;
             }
         }
@@ -63,11 +65,13 @@ class FieldService
         return $searchable;
     }
 
-    public function getRelationships(): array
+    public function getRelationships (array $config): array
     {
         $relationships = [];
-        foreach ($this->config['fields'] as $field) {
-            if (array_key_exists(self::KEY_RELATIONSHIPS, $field)) {
+        foreach ($config['fields'] as $field)
+        {
+            if (array_key_exists(self::KEY_RELATIONSHIPS, $field))
+            {
                 $relationships[] = $field;
             }
         }
@@ -75,29 +79,38 @@ class FieldService
         return $relationships;
     }
 
-    public function getRules(array $field): array
+    public function getRules (array $field): array
     {
         return array_key_exists('rules', $field)
             ? $field['rules']
             : [];
     }
 
-    public function getRelationship(array $field): array
+    public function getRelationship (array $field): array
     {
         return array_key_exists('relationship', $field)
             ? $field
             : [];
     }
 
-    public function getRulesToString(array $rules): string
+    #[Pure] public function getRulesForRelationship (array $field): string
+    {
+        return $field['relationship']['type'] === 'belongsToMany'
+            ? "'" . $field['name'] . "' => " . $this->getRulesToString($field['rules'])
+            : "'editing." . $field['name'] . "' => " . $this->getRulesToString($field['rules']);
+    }
+
+    public function getRulesToString (array $rules): string
     {
         $rule = "[";
 
         $rule .= empty($rules['nullable']) ? "'required'," : "'nullable',";
         $rule .= empty($rules['unique']) ? '' : $rules['unique'] . ',';
 
-        if (! empty($rules['extra'])) {
-            foreach ($rules['extra'] as $extra) {
+        if ( ! empty($rules['extra']))
+        {
+            foreach ($rules['extra'] as $extra)
+            {
                 $rule .= "'$extra',";
             }
         }

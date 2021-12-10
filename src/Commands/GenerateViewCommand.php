@@ -2,14 +2,12 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Views\DeleteModalService;
 use Dantofema\LaravelSetup\Services\Views\FormModalService;
 use Dantofema\LaravelSetup\Services\Views\TableService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
+use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 
 class GenerateViewCommand extends Command
 {
@@ -30,46 +28,53 @@ class GenerateViewCommand extends Command
         $this->tableService = new TableService();
     }
 
+    /**
+     * @throws Exception
+     */
     public function handle (): bool
     {
-        $this->init('view');
+        $this->config = include $this->argument('path');
 
-        return $this->create();
+        $types = $this->config['allInOne']
+            ? ['view']
+            : ['viewCollection', 'viewModel'];
+
+        $this->init($types);
+
+        foreach ($this->properties as $property)
+        {
+            $this->put($this->replace($property));
+        }
+
+        return true;
     }
 
-    public function create (): bool
+    private function replace (array $property): string
     {
-        return File::put(
-            Text::config($this->config)->path('view'),
-            $this->replace()
+        $property['stub'] = $this->getTitle($property['stub']);
+        $property['stub'] = $this->formModal->get($this->config, $property['stub']);
+        $property['stub'] = $this->deleteModal->get($property['stub']);
+
+        $property['stub'] = $this->tableService->getHeadings(
+            gen()->field()->getIndex($this->config),
+            $property['stub']
         );
+
+        $property['stub'] = $this->tableService->getCells(
+            gen()->field()->getIndex($this->config),
+            $property['stub']
+        );
+
+        return $property['stub'];
     }
 
-    private function replace (): string
-    {
-        $this->stub = $this->getTitle();
-        $this->stub = $this->formModal->get($this->config, $this->stub);
-        $this->stub = $this->deleteModal->get($this->stub);
-
-        $this->stub = $this->tableService->getHeadings(
-            Field::config($this->config)->getIndex(),
-            $this->stub
-        );
-
-        $this->stub = $this->tableService->getCells(
-            Field::config($this->config)->getIndex(),
-            $this->stub
-        );
-
-        return $this->stub;
-    }
-
-    private function getTitle (): string
+    private function getTitle (string $stub): string
     {
         return str_replace(
             ':title:',
             $this->config['view']['title'] ?: '',
-            $this->stub
+            $stub
         );
     }
+
 }

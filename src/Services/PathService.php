@@ -69,6 +69,21 @@ class PathService
         return self::LIVEWIRE . ($config['backend'] ? 'Backend/' : 'Frontend/');
     }
 
+    #[Pure] protected function viewCollection (array $config): string
+    {
+        return $this->view($config);
+    }
+
+    protected function view (array $config): string
+    {
+        return self::VIEW . ($config['backend'] ? 'backend/' : 'frontend/');
+    }
+
+    #[Pure] protected function viewModel (array $config): string
+    {
+        return $this->view($config);
+    }
+
     #[Pure] protected function livewireModel (array $config): string
     {
         return $this->livewire($config);
@@ -82,11 +97,6 @@ class PathService
     protected function migration (): string
     {
         return self::MIGRATION;
-    }
-
-    protected function view (array $config): string
-    {
-        return self::VIEW . ($config['backend'] ? 'backend/' : 'frontend/');
     }
 
     protected function test (array $config): string

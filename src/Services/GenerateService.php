@@ -46,9 +46,9 @@ class GenerateService
         return (new ReplaceService())->fromField($field, $config, $stub);
     }
 
-    public function getStub (string $stub): string
+    public function getStub (string $type): string
     {
-        return (new StubService())->get($stub);
+        return (new StubService())->get($type);
     }
 
     public function getName (array $config, string $type, bool $whitExtension = false): string

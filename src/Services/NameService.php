@@ -42,14 +42,19 @@ class NameService
         return $config['table']['name'];
     }
 
-    protected function view (array $config): string
-    {
-        return $config['table']['name'] . '.blade';
-    }
-
     protected function viewModel (array $config): string
     {
         return strtolower($config['model']['name']) . '.blade';
+    }
+
+    protected function viewCollection (array $config): string
+    {
+        return $this->view($config);
+    }
+
+    protected function view (array $config): string
+    {
+        return $config['table']['name'] . '.blade';
     }
 
     protected function migration (array $config): string

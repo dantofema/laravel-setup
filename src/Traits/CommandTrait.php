@@ -2,9 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
-use Dantofema\LaravelSetup\Facades\Generate;
-use Dantofema\LaravelSetup\Facades\Replace;
-use Dantofema\LaravelSetup\Facades\Text;
+use Dantofema\LaravelSetup\Services\GenerateService;
 use Exception;
 use Illuminate\Support\Facades\File;
 
@@ -13,8 +11,9 @@ trait CommandTrait
     use FileExistsTrait;
 
     protected array $config;
-    private array $stubs;
-    private string $type;
+    protected array $stubs;
+    protected array $types;
+    protected GenerateService $generateService;
 
     public function getConfig (): array
     {
@@ -24,10 +23,11 @@ trait CommandTrait
     /**
      * @throws Exception
      */
-    protected function init (string $type): bool
+    protected function init (): bool
     {
-        $this->type = $type;
-        Generate::setup();
+        $this->generateService = new GenerateService();
+
+        $this->generateService->setup();
 
         $this->configFileExists();
 
@@ -35,45 +35,42 @@ trait CommandTrait
 
         if ($this->option('force'))
         {
-            Generate::delete($this->config, $type);
+            $this->generateService->delete($this->config, $this->types);
         }
 
-        if ($type == 'livewire')
+        foreach ($this->types as $type)
         {
-            Generate::addRoute($this->config);
+            if (str_contains($type, 'livewire'))
+            {
+                $this->generateService->addRoute($this->config);
+            }
         }
 
-        $this->exists($type);
+        $this->exists();
 
-        $this->setStubs($type);
+        $this->setStubs();
 
         return true;
     }
 
-    protected function setStubs (string $type): void
+    protected function setStubs (): void
     {
-        if ( ! $this->config['modal'] and ($type === 'view' or $type === 'livewire'))
+        foreach ($this->types as $type)
         {
-            $this->stubs = [
-                $type . '.collection' => file_get_contents(Generate::getStub($type) . '.collection'),
-                $type . '.model' => file_get_contents(Generate::getStub($type) . '.model'),
+            $this->stubs[] = [
+                $type => file_get_contents($this->generateService->getStub($type)),
             ];
-
-            return;
         }
-
-        $this->stubs = [
-            $type => file_get_contents(Generate::getStub($type)),
-        ];
     }
 
-    protected function put (string $content): bool|int
+    protected function put (string $content): void
     {
-        $replaceContent = Replace::config($this->config)
-            ->stub($content)
-            ->type($this->type)
-            ->default();
-
-        return File::put(Text::config($this->config)->path($this->type), $replaceContent);
+        foreach ($this->types as $type)
+        {
+            File::put(
+                $this->generateService->getPath($this->config, $type),
+                $this->generateService->replaceFromConfig($this->config, $type, $content)
+            );
+        }
     }
 }

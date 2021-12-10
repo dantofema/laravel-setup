@@ -13,14 +13,13 @@ use Dantofema\LaravelSetup\Commands\GenerateViewCommand;
 use Dantofema\LaravelSetup\Services\FieldService;
 use Dantofema\LaravelSetup\Services\FileService;
 use Dantofema\LaravelSetup\Services\GenerateService;
-use Dantofema\LaravelSetup\Services\ReplaceService;
 use Dantofema\LaravelSetup\Services\TextService;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class LaravelSetupServiceProvider extends PackageServiceProvider
 {
-    public function configurePackage(Package $package): void
+    public function configurePackage (Package $package): void
     {
         /*
          * This class is a Package Service Provider
@@ -42,7 +41,7 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
             ->hasCommand(GenerateFactoryCommand::class);
     }
 
-    public function packageRegistered()
+    public function packageRegistered ()
     {
         $this->app->bind('generate', function () {
             return new GenerateService();
@@ -52,16 +51,8 @@ class LaravelSetupServiceProvider extends PackageServiceProvider
             return new FileService();
         });
 
-        $this->app->bind('text', function () {
-            return new TextService();
-        });
-
         $this->app->bind('field', function () {
             return new FieldService();
-        });
-
-        $this->app->bind('replace', function () {
-            return new ReplaceService();
         });
     }
 }

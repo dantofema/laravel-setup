@@ -25,6 +25,14 @@ class PathService
         return $this->$type($config) . $this->nameService->get($config, $type, true);
     }
 
+    public function renderView (array $config): string
+    {
+        $name = 'livewire.';
+        $name .= $config['backend'] ? 'backend.' : 'frontend.';
+
+        return $name . $config['table']['name'];
+    }
+
     public function namespace (array $config, string $type, bool $withName = true): string
     {
         $folders = array_filter(explode('/', $this->$type($config)));

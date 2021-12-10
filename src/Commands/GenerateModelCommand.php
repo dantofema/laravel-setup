@@ -13,7 +13,6 @@ class GenerateModelCommand extends Command
 {
     use CommandTrait;
 
-    protected const STUB_PATH = '/../Stubs/Model.php.stub';
     public $signature = 'generate:model {path : path to the config file } {--force}';
     public $description = 'Model file generator';
     protected array $config;
@@ -22,14 +21,14 @@ class GenerateModelCommand extends Command
     private RelationshipsService $modelRelationship;
     private SearchService $searchService;
 
-    public function __construct()
+    public function __construct ()
     {
         parent::__construct();
         $this->modelRelationship = new RelationshipsService();
         $this->searchService = new SearchService();
     }
 
-    public function handle(): bool
+    public function handle (): bool
     {
         $this->init('model');
         $this->getUserstamps();
@@ -46,23 +45,25 @@ class GenerateModelCommand extends Command
         return true;
     }
 
-    protected function getUserstamps()
+    protected function getUserstamps ()
     {
-        if (in_array('SoftDeletes', $this->config['model']['use'])) {
+        if (in_array('SoftDeletes', $this->config['model']['use']))
+        {
             $this->useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
             $this->useInClass .= "use Userstamps;" . PHP_EOL;
         }
     }
 
-    protected function getSoftDelete()
+    protected function getSoftDelete ()
     {
-        if (in_array('SoftDeletes', $this->config['model']['use'])) {
+        if (in_array('SoftDeletes', $this->config['model']['use']))
+        {
             $this->useNamespace .= "use Illuminate\Database\Eloquent\SoftDeletes;\r\n";
             $this->useInClass .= "use SoftDeletes;\r\n";
         }
     }
 
-    private function getNamespace(): void
+    private function getNamespace (): void
     {
         $this->stub = str_replace(
             ':namespace:',
@@ -71,12 +72,12 @@ class GenerateModelCommand extends Command
         );
     }
 
-    private function getPath(): void
+    private function getPath (): void
     {
         $this->stub = str_replace(':path:', $this->config['route']['path'], $this->stub);
     }
 
-    protected function getSrcAttribute()
+    protected function getSrcAttribute ()
     {
         $this->stub = str_replace(
             ':getSrcAttribute:',
@@ -87,12 +88,13 @@ class GenerateModelCommand extends Command
         );
     }
 
-    public function create()
+    public function create ()
     {
         $vars = $this->getVarsFromColumns();
         $definition = $this->getReturnFromColumns();
         $stub = $this->getStub();
-        if (! $stub) {
+        if ( ! $stub)
+        {
             $this->error('Error get stub');
             $this->error('Exit');
 
@@ -104,7 +106,7 @@ class GenerateModelCommand extends Command
         $this->put($content);
     }
 
-    private function getFileName(): string
+    private function getFileName (): string
     {
         $this->stub = str_replace(
             ':namespace:',

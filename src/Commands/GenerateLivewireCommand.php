@@ -38,7 +38,15 @@ class GenerateLivewireCommand extends Command
      */
     public function handle (): bool
     {
-        $this->init('livewire');
+        if ($this->config['allInOne'])
+        {
+            $this->types = ['livewire'];
+        } else
+        {
+            $this->types = ['livewireCollection', 'livewireModel'];
+        }
+
+        $this->init();
 
         foreach ($this->stubs as $stub)
         {

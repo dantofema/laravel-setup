@@ -2,7 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Traits;
 
-use Dantofema\LaravelSetup\Facades\Text;
+use Dantofema\LaravelSetup\Services\GenerateService;
 use Exception;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -12,29 +12,38 @@ trait FileExistsTrait
     /**
      * @throws Exception
      */
-    protected function exists(string $type): bool
+    protected function exists (): bool
     {
-        if ($type == 'migration') {
-            $this->migrationFileExists();
-        }
+        foreach ($this->types as $type)
+        {
+            if ($type == 'migration')
+            {
+                $this->migrationFileExists();
+            }
 
-        if (File::exists(Text::config($this->config)->path($type))) {
-            $this->error('The ' . $type . ' file "' . Text::config($this->config)->filename($type) . '" already exists ');
-            $this->error('Exit');
+            $generateService = new GenerateService();
 
-            throw new Exception('Livewire file exists');
+            if (File::exists($generateService->getPath($this->config, $type)))
+            {
+                $this->error('The ' . $type . ' file "'
+                    . $generateService->getName($this->config, $type, true)
+                    . '" already exists ');
+
+                throw new Exception('Livewire file exists');
+            }
         }
 
         return false;
     }
 
-    protected function migrationFileExists(): bool
+    protected function migrationFileExists (): bool
     {
         return collect(File::files('database/migrations/'))
             ->contains(function ($file) {
                 $name = $this->config['table']['name'];
 
-                if (Str::contains($file, '_create_' . $name . '_table.php')) {
+                if (Str::contains($file, '_create_' . $name . '_table.php'))
+                {
                     throw new Exception('Migration file exists');
                 }
             });
@@ -43,9 +52,10 @@ trait FileExistsTrait
     /**
      * @throws Exception
      */
-    protected function configFileExists(): bool
+    protected function configFileExists (): bool
     {
-        if (File::exists($this->argument('path'))) {
+        if (File::exists($this->argument('path')))
+        {
             return true;
         }
         $this->error('Not found "' . $this->argument('path') . '"');

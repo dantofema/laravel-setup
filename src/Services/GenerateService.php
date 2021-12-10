@@ -4,43 +4,69 @@ namespace Dantofema\LaravelSetup\Services;
 
 class GenerateService
 {
-    public function delete(array $config, string $type)
+    public function delete (array $config, array $types)
     {
-        (new DeleteService())->type($type)->config($config);
+        (new DeleteService())->execute($config, $types);
     }
 
-    public function addRoute(array $config)
+    public function addRoute (array $config)
     {
         (new RouteService())->add($config);
     }
 
-    public function removeRoute(array $config)
+    public function removeRoute (array $config)
     {
         (new RouteService())->delete($config);
     }
 
-    public function addSeeder(array $config)
+    public function addSeeder (array $config)
     {
         (new SeederService())->add($config);
     }
 
-    public function removeSeeder(array $config)
+    public function removeSeeder (array $config)
     {
         (new SeederService())->delete($config);
     }
 
-    public function setup()
+    public function setup ()
     {
         (new BeforeService())->setup();
     }
 
-    public function replaceDefault(array $config, string $stub, string $type)
+    public function replaceFromConfig (array $config, string $type, string $stub): string
     {
-        (new ReplaceService())->config($config)->stub($stub)->type($type)->default();
+        return (new ReplaceService())->fromConfig($config, $type, $stub);
     }
 
-    public function replaceField(array $config, string $stub, array $field)
+    public function replaceFromField (array $field, array $config, string $stub): string
     {
-        (new ReplaceService())->config($config)->stub($stub)->field($field);
+        return (new ReplaceService())->fromField($field, $config, $stub);
     }
+
+    public function getStub (string $stub): string
+    {
+        return (new StubService())->get($stub);
+    }
+
+    public function getName (array $config, string $type, bool $whitExtension = false): string
+    {
+        return (new NameService())->get($config, $type, $whitExtension);
+    }
+
+    public function getPath (array $config, string $type): string
+    {
+        return (new PathService())->get($config, $type);
+    }
+
+    public function getNamespace (array $config, string $type, bool $whitName = false): string
+    {
+        return (new PathService())->namespace($config, $type, $whitName);
+    }
+
+    public function getRenderView (array $config): string
+    {
+        return (new PathService())->renderView($config);
+    }
+
 }

@@ -4,9 +4,9 @@
         <span wire:model="titleFormModal">{{ $titleFormModal }}</span>
     </x-slot>
     <x-slot name="content">
-
-        :fields:
-
+        <div class="grid grid-cols-2 gap-4">
+            :fields:
+        </div>
         <div>
             <x-jet-validation-errors/>
         </div>

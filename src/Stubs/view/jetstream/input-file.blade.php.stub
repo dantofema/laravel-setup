@@ -1,4 +1,4 @@
-<x-jet-label class="space-y-2 w-1/2">
+<x-jet-label class="space-y-2">
     <div>:label:</div>
     <div>
         <img src="{{ $editing->src }}"

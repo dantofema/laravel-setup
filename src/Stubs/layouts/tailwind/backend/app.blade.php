@@ -17,6 +17,15 @@
 
     <!-- Scripts -->
     <script src="{{ mix('js/app.js') }}" defer></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.js"
+            integrity="sha512-/1nVu72YEESEbcmhE/EvjH/RxTg62EKvYWLG3NdeZibTCuEtW5M4z3aypcvsoZw03FAopi94y04GhuqRU9p+CQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.css"
+          integrity="sha512-CWdvnJD7uGtuypLLe5rLU3eUAkbzBR3Bm1SFPEaRfvXXI2v2H5Y0057EMTzNuGGRIznt8+128QIDQ8RqmHbAdg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
 </head>
 
 <body>
@@ -41,12 +50,11 @@
 
             <div class="py-6">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-
                     <!-- Replace with your content -->
-                    <div class="py-4">
-                        {{ $slot }}
-                    </div>
-                    <!-- /End replace -->
+
+                {{ $slot }}
+
+                <!-- /End replace -->
 
                 </div>
             </div>

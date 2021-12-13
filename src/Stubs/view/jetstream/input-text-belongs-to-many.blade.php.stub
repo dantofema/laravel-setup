@@ -1,6 +1,6 @@
-<div class="space-y-2">
+<div class="space-y-2 w-1/2">
     <x-jet-label class="space-y-2">
-        <div class="w-1/2">:label:</div>
+        <div>:label:</div>
         <div x-data="{isTyped: false}">
             <div>
                 <div class="relative">

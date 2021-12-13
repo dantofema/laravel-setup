@@ -103,7 +103,7 @@ class GenerateMigrationCommand extends Command
             return sprintf(
                 "\$table->foreignId('%s')%s->constrained('%s');" . PHP_EOL,
                 $field['name'],
-                ! empty($rules['nullable']) ? '->nullable()' : null,
+                $field['rules']['nullable'] ? '->nullable()' : null,
                 $field['relationship']['table']
             );
         }

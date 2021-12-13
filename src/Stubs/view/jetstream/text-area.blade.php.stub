@@ -1,5 +1,5 @@
 <x-jet-label class="space-y-2">
-    <div class="w-1/2">:label:</div>
+    <div>:label:</div>
 </x-jet-label>
 
 <x-input.trix wire:model="editing.:field:" rows="15"></x-input.trix>

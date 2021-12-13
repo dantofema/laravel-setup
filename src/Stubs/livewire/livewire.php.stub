@@ -27,7 +27,7 @@ class :livewire: extends Component
         :detach:
         $this->editing->delete();
         $this->showDeleteModal = false;
-        $this->reset(['parameterId', 'parameterAction']);
+        $this->index();
     }
 
     public function delete (:model: $model)
@@ -64,6 +64,7 @@ class :livewire: extends Component
         $this->validate();
         $this->editing->save();
         :syncBelongsToMany:
+        $this->index();
     }
 
     public function rules (): array

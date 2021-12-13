@@ -105,7 +105,7 @@ class GenerateLivewireCommand extends Command
 
     private function getRules (string $stub): string
     {
-        $rules = "\$rules = [\r\n";
+        $rules = "\$rules = [" . PHP_EOL;
         foreach ($this->config['fields'] as $field)
         {
             if ($field['form']['input'] === 'file')
@@ -118,7 +118,7 @@ class GenerateLivewireCommand extends Command
 
             $rules .= ',' . PHP_EOL;
         }
-        $rules .= "];\r\n";
+        $rules .= "];" . PHP_EOL;
 
         $fieldFile = gen()->field()->getFile($this->config);
 
@@ -127,7 +127,7 @@ class GenerateLivewireCommand extends Command
             $this->filesystem->execute($this->config);
             $fileRules = gen()->field()->getRulesToString($fieldFile['rules']);
             $rules .= <<<EOT
-        if (\$this->createAction)
+        if (\$this->parameterAction == 'create')
         {
             \$rules['newFile'] = $fileRules;
         }

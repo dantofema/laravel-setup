@@ -1,16 +1,13 @@
-<x-jet-label class="space-y-2">
+<x-jet-label class="space-y-2  w-1/2">
+        <div>:label:</div>
 
-    <label>
-        <div class="w-1/2">:label:</div>
-
-        <select wire:model="editing.:field:">
+        <x-input.select wire:model="editing.:field:" class="w-full">
 
             <option value="">Seleccione...</option>
             @foreach($:arrayItems: as $:modelLower:)
                 <option value="{{ $:modelLower:->id }}">{{ $:modelLower:->:optionField: }}</option>
             @endforeach
 
-        </select>
-    </label>
+        </x-input.select>
 
 </x-jet-label>

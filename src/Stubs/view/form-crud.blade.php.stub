@@ -1,0 +1,11 @@
+
+        :fields:
+
+        <div>
+            <x-jet-validation-errors/>
+        </div>
+
+        <x-jet-button wire:click="$set('showFormModal', false)">Cancelar</x-jet-button>
+        <x-jet-button wire:click="save" class="bg-blue-700">Confirmar</x-jet-button>
+
+

@@ -6,25 +6,31 @@ use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Exception;
 use Illuminate\Support\Facades\File;
 
-class FormModalService
+class FormCrudService
 {
     use CommandTrait;
 
-    protected const STUB_PATH = __DIR__ . '/../../Stubs/view/jetstream/form-modal.blade.php.stub';
+    protected const STUB_PATH_ALL_IN_ONE = __DIR__ . '/../../Stubs/view/jetstream/form-crud-modal.blade.php.stub';
+    protected const STUB_PATH = __DIR__ . '/../../Stubs/view/form-crud.blade.php.stub';
     protected const INPUT_FILE_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-file.blade.php.stub';
     protected const INPUT_TEXT_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-text.blade.php.stub';
     protected const INPUT_TEXT_BELONGS_TO_MANY_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-text-belongs-to-many.blade.php.stub';
     protected const TEXT_AREA_PATH = __DIR__ . '/../../Stubs/view/jetstream/text-area.blade.php.stub';
     protected const SELECT_PATH = __DIR__ . '/../../Stubs/view/jetstream/select.blade.php.stub';
 
+    /**
+     * @throws Exception
+     */
     public function get (array $config, string $stub): string
     {
-        $form = File::get(self::STUB_PATH);
+        $form = $config['allInOne']
+            ? File::get(self::STUB_PATH_ALL_IN_ONE)
+            : File::get(self::STUB_PATH);
 
         $form = str_replace(':fields:', $this->fields($config), $form);
 
         return str_replace(
-            ':formModal:',
+            ':formCrud:',
             $form,
             $stub
         );

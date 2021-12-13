@@ -2,7 +2,7 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Services\Views\FormModalService;
+use Dantofema\LaravelSetup\Services\Views\FormCrudService;
 use Dantofema\LaravelSetup\Services\Views\TableService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Exception;
@@ -15,14 +15,14 @@ class GenerateViewCommand extends Command
     public $signature = 'generate:view {path : path to the config file } {--force}';
     public $description = 'View file generator';
     protected array $config;
-    private FormModalService $formModal;
+    private FormCrudService $formModal;
 
     private TableService $tableService;
 
     public function __construct ()
     {
         parent::__construct();
-        $this->formModal = new FormModalService();
+        $this->formModal = new FormCrudService();
 
         $this->tableService = new TableService();
     }

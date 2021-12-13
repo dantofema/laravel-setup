@@ -30,7 +30,7 @@
 
         <x-table.links :rows="$rows"/>
 
-        :formModal:
+        :formCrud:
 
         <x-modal.delete :message="$bodyDeleteModal"/>
 

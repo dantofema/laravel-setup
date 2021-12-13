@@ -8,8 +8,6 @@ it('get Text', closure: function () {
 
     expect($name->get($config, 'livewire'))->toEqual('PostsLivewire');
     expect($name->get($config, 'livewire', true))->toEqual('PostsLivewire.php');
-    expect($name->get($config, 'livewireModel'))->toEqual('PostLivewire');
-    expect($name->get($config, 'livewireModel', true))->toEqual('PostLivewire.php');
 
     expect($name->get($config, 'model'))->toEqual('Post');
     expect($name->get($config, 'model', true))->toEqual('Post.php');
@@ -17,8 +15,10 @@ it('get Text', closure: function () {
     expect($name->get($config, 'seeder'))->toEqual('PostSeeder');
     expect($name->get($config, 'seeder', true))->toEqual('PostSeeder.php');
 
-    expect($name->get($config, 'view'))->toEqual('posts.blade');
-    expect($name->get($config, 'view', true))->toEqual('posts.blade.php');
+    expect($name->get($config, 'viewAllInOne'))->toEqual('posts.blade');
+    expect($name->get($config, 'viewAllInOne', true))->toEqual('posts.blade.php');
+    expect($name->get($config, 'viewCollection'))->toEqual('posts.blade');
+    expect($name->get($config, 'viewCollection', true))->toEqual('posts.blade.php');
     expect($name->get($config, 'viewModel'))->toEqual('post.blade');
     expect($name->get($config, 'viewModel', true))->toEqual('post.blade.php');
 
@@ -30,7 +30,4 @@ it('get Text', closure: function () {
 
     expect($name->get($config, 'test'))->toEqual('PostsLivewireTest');
     expect($name->get($config, 'test', true))->toEqual('PostsLivewireTest.php');
-
-    expect($name->get($config, 'testModel'))->toEqual('PostLivewireTest');
-    expect($name->get($config, 'testModel', true))->toEqual('PostLivewireTest.php');
 });

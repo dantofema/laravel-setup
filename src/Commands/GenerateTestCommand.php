@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Tests\CreateService;
 use Dantofema\LaravelSetup\Services\Tests\EditService;
 use Dantofema\LaravelSetup\Services\Tests\EditSlugService;
@@ -32,61 +31,73 @@ class GenerateTestCommand extends Command
         $this->editService = new EditService();
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handle (): bool
     {
-        $this->init('test');
+        $this->config = include $this->argument('path');
 
-        $this->getUse();
-        $this->getUri();
-        $this->getField();
-        $this->editSlug();
-        $this->getDisk();
-        $this->stub = $this->requiredService->get($this->config, $this->stub);
-        $this->stub = $this->saveService->get($this->config, $this->stub);
-        $this->stub = $this->editService->file($this->config, $this->stub);
-        $this->stub = $this->stub . File::get(__DIR__ . '/../Stubs/tests/extra-methods.stub');
-        $this->put($this->stub);
+        $this->init(['test']);
+
+        foreach ($this->properties as $property)
+        {
+            $this->put($property['type'], $this->replace($property));
+        }
 
         return true;
     }
 
-    private function getUse (): void
+    private function replace (array $property): string
     {
-        $replace = 'use ' . Text::config($this->config)->namespace('livewire') . PHP_EOL;
-        $this->stub = str_replace(':use:', $replace, $this->stub);
+        $property['stub'] = $this->getUse($property['stub']);
+        $property['stub'] = $this->getUri($property['stub']);
+        $property['stub'] = $this->getField($property['stub']);
+        $property['stub'] = $this->editSlug($property['stub']);
+        $property['stub'] = $this->getDisk($property['stub']);
+        $property['stub'] = $this->requiredService->get($this->config, $property['stub']);
+        $property['stub'] = $this->saveService->get($this->config, $property['stub']);
+        $property['stub'] = $this->editService->file($this->config, $property['stub']);
+        return $property['stub'] . File::get(__DIR__ . '/../Stubs/tests/extra-methods.stub');
     }
 
-    private function getUri (): void
+    private function getUse (string $stub): string
+    {
+        $replace = 'use ' . gen()->getNamespace($this->config, 'livewire', true) . PHP_EOL;
+        return str_replace(':use:', $replace, $stub);
+    }
+
+    private function getUri (string $stub): string
     {
         $uri = $this->config['backend'] ? 'sistema/' : '';
-        $this->stub = str_replace(
+        return str_replace(
             ':uri:',
             $uri . $this->config['route']['path'],
-            $this->stub
+            $stub
         );
     }
 
-    private function getField (): void
+    private function getField (string $stub): string
     {
         $field = $this->config['fields'][0];
 
-        $this->stub = str_replace(
+        return str_replace(
             ':field:',
             $field['name'],
-            $this->stub
+            $stub
         );
     }
 
-    private function editSlug (): void
+    private function editSlug (string $stub): string
     {
-        $this->stub = str_replace(
+        return str_replace(
             ':edit-slug:',
             $this->editSlugService->get($this->config),
-            $this->stub
+            $stub
         );
     }
 
-    private function getDisk (): void
+    private function getDisk (string $stub): string
     {
         $disk = '';
         foreach ($this->config['fields'] as $field)
@@ -97,6 +108,6 @@ class GenerateTestCommand extends Command
                 $disk .= "\$this->newFile = '';";
             }
         }
-        $this->stub = str_replace(':disk:', $disk, $this->stub);
+        return str_replace(':disk:', $disk, $stub);
     }
 }

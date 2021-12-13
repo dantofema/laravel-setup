@@ -17,17 +17,17 @@ class NameService
         return strtolower($config['model']['name']);
     }
 
-    protected function livewireModel (array $config): string
+    protected function test (array $config): string
     {
-        return ucfirst($config['model']['name']) . 'Livewire';
-    }
-
-    protected function livewireCollection (array $config): string
-    {
-        return $this->livewire($config);
+        return ucfirst($config['table']['name']) . 'LivewireTest';
     }
 
     protected function livewire (array $config): string
+    {
+        return ucfirst($config['table']['name']) . 'Livewire';
+    }
+
+    protected function livewireAllInOne (array $config): string
     {
         return ucfirst($config['table']['name']) . 'Livewire';
     }
@@ -49,10 +49,10 @@ class NameService
 
     protected function viewCollection (array $config): string
     {
-        return $this->view($config);
+        return $this->viewAllInOne($config);
     }
 
-    protected function view (array $config): string
+    protected function viewAllInOne (array $config): string
     {
         return $config['table']['name'] . '.blade';
     }
@@ -73,13 +73,4 @@ class NameService
         return $config['model']['name'] . 'Seeder';
     }
 
-    protected function test (array $config): string
-    {
-        return ucfirst($config['table']['name']) . 'LivewireTest';
-    }
-
-    protected function testModel (array $config): string
-    {
-        return ucfirst($config['model']['name']) . 'LivewireTest';
-    }
 }

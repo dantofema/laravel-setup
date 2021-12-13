@@ -7,7 +7,7 @@
             <x-input.search/>
 
             <div class="flex justify-end space-x-2">
-                <x-button.create text="Nueva nota"/>
+                <x-page-actions :id="$parameterId" :action="$parameterAction"/>
             </div>
 
         </div>
@@ -30,9 +30,7 @@
 
         <x-table.links :rows="$rows"/>
 
-        :deleteModal:
-
-        :formModal:
+        <x-modal.delete :message="$bodyDeleteModal"/>
 
     </div>
 </div>

@@ -5,13 +5,12 @@ namespace Dantofema\LaravelSetup\Services;
 class StubService
 {
     private array $stubs = [
-        'view' => '/../Stubs/view/jetstream/basic.blade.php.stub',
-        'viewCollection' => '/../Stubs/view/jetstream/basic.blade.php.stub',
-        'viewModel' => '/../Stubs/view/jetstream/basic.blade.php.stub',
+        'viewAllInOne' => '/../Stubs/view/jetstream/all-in-one.blade.php.stub',
+        'viewCollection' => '/../Stubs/view/collection.blade.php.stub',
+        'viewModel' => '/../Stubs/view/model.blade.php.stub',
 
-        'livewire' => '/../Stubs/livewire/Livewire.php.stub',
-        'livewireCollection' => '/../Stubs/livewire/Livewire.php.stub',
-        'livewireModel' => '/../Stubs/livewire/Livewire.php.stub',
+        'livewireAllInOne' => '/../Stubs/livewire/livewire-all-in-one.php.stub',
+        'livewire' => '/../Stubs/livewire/livewire.php.stub',
 
         'test' => '/../Stubs/test.stub',
         'testCollection' => '/../Stubs/test.stub',

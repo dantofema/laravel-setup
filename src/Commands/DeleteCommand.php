@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Generate;
 use Illuminate\Console\Command;
 
 class DeleteCommand extends Command
@@ -16,38 +15,42 @@ class DeleteCommand extends Command
     private array $types = [
         'factory',
         'livewire',
+        'livewireAllInOne',
         'migration',
         'model',
         'test',
-        'view',
+        'viewAllInOne',
+        'viewModel',
+        'viewCollection',
     ];
 
-    public function handle(): bool
+    public function handle (): bool
     {
         $this->config = include $this->argument('path');
 
-        if ($this->argument('type') === 'route') {
+        if ($this->argument('type') === 'route')
+        {
             $this->route();
 
             return true;
         }
 
-        if ($this->argument('type') === 'all') {
-            foreach ($this->types as $type) {
-                Generate::delete($this->config, $type);
-            }
+        if ($this->argument('type') === 'all')
+        {
+            gen()->delete($this->config, $this->types);
+
             $this->route();
 
             return true;
         }
 
-        Generate::delete($this->config, $this->argument('type'));
+        gen()->delete($this->config, $this->argument('type'));
 
         return true;
     }
 
-    private function route()
+    private function route ()
     {
-        Generate::removeRoute($this->config);
+        gen()->removeRoute($this->config);
     }
 }

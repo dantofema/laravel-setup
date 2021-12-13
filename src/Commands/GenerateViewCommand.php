@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Services\Views\DeleteModalService;
 use Dantofema\LaravelSetup\Services\Views\FormModalService;
 use Dantofema\LaravelSetup\Services\Views\TableService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
@@ -17,14 +16,14 @@ class GenerateViewCommand extends Command
     public $description = 'View file generator';
     protected array $config;
     private FormModalService $formModal;
-    private DeleteModalService $deleteModal;
+
     private TableService $tableService;
 
     public function __construct ()
     {
         parent::__construct();
         $this->formModal = new FormModalService();
-        $this->deleteModal = new DeleteModalService();
+
         $this->tableService = new TableService();
     }
 
@@ -36,14 +35,14 @@ class GenerateViewCommand extends Command
         $this->config = include $this->argument('path');
 
         $types = $this->config['allInOne']
-            ? ['view']
+            ? ['viewAllInOne']
             : ['viewCollection', 'viewModel'];
 
         $this->init($types);
 
         foreach ($this->properties as $property)
         {
-            $this->put($this->replace($property));
+            $this->put($property['type'], $this->replace($property));
         }
 
         return true;
@@ -53,7 +52,6 @@ class GenerateViewCommand extends Command
     {
         $property['stub'] = $this->getTitle($property['stub']);
         $property['stub'] = $this->formModal->get($this->config, $property['stub']);
-        $property['stub'] = $this->deleteModal->get($property['stub']);
 
         $property['stub'] = $this->tableService->getHeadings(
             gen()->field()->getIndex($this->config),

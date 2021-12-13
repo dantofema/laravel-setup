@@ -1,6 +1,5 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -54,26 +53,6 @@ it('generate fields', function () {
     ]))->toBeTrue();
 });
 
-it('if migration file exist return exception and exit', function () {
-    $this->expectException(Exception::class);
-
-    Artisan::call('generate:migration tests/config/all-in-one.php');
-
-    sleep(1);
-
-    $file = getMigrationFile();
-
-    expect(Artisan::call('generate:migration tests/config/all-in-one.php'))->toEqual(0);
-
-    $newFiles = File::files('database/migrations');
-
-    expect(count($newFiles))->toEqual(1);
-
-    $newFile = getMigrationFile();
-
-    expect($newFile->getBaseName())->toEqual($file->getBaseName());
-});
-
 it('if config file not found return error and exit', function () {
     $this->expectException(Exception::class);
     expect(Artisan::call('generate:migration config/not-found.php'))->toEqual(0);
@@ -85,5 +64,5 @@ it('migration file check syntax', closure: function () {
     Artisan::call('generate:migration tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
-    expect(shell_exec("php -l -f " . Text::config($config)->path('migration')))->toContain('No syntax errors detected');
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'migration')))->toContain('No syntax errors detected');
 });

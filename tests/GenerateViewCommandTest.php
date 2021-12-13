@@ -60,7 +60,7 @@ it('all-in-one - view file check syntax', closure: function () {
     Artisan::call('generate:view tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/all-in-one.php');
 
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'view')))->toContain('No syntax errors detected');
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'viewAllInOne')))->toContain('No syntax errors detected');
 });
 
 it('view file check syntax', closure: function () {

@@ -1,6 +1,5 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -45,5 +44,8 @@ it('model file check syntax', closure: function () {
     Artisan::call('generate:model tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
-    expect(shell_exec("php -l -f " . Text::config($config)->path('model')))->toContain('No syntax errors detected');
+//    dump(File::get(gen()->getPath($config, 'model')));
+
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'model')))
+        ->toContain('No syntax errors detected');
 });

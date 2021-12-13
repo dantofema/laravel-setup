@@ -39,15 +39,15 @@ class GenerateLivewireCommand extends Command
         $this->config = include $this->argument('path');
 
         $types = $this->config['allInOne']
-            ? ['livewire']
-            : ['livewireCollection', 'livewireModel'];
+            ? ['livewireAllInOne']
+            : ['livewire'];
 
         $this->init($types);
 
         foreach ($this->properties as $property)
         {
-            $this->put($this->replace($property));
-            gen()->addRoute($this->config);
+            $this->put($property['type'], $this->replace($property));
+            gen()->addRoute($this->config, $property['type']);
         }
 
         return true;
@@ -72,7 +72,7 @@ class GenerateLivewireCommand extends Command
     {
         return str_replace(
             ':namespace:',
-            gen()->getNamespace($this->config, $property['type'], $property['stub']),
+            gen()->getNamespace($this->config, $property['type']),
             $property['stub']
         );
     }

@@ -2,11 +2,10 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\Models\RelationshipsService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
+use Exception;
 use Illuminate\Console\Command;
 
 class GenerateModelCommand extends Command
@@ -28,90 +27,89 @@ class GenerateModelCommand extends Command
         $this->searchService = new SearchService();
     }
 
+    /**
+     * @throws Exception
+     */
     public function handle (): bool
     {
-        $this->init('model');
-        $this->getUserstamps();
-        $this->getSoftDelete();
-        $this->getNamespace();
-        $this->stub = str_replace(':useNamespace:', $this->useNamespace, $this->stub);
-        $this->stub = str_replace(':useInClass:', $this->useInClass, $this->stub);
-        $this->stub = $this->searchService->get($this->config, $this->stub);
-        $this->stub = $this->modelRelationship->get(Field::config($this->config)->getRelationships(), $this->stub);
-        $this->getPath();
-        $this->getSrcAttribute();
-        $this->put($this->stub);
+        $this->config = include $this->argument('path');
+
+        $this->init(['model']);
+
+        foreach ($this->properties as $property)
+        {
+            $this->put($property['type'], $this->replace($property));
+        }
 
         return true;
     }
 
-    protected function getUserstamps ()
+    private function replace (array $property): string
     {
-        if (in_array('SoftDeletes', $this->config['model']['use']))
-        {
-            $this->useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
-            $this->useInClass .= "use Userstamps;" . PHP_EOL;
-        }
+        $property['stub'] = $this->getNamespace($property['stub']);
+
+        $property['stub'] = $this->searchService->get($this->config, $property['stub']);
+        $property['stub'] = $this->modelRelationship->get(
+            gen()->field()->getRelationships($this->config),
+            $property['stub']
+        );
+        $property['stub'] = $this->getUses($property['stub']);
+        $property['stub'] = $this->getPath($property['stub']);
+        $property['stub'] = $this->getSrcAttribute($property['stub']);
+
+        return $property['stub'];
     }
 
-    protected function getSoftDelete ()
+    private function getNamespace (string $stub): string
     {
-        if (in_array('SoftDeletes', $this->config['model']['use']))
-        {
-            $this->useNamespace .= "use Illuminate\Database\Eloquent\SoftDeletes;\r\n";
-            $this->useInClass .= "use SoftDeletes;\r\n";
-        }
-    }
-
-    private function getNamespace (): void
-    {
-        $this->stub = str_replace(
+        return str_replace(
             ':namespace:',
-            Text::config($this->config)->namespaceFolder('model'),
-            $this->stub
+            gen()->getNamespace($this->config, 'model'),
+            $stub
         );
     }
 
-    private function getPath (): void
+    private function getUses (string $stub)
     {
-        $this->stub = str_replace(':path:', $this->config['route']['path'], $this->stub);
+        $useNamespace = '';
+        $useInClass = '';
+        if (in_array('SoftDeletes', $this->config['model']['use']))
+        {
+            $useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
+            $useInClass .= "use Userstamps;" . PHP_EOL;
+        }
+        if (in_array('SoftDeletes', $this->config['model']['use']))
+        {
+            $useNamespace .= "use Illuminate\Database\Eloquent\SoftDeletes;\r\n";
+            $useInClass .= "use SoftDeletes;\r\n";
+        }
+        $stub = str_replace(':useNamespace:', $useNamespace, $stub);
+
+        return str_replace(':useInClass:', $useInClass, $stub);
     }
 
-    protected function getSrcAttribute ()
+    private function getPath (string $stub): string
     {
-        $this->stub = str_replace(
+        return str_replace(':path:', $this->config['route']['path'], $stub);
+    }
+
+    protected function getSrcAttribute (string $stub): string
+    {
+        return str_replace(
             ':getSrcAttribute:',
-            empty(Field::config($this->config)->getFile())
+            empty(gen()->field()->getFile($this->config))
                 ? ''
                 : file_get_contents(__DIR__ . '/../Stubs/model/getSrcAttribute.stub'),
-            $this->stub
+            $stub
         );
     }
 
-    public function create ()
+    private function getFileName (string $stub): string
     {
-        $vars = $this->getVarsFromColumns();
-        $definition = $this->getReturnFromColumns();
-        $stub = $this->getStub();
-        if ( ! $stub)
-        {
-            $this->error('Error get stub');
-            $this->error('Exit');
-
-            return false;
-        }
-        $use = $this->getUse($vars);
-        $content = $this->replace($stub, $use, $vars, $definition);
-        $filename = $this->getFileName();
-        $this->put($content);
-    }
-
-    private function getFileName (): string
-    {
-        $this->stub = str_replace(
+        return str_replace(
             ':namespace:',
-            Text::config($this->config)->namespaceFolder('model'),
-            $this->stub
+            gen()->getNamespace($this->config, 'model'),
+            $stub
         );
     }
 }

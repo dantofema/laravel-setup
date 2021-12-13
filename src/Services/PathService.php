@@ -25,12 +25,14 @@ class PathService
         return $this->$type($config) . $this->nameService->get($config, $type, true);
     }
 
-    public function renderView (array $config): string
+    public function renderView (array $config, string $type): string
     {
-        $name = 'livewire.';
-        $name .= $config['backend'] ? 'backend.' : 'frontend.';
+        $path = 'livewire.';
+        $path .= $config['backend'] ? 'backend.' : 'frontend.';
 
-        return $name . $config['table']['name'];
+        return $path . ($type == 'viewModel'
+                ? strtolower(gen()->getName($config, 'model'))
+                : $config['table']['name']);
     }
 
     public function namespace (array $config, string $type, bool $withName = true): string
@@ -59,7 +61,7 @@ class PathService
         return self::ROUTE . 'web.php';
     }
 
-    #[Pure] protected function livewireCollection (array $config): string
+    #[Pure] protected function livewireAllInOne (array $config): string
     {
         return $this->livewire($config);
     }
@@ -84,9 +86,29 @@ class PathService
         return $this->view($config);
     }
 
+    #[Pure] protected function viewAllInOne (array $config): string
+    {
+        return $this->view($config);
+    }
+
     #[Pure] protected function livewireModel (array $config): string
     {
         return $this->livewire($config);
+    }
+
+    #[Pure] protected function testModel (array $config): string
+    {
+        return $this->test($config);
+    }
+
+    protected function test (array $config): string
+    {
+        return self::TEST . ($config['backend'] ? 'Backend/' : 'Frontend/');
+    }
+
+    #[Pure] protected function testCollection (array $config): string
+    {
+        return $this->test($config);
     }
 
     protected function model (): string
@@ -97,11 +119,6 @@ class PathService
     protected function migration (): string
     {
         return self::MIGRATION;
-    }
-
-    protected function test (array $config): string
-    {
-        return self::TEST . ($config['backend'] ? 'Backend/' : 'Frontend/');
     }
 
     protected function factory (): string

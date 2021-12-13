@@ -29,12 +29,9 @@ it('generate livewire file', closure: function () {
     $files = File::files('app/Http/Livewire/Backend');
 
     expect(count($files))
-        ->toEqual(2);
+        ->toEqual(1);
 
-    expect(in_array($files[0]->getFilenameWithoutExtension(), ['PostLivewire', 'PostsLivewire']))
-        ->toBeTrue();
-
-    expect(in_array($files[1]->getFilenameWithoutExtension(), ['PostLivewire', 'PostsLivewire']))
+    expect($files[0]->getFilenameWithoutExtension() == 'PostsLivewire')
         ->toBeTrue();
 });
 
@@ -54,7 +51,7 @@ it('allInOne - replaces', closure: function () {
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
-        gen()->path()->renderView($config),
+        gen()->path()->renderView($config, 'viewAllInOne'),
     ]))
         ->toBeTrue();
 
@@ -67,7 +64,7 @@ it('replaces in livewireModel', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(Str::contains($content, [
         $config['model']['name'],
@@ -78,7 +75,8 @@ it('replaces in livewireModel', closure: function () {
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
-        gen()->path()->renderView($config),
+        gen()->path()->renderView($config, 'viewModel'),
+        gen()->path()->renderView($config, 'viewCollection'),
     ]))
         ->toBeTrue();
 
@@ -91,7 +89,7 @@ it('replaces in livewireCollection', closure: function () {
         ->toEqual(1);
 
     $config = include __DIR__ . '/config/default.php';
-    $content = File::get('app/Http/Livewire/Backend/PostLivewire.php');
+    $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(Str::contains($content, [
         $config['model']['name'],
@@ -102,7 +100,8 @@ it('replaces in livewireCollection', closure: function () {
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
-        gen()->path()->renderView($config),
+        gen()->path()->renderView($config, 'viewModel'),
+        gen()->path()->renderView($config, 'viewCollection'),
     ]))
         ->toBeTrue();
 
@@ -118,21 +117,13 @@ it('allInOne - livewire file check syntax', closure: function () {
         ->toContain('No syntax errors detected');
 });
 
-it('livewireModel file check syntax', closure: function () {
+it('livewire file check syntax', closure: function () {
     Artisan::call('generate:livewire tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
 //    dump(File::get(gen()->getPath($config, 'livewire')));
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewireModel')))
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewire')))
         ->toContain('No syntax errors detected');
-});
-
-it('livewireCollection file check syntax', closure: function () {
-    Artisan::call('generate:livewire tests/config/default.php');
-    $config = include(__DIR__ . '/config/default.php');
-//    dump(File::get(gen()->getPath($config, 'livewire')));
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewireCollection')))
-        ->toContain('No syntax errors detected');
-});
+});;
 
 it('allInOne - route file check syntax', closure: function () {
     Artisan::call('generate:livewire tests/config/all-in-one.php');

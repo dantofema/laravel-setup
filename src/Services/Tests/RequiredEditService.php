@@ -2,29 +2,30 @@
 
 namespace Dantofema\LaravelSetup\Services\Tests;
 
-use Dantofema\LaravelSetup\Facades\Field;
-use Dantofema\LaravelSetup\Facades\Replace;
 use Illuminate\Support\Facades\File;
+use JetBrains\PhpStorm\Pure;
 
 class RequiredEditService
 {
     protected const REQUIRED_STUB = __DIR__ . '/../../Stubs/tests/edit-required.stub';
 
-    public function get(array $config, string $stub): string
+    public function get (array $config, string $stub): string
     {
         $requiredFields = $this->getRequiredFields($config['fields']);
 
         return str_replace(':required:', $this->getRequired($requiredFields, $config), $stub);
     }
 
-    private function getRequiredFields($fields): array
+    #[Pure] private function getRequiredFields ($fields): array
     {
         $requiredFields = [];
 
-        foreach ($fields as $field) {
-            $rule = Field::getRules($field);
+        foreach ($fields as $field)
+        {
+            $rule = gen()->field()->getRules($field);
 
-            if (! empty($rule) and empty($rule['nullable']) and $field['name'] !== 'slug') {
+            if ( ! empty($rule) and empty($rule['nullable']) and $field['name'] !== 'slug')
+            {
                 $requiredFields[] = $field;
             }
         }
@@ -32,13 +33,14 @@ class RequiredEditService
         return $requiredFields;
     }
 
-    private function getRequired(array $requiredFields, array $config): string
+    private function getRequired (array $requiredFields, array $config): string
     {
         $required = '';
 
-        foreach ($requiredFields as $field) {
-            $requiredStub = Replace::config($config)->stub(File::get(self::REQUIRED_STUB))->type('test')->default();
-            $required .= Replace::config($config)->stub($requiredStub)->field($field);
+        foreach ($requiredFields as $field)
+        {
+            $requiredStub = gen()->replaceFromConfig($config, 'test', File::get(self::REQUIRED_STUB));
+            $required .= gen()->replaceFromField($field, $config, $requiredStub);
         }
 
         return $required;

@@ -8,21 +8,15 @@ class RouteService
 {
     protected const ROUTES_WEB_PHP = 'routes/web.php';
 
-    public function add (array $config)
+    public function add (array $config, string $type)
     {
         $content = File::get(self::ROUTES_WEB_PHP);
 
-        if (str_contains($content, gen()->getNamespace($config, 'livewire')))
+        if (str_contains($content, gen()->getNamespace($config, $type)))
         {
             $content = str_replace(
                 "?php",
-                "?php\r\nuse " . gen()->getNamespace($config, 'livewire') . PHP_EOL,
-                $content
-            );
-
-            $content = str_replace(
-                "\r\n\r\n",
-                "",
+                "?php\r\nuse " . gen()->getNamespace($config, $type) . PHP_EOL,
                 $content
             );
         }
@@ -32,7 +26,7 @@ class RouteService
 
     protected function getRoute (array $config): string
     {
-        $route = "\r\nRoute::get('/" . $config['route']['path'] . "', " . gen()->getName($config, 'livewire') . "::class)";
+        $route = "\r\nRoute::get('/" . $config['route']['path'] . "/{action?}/{modelId?}', " . gen()->getName($config, 'livewire') . "::class)";
         $route .= $config['backend'] ? "->middleware('auth')->prefix('sistema')" : "";
         $route .= "->name('{$config['table']['name']}');";
 

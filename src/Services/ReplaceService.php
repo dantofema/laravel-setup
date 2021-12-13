@@ -80,7 +80,14 @@ class ReplaceService
 
     private function renderView (): void
     {
-        $this->stub = str_replace(':renderView:', gen()->getRenderView($this->config), $this->stub);
+        $this->stub = str_replace(':renderViewCollection:', gen()->getRenderView($this->config, 'viewCollection'),
+            $this->stub);
+
+        $this->stub = str_replace(':renderViewModel:', gen()->getRenderView($this->config, 'viewModel'),
+            $this->stub);
+
+        $this->stub = str_replace(':renderViewAllInOne:', gen()->getRenderView($this->config, 'viewAllInOne'),
+            $this->stub);
     }
 
     private function actingAs (): void
@@ -119,7 +126,7 @@ class ReplaceService
 
         if ($this->type !== 'model')
         {
-            $useString .= 'use ' . gen()->getName($this->config, 'model') . ';' . PHP_EOL;
+            $useString .= "use App\Models\\" . gen()->getName($this->config, 'model') . ';' . PHP_EOL;
         }
 
         $useString .= str_contains($this->stub, 'Carbon::')

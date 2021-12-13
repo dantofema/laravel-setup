@@ -1,6 +1,5 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Text;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -33,9 +32,9 @@ it('replace table', closure: function () {
     expect(Str::contains($content, [
         $config['table']['name'],
         $config['route']['path'],
-        Text::config($config)->name('livewire') . '::class',
+        gen()->getName($config, 'livewire') . '::class',
         "->set('editing.{$config['fields'][0]['name']}', '')",
-        'use ' . Text::config($config)->namespace('model'),
+        'use ' . gen()->getNamespace($config, 'model', true),
     ]))->toBeTrue();
 });
 
@@ -43,6 +42,6 @@ it('test file check syntax', closure: function () {
     Artisan::call('generate:test tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
-//    dump(File::get(Text::config($config)->path('test')));
-    expect(shell_exec("php -l -f " . Text::config($config)->path('test')))->toContain('No syntax errors detected');
+    //    dump(File::get(gen()->$this->getPath(config, 'test));
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'test')))->toContain('No syntax errors detected');
 });

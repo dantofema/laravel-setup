@@ -1,6 +1,5 @@
 <?php
 
-use Dantofema\LaravelSetup\Facades\Text;
 use Dantofema\LaravelSetup\Services\SeederService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -14,9 +13,9 @@ it('add seeder', closure: function () {
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
     expect(Str::contains($content, [
-        "use " . Text::config($config)->namespace('model') . ";",
+        "use " . gen()->getNamespace($config, 'model', true) . ";",
         "<?php",
-        Text::config($config)->name('model') . "::factory(10)->create();",
+        gen()->getName($config, 'model') . "::factory(10)->create();",
         'class DatabaseSeeder extends Seeder',
         'namespace Database\Seeders;',
     ]))->toBeTrue();
@@ -31,8 +30,8 @@ it('delete seeder', closure: function () {
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
     expect(Str::contains($content, [
-        "use " . Text::config($config)->namespace('model') . ";",
-        Text::config($config)->name('model') . "::factory(10)->create();",
+        "use " . gen()->getNamespace($config, 'model', true) . ";",
+        gen()->getName($config, 'model') . "::factory(10)->create();",
     ]))->toBeFalse();
 
     expect(Str::contains($content, [

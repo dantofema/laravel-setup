@@ -2,7 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Services\Tests;
 
-use Dantofema\LaravelSetup\Facades\Replace;
 use Dantofema\LaravelSetup\Services\FakerService;
 use Illuminate\Support\Facades\File;
 use JetBrains\PhpStorm\Pure;
@@ -14,44 +13,53 @@ class EditService
     public FakerService $fakerService;
 
     #[Pure]
- public function __construct()
- {
-     $this->fakerService = new FakerService();
- }
-
-    public function get(array $config, string $stub): string
+    public function __construct ()
     {
-        $editStub = Replace::config($config)->stub(self::EDIT_STUB)->type('test')->default();
+        $this->fakerService = new FakerService();
+    }
+
+    public function get (array $config, string $stub): string
+    {
         $string = '';
 
-        foreach ($config['fields'] as $field) {
-            if ($field['form']['input'] === 'file') {
+        foreach ($config['fields'] as $field)
+        {
+            if ($field['form']['input'] === 'file')
+            {
                 continue;
             }
 
-            if ($field['form']['input']) {
-                $string .= Replace::config($config)->stub($editStub)->type('test')->default();
+            if ($field['form']['input'])
+            {
+                $string .= gen()->replaceFromConfig(
+                    $config,
+                    'test',
+                    gen()->replaceFromConfig($config, 'test', self::EDIT_STUB)
+                );
+
                 $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
             }
         }
 
-        return $stub . Replace::config($config)->stub($string)->type('test')->default();
+        return $stub . gen()->replaceFromConfig($config, 'test', $string);
     }
 
-    public function file(array $config, string $stub): string
+    public function file (array $config, string $stub): string
     {
-        $editStub = Replace::config($config)->stub(File::get(self::EDIT_FILE_STUB))->type('test')->default();
+        $editStub = gen()->replaceFromConfig($config, 'test', File::get(self::EDIT_FILE_STUB));
         $string = '';
 
-        foreach ($config['fields'] as $field) {
-            if ($field['form']['input'] !== 'file') {
+        foreach ($config['fields'] as $field)
+        {
+            if ($field['form']['input'] !== 'file')
+            {
                 continue;
             }
 
-            $string .= Replace::config($config)->stub($editStub)->field($field);
+            $string .= gen()->replaceFromField($field, $config, $editStub);
             $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
         }
 
-        return $stub . Replace::config($config)->stub($string)->type('test')->default();
+        return $stub . gen()->replaceFromConfig($config, 'test', $string);
     }
 }

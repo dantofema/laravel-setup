@@ -2,8 +2,8 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Field;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -16,23 +16,34 @@ class GenerateMigrationCommand extends Command
     public $signature = 'generate:migration {path : path to the config file } {--force}';
     public $description = 'Migration file generator';
 
+    /**
+     * @throws Exception
+     */
     public function handle (): bool
     {
-        $this->init('migration');
+        $this->config = include $this->argument('path');
 
-        $rows = $this->getFields();
+        $this->init(['migration']);
 
-        $this->stub = str_replace(':fields:', $rows, $this->stub);
-
-        $this->stub = str_replace(
-            ':className:',
-            Str::of($this->config['table']['name'])->camel()->ucfirst(),
-            $this->stub
-        );
-
-        $this->put($this->stub);
+        foreach ($this->properties as $property)
+        {
+            $this->put($property['type'], $this->replace($property));
+        }
 
         return true;
+    }
+
+    private function replace (array $property): string
+    {
+        $rows = $this->getFields();
+
+        $property['stub'] = str_replace(':fields:', $rows, $property['stub']);
+
+        return str_replace(
+            ':className:',
+            Str::of($this->config['table']['name'])->camel()->ucfirst(),
+            $property['stub']
+        );
     }
 
     public function getFields (): string
@@ -41,7 +52,7 @@ class GenerateMigrationCommand extends Command
         foreach ($this->config['fields'] as $field)
         {
             $relationship = gen()->field()->getRelationship($field);
-            $rules = Field::getRules($field);
+            $rules = gen()->field()->getRules($field);
 
             if (empty($relationship))
             {

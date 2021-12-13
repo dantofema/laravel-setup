@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Services\Models;
 
-use Dantofema\LaravelSetup\Facades\Field;
-
 class SearchService
 {
     protected const SEARCH_STUB = __DIR__ . '/../../Stubs/model/scopeSearch.stub';
@@ -14,7 +12,7 @@ class SearchService
 
         $query = "\$query" . PHP_EOL;
 
-        foreach (Field::config($config)->getSearchable() as $searchableField)
+        foreach (gen()->field()->getSearchable($config) as $searchableField)
         {
             if (array_key_exists('relationship', $searchableField))
             {

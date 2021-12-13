@@ -2,9 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Facades\Generate;
 use Dantofema\LaravelSetup\Services\FakerService;
 use Dantofema\LaravelSetup\Traits\CommandTrait;
+use Exception;
 use Illuminate\Console\Command;
 
 class GenerateFactoryCommand extends Command
@@ -21,18 +21,29 @@ class GenerateFactoryCommand extends Command
         $this->faker = new FakerService();
     }
 
+    /**
+     * @throws Exception
+     */
     public function handle (): bool
     {
-        $this->init('factory');
+        $this->config = include $this->argument('path');
 
-        $this->stub = str_replace(':vars:', $this->getVarsFromColumns(), $this->stub);
-        $this->stub = str_replace(':return:', $this->getReturnFromColumns(), $this->stub);
+        $this->init(['factory']);
 
-        $this->put($this->stub);
+        foreach ($this->properties as $property)
+        {
+            $this->put($property['type'], $this->replace($property));
+        }
 
-        Generate::addSeeder($this->config);
+        gen()->addSeeder($this->config);
 
         return true;
+    }
+
+    private function replace (array $property): string
+    {
+        $property['stub'] = str_replace(':vars:', $this->getVarsFromColumns(), $property['stub']);
+        return str_replace(':return:', $this->getReturnFromColumns(), $property['stub']);
     }
 
     private function getVarsFromColumns (): string

@@ -9,10 +9,19 @@ it('get path', closure: function () {
     expect($pathService->get($config, 'livewire'))
         ->toEqual('app/Http/Livewire/Backend/PostsLivewire.php');
 
+    expect($pathService->get($config, 'livewireAllInOne'))
+        ->toEqual('app/Http/Livewire/Backend/PostsLivewire.php');
+
     expect($pathService->get($config, 'model'))
         ->toEqual('app/Models/Post.php');
 
-    expect($pathService->get($config, 'view'))
+    expect($pathService->get($config, 'viewAllInOne'))
+        ->toEqual('resources/views/livewire/backend/posts.blade.php');
+
+    expect($pathService->get($config, 'viewModel'))
+        ->toEqual('resources/views/livewire/backend/post.blade.php');
+
+    expect($pathService->get($config, 'viewCollection'))
         ->toEqual('resources/views/livewire/backend/posts.blade.php');
 
     expect($pathService->get($config, 'migration'))

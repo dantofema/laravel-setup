@@ -13,11 +13,12 @@ trait WithSetup
     public bool $sortDirection = true;
     public string $search = '';
     public int $perPage = 10;
-    public string $titleFormModal = '';
-    public string $bodyDeleteModal = '';
 
-    public bool $showFormModal = false;
+    public string $bodyDeleteModal = 'Esta seguro de eliminar el item seleccionado?';
     public bool $showDeleteModal = false;
+
+    public string $parameterAction = '';
+    public int|null $parameterId = null;
 
     public function sortBy (string $field)
     {
@@ -44,6 +45,11 @@ trait WithSetup
     public function setSlug (string $field)
     {
         $this->editing->slug = Str::slug($this->editing->$field);
+    }
+
+    public function index ()
+    {
+        $this->reset(['parameterId', 'parameterAction']);
     }
 
 }

@@ -109,5 +109,5 @@ it('factory file check syntax', closure: function () {
     $config = include(__DIR__ . '/config/default.php');
 
 //    dd(File::get(Text::config($config)->path('factory')));
-    expect(shell_exec("php -l -f " . Text::config($config)->path('factory')))->toContain('No syntax errors detected');
+    expect(shell_exec("php -l -f " . gen()->getPath($config, 'factory', true)))->toContain('No syntax errors detected');
 });

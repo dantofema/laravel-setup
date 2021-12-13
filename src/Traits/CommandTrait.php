@@ -34,14 +34,12 @@ trait CommandTrait
         return true;
     }
 
-    protected function put (string $stub): void
+    protected function put (string $type, string $stub): void
     {
-        foreach ($this->properties as $property)
-        {
-            File::put(
-                gen()->getPath($this->config, $property['type']),
-                gen()->replaceFromConfig($this->config, $property['type'], $stub)
-            );
-        }
+        File::put(
+            gen()->getPath($this->config, $type),
+            gen()->replaceFromConfig($this->config, $type, $stub)
+        );
     }
+
 }

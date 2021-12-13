@@ -11,9 +11,9 @@ class GenerateService
         (new DeleteService())->execute($config, $types);
     }
 
-    public function addRoute (array $config)
+    public function addRoute (array $config, string $type)
     {
-        (new RouteService())->add($config);
+        (new RouteService())->add($config, $type);
     }
 
     public function removeRoute (array $config)
@@ -71,9 +71,9 @@ class GenerateService
         return (new PathService())->namespace($config, $type, $whitName);
     }
 
-    public function getRenderView (array $config): string
+    public function getRenderView (array $config, string $type): string
     {
-        return (new PathService())->renderView($config);
+        return (new PathService())->renderView($config, $type);
     }
 
     #[Pure] public function field (): FieldService

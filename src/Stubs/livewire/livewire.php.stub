@@ -1,0 +1,110 @@
+<?php
+
+namespace :namespace:;
+
+:useDefault:
+use App\Http\Livewire\Traits\WithSetup;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
+:useCollection:
+
+class :livewire: extends Component
+{
+    use WithPagination, WithFileUploads;
+    use WithSetup;
+
+    public :model: $editing;
+    public string $sortField = ':sortField:';
+    :newFile:
+    :properties:
+
+    public function confirmDelete ()
+    {
+        :detach:
+        $this->editing->delete();
+        $this->showDeleteModal = false;
+        $this->reset(['parameterId', 'parameterAction']);
+    }
+
+    public function delete (:model: $model)
+    {
+        if ($this->parameterAction == '')
+        {
+            $this->editing = $model;
+        }
+        $this->showDeleteModal = true;
+    }
+
+    public function edit (:model: $model)
+    {
+        $this->parameterAction = 'edit';
+        $this->parameterId = $model->id;
+        $this->resetValidation();
+        $this->editing = $model;
+        :editNewFile:
+        :editBelongsToMany:
+    }
+
+    public function create ()
+    {
+        $this->parameterAction = 'create';
+        $this->resetValidation();
+        $this->editing = :model:::make();
+        :createNewFile:
+    }
+
+    public function save ()
+    {
+        :saveNewFile:
+        :saveSlug:
+        $this->validate();
+        $this->editing->save();
+        :syncBelongsToMany:
+    }
+
+    public function rules (): array
+    {
+        :rules:
+    }
+
+    public function render (): Factory|View|Application
+    {
+        if (empty($this->parameterAction))
+        {
+            return view(':renderViewCollection:', [
+                'rows' => :model:::search($this->search)
+                    ->orderBy($this->sortField, $this->sortDirection ? 'desc' : 'asc')
+                    ->paginate($this->perPage),
+            ]):layout:;
+        }
+        return view(':renderViewModel:')
+            :layout:;
+    }
+
+    :belongsToManyMethods:
+
+    public function mount ()
+    {
+            if ($this->parameterAction === 'create')
+            {
+                $this->create();
+            }
+
+            if ($this->parameterAction == 'edit')
+            {
+                $this->edit(Post::find($this->parameterId));
+            }
+
+            if (empty($this->parameterAction))
+            {
+                $this->editing = :model:::make();
+            }
+
+            :queryRelationships:
+
+    }
+}

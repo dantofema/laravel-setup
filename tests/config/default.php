@@ -119,6 +119,18 @@ return [
             ],
         ],
         [
+            'name' => 'publication_time',
+            'type' => 'date',
+            'label' => 'Fecha de publicación',
+            'form' => [
+                'input' => 'date',
+                'pickaday' => [],
+            ],
+            'rules' => [
+                'required' => false,
+            ],
+        ],
+        [
             'name' => 'body',
             'type' => 'text',
             'label' => 'Cuerpo',

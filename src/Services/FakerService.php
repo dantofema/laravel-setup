@@ -47,12 +47,14 @@ class FakerService
             'image' => $preFaker . 'word().".jpg"',
             'phone' => $preFaker . 'isbn10',
             'title', 'subtitle', 'body', 'lead', 'epigraph' => $preFaker . 'sentence()',
-            'publication_time' => $preFaker . 'dateTimeBetween(" - 90 days", " + 7 days", null)->format("d - m - Y H:i:s")',
+            'publication_time' => $preFaker . 'dateTimeBetween("-90 days", "+7 days", null)',
             'facebook' => $preFaker . 'url()',
             'birthday' => $preFaker . 'date()',
-            'date_from' => $preFaker . 'dateTimeBetween("now", "now", null)->format("d - m - Y H:i:s")',
-            'date_to' => $preFaker . 'dateTimeInInterval("now", " + 5 days", null)->format("d - m - Y H:i:s")',
-            default => 'word()'
+            'date_from' => $preFaker . 'dateTimeBetween("now", "now", null)',
+            'date_to' => $preFaker . 'dateTimeInInterval("now", "+5 days", null)',
+            default => isset($field['faker'])
+                ? $preFaker . $field['faker']
+                : dump('No se encuentra el faker para el campo "' . $field['name'] . '".')
         };
     }
 }

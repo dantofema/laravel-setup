@@ -59,11 +59,13 @@ class GenerateLivewireCommand extends Command
         $property['stub'] = $this->sortField($property['stub']);
         $property['stub'] = $this->newFileService->get($this->config, $property['stub']);
         $property['stub'] = $this->getSaveSlug($property['stub']);
+        $property['stub'] = $this->getSaveDate($property['stub']);
         $property['stub'] = $this->getRules($property['stub']);
         $property['stub'] = $this->getProperties($property['stub']);
         $property['stub'] = $this->getUseCollection($property['stub']);
         $property['stub'] = $this->getQueryRelationships($property['stub']);
         $property['stub'] = $this->getLayout($property['stub']);
+        $property['stub'] = $this->getDateProperties($property['stub']);
         $property['stub'] = $this->syncBelongsToMany->get($this->config, $property['stub']);
         return $this->belongsToMany->get($this->config, $property['stub']);
     }
@@ -103,6 +105,23 @@ class GenerateLivewireCommand extends Command
         );
     }
 
+    private function getSaveDate (string $stub): string
+    {
+        $slug = '';
+        foreach ($this->config['fields'] as $field)
+        {
+            if (isset($field['type']) and $field['type'] == 'date')
+            {
+                $slug = "\$this->saveDate('" . $field['name'] . "');";
+            }
+        }
+        return str_replace(
+            ':saveDate:',
+            $slug,
+            $stub
+        );
+    }
+
     private function getRules (string $stub): string
     {
         $rules = "\$rules = [" . PHP_EOL;
@@ -112,9 +131,13 @@ class GenerateLivewireCommand extends Command
             {
                 continue;
             }
-            $rules .= isset($field['relationship'])
-                ? gen()->field()->getRulesForRelationship($field)
-                : "'editing." . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules']);
+
+            $rules .= match (true)
+            {
+                isset($field['relationship']) => gen()->field()->getRulesForRelationship($field),
+                $field['type'] === 'date' => "'" . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules']),
+                default => "'editing." . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules'])
+            };
 
             $rules .= ',' . PHP_EOL;
         }
@@ -219,5 +242,32 @@ EOT;
             $layout = "->layout('layouts.tailwind.backend.app')";
         }
         return str_replace(':layout:', $layout, $stub);
+    }
+
+    private function getDateProperties (string $stub): string
+    {
+        $edit = '';
+        $create = '';
+        foreach ($this->config['fields'] as $field)
+        {
+            if (isset($field['type']) and $field['type'] === 'date')
+            {
+                $edit .= "\$this->" . $field['name']
+                    . " = \$this->showDate('"
+                    . $field['name'] . "');";
+
+                $create .= "\$this->" . $field['name'] . " = '';";
+            }
+        }
+        $stub = str_replace(
+            ':createDateProperties:',
+            $create,
+            $stub
+        );
+        return str_replace(
+            ':editDateProperties:',
+            $edit,
+            $stub
+        );
     }
 }

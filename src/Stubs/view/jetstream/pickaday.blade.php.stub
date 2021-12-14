@@ -1,0 +1,4 @@
+<x-jet-label class="space-y-2">
+    <div>:label:</div>
+    <x-input.pickaday wire:model.lazy=":editing::field:" class="pl-10 w-full" />
+</x-jet-label>

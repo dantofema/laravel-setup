@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Traits;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -66,6 +67,21 @@ trait WithSetup
                 'href' => $url,
             ]);
         }
+    }
+
+    public function saveDate (string $attributeName)
+    {
+        $this->editing->$attributeName = empty($this->$attributeName)
+            ? ''
+            : Carbon::createFromFormat('d-m-Y', $this->$attributeName);
+    }
+
+    public function showDate (string $attributeName): string
+    {
+        return empty($this->editing->$attributeName)
+            ? ''
+            : $this->$attributeName = Carbon::createFromFormat('Y-m-d H:i:s', $this->editing->$attributeName)
+                ->format('d-m-Y');
     }
 
 }

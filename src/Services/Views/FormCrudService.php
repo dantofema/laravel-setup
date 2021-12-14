@@ -14,9 +14,11 @@ class FormCrudService
     protected const STUB_PATH = __DIR__ . '/../../Stubs/view/form-crud.blade.php.stub';
     protected const INPUT_FILE_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-file.blade.php.stub';
     protected const INPUT_TEXT_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-text.blade.php.stub';
+    protected const PICKADAY_PATH = __DIR__ . '/../../Stubs/view/jetstream/pickaday.blade.php.stub';
     protected const INPUT_TEXT_BELONGS_TO_MANY_PATH = __DIR__ . '/../../Stubs/view/jetstream/input-text-belongs-to-many.blade.php.stub';
     protected const TEXT_AREA_PATH = __DIR__ . '/../../Stubs/view/jetstream/text-area.blade.php.stub';
     protected const SELECT_PATH = __DIR__ . '/../../Stubs/view/jetstream/select.blade.php.stub';
+    protected const TRIX_PATH = __DIR__ . '/../../Stubs/view/jetstream/trix.blade.php.stub';
 
     /**
      * @throws Exception
@@ -52,8 +54,9 @@ class FormCrudService
                 'textarea' => $this->textarea($field),
                 'file' => $this->inputFile($field),
                 'select' => $this->inputSelect($field),
+                'date' => $this->inputDate($field),
                 false => '',
-                default => dump("El valor '{$field['form']['input']}' no match.")
+                default => dump("FormCrudService: El valor '{$field['form']['input']}' no match.")
             };
             $fields .= "\r\n";
         }
@@ -110,7 +113,9 @@ class FormCrudService
 
     private function textarea (array $field): string
     {
-        $stub = File::get(self::TEXT_AREA_PATH);
+        $stub = isset($field['form']['richText'])
+            ? File::get(self::TRIX_PATH)
+            : File::get(self::TEXT_AREA_PATH);
 
         $stub = str_replace(':label:', $field['label'], $stub);
 
@@ -136,5 +141,15 @@ class FormCrudService
         $stub = str_replace(':modelLower:', strtolower($field['relationship']['model']), $stub);
 
         return str_replace(':optionField:', $field['relationship']['searchable'], $stub);
+    }
+
+    private function inputDate (array $field): string
+    {
+        $stub = File::get(self::PICKADAY_PATH);
+        $stub = str_replace(':label:', $field['label'], $stub);
+
+        $stub = str_replace(':editing:', '', $stub);
+
+        return str_replace(':field:', $field['name'], $stub);
     }
 }

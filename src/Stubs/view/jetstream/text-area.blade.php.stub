@@ -1,4 +1,5 @@
 <x-jet-label class="space-y-2 col-span-2">
     <div>:label:</div>
+    <textarea wire:model=":field:" class="w-full"></textarea>
 </x-jet-label>
-<x-input.trix wire:model.lazy="editing.:field:" :initialValue="$editing->:field:"></x-input.trix>
+

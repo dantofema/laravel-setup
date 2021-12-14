@@ -20,6 +20,8 @@ trait WithSetup
     public string $parameterAction = '';
     public int|null $parameterId = null;
 
+    public $newTrixAttachmentFile;
+
     public function sortBy (string $field)
     {
         if ($this->sortField == $field)
@@ -50,6 +52,20 @@ trait WithSetup
     public function index ()
     {
         $this->reset(['parameterId', 'parameterAction']);
+    }
+
+    public function trixAttachmentUpload (string $url, string $event)
+    {
+        if ($this->newTrixAttachmentFile->getFilename() == $url)
+        {
+            $attachmentFile = $this->newTrixAttachmentFile->store('/', $this->disk);
+            $url = Storage::disk($this->disk)->url($attachmentFile);
+
+            $this->dispatchBrowserEvent($event, [
+                'url' => $url,
+                'href' => $url,
+            ]);
+        }
     }
 
 }

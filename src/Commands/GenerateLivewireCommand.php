@@ -146,20 +146,28 @@ EOT;
     private function getProperties (string $stub): string
     {
         $response = '';
-        $fields = gen()->field()->getRelationships($this->config);
-        foreach ($fields as $field)
+        $relationshipFields = gen()->field()->getRelationships($this->config);
+        foreach ($relationshipFields as $relationshipField)
         {
-            if ($field['relationship']['type'] === 'belongsToMany')
+            if ($relationshipField['relationship']['type'] === 'belongsToMany')
             {
-                $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                $response .= "public Collection $" . $relationshipField['relationship']['table'] . ";" . PHP_EOL;
                 $response .= "public Collection \$"
-                    . strtolower($field['relationship']['model']) . "Options;" . PHP_EOL;
-                $response .= "public string \$new" . $field['relationship']['model'] . "='';" . PHP_EOL;
+                    . strtolower($relationshipField['relationship']['model']) . "Options;" . PHP_EOL;
+                $response .= "public string \$new" . $relationshipField['relationship']['model'] . "='';" . PHP_EOL;
             }
 
-            if ($field['relationship']['type'] === 'belongsTo')
+            if ($relationshipField['relationship']['type'] === 'belongsTo')
             {
-                $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                $response .= "public Collection $" . $relationshipField['relationship']['table'] . ";" . PHP_EOL;
+            }
+        }
+
+        foreach ($this->config['fields'] as $field)
+        {
+            if (isset($field['form']['richText']))
+            {
+                $response .= "private string \$disk = '" . gen()->getName($this->config, 'disk') . "';";
             }
         }
         return str_replace(':properties:', $response, $stub);

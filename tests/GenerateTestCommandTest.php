@@ -9,7 +9,7 @@ it('backend directory is empty', closure: function () {
         ->toEqual(0);
 });
 
-it('generate livewire file', closure: function () {
+it('generate test file', closure: function () {
     expect(Artisan::call('generate:test tests/config/all-in-one.php'))
         ->toEqual(1);
 
@@ -32,9 +32,9 @@ it('replace table', closure: function () {
     expect(Str::contains($content, [
         $config['table']['name'],
         $config['route']['path'],
-        gen()->getName($config, 'livewire') . '::class',
+        gen()->config()->livewire($config) . '::class',
         "->set('editing.{$config['fields'][0]['name']}', '')",
-        'use ' . gen()->getNamespace($config, 'model', true),
+        'use ' . gen()->namespace()->model($config),
     ]))->toBeTrue();
 });
 
@@ -42,6 +42,7 @@ it('test file check syntax', closure: function () {
     Artisan::call('generate:test tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
-    //    dump(File::get(gen()->$this->getPath(config, 'test));
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'test')))->toContain('No syntax errors detected');
+    //    dump(File::get(gen()->path()->test($config));
+    expect(shell_exec("php -l -f " . gen()->path()->test($config)))
+        ->toContain('No syntax errors detected');
 });

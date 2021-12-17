@@ -8,36 +8,58 @@ use Illuminate\Support\Str;
 class DeleteService
 {
 
-    public function execute (array $config, array $types): void
+    public function view (array $config)
     {
-        foreach ($types as $type)
+        File::delete(gen()->config()->view($config));
+        if ( ! gen()->config()->isAllInOne($config))
         {
-            if ($type === 'migration')
-            {
-                $this->deleteMigrationFile($config['table']['name']);
-            }
-
-            if (str_contains($type, 'livewire'))
-            {
-                (new RouteService())->delete($config);
-            }
-
-            File::delete((new GenerateService())->getPath($config, $type));
+            File::delete(gen()->config()->isModel()->view($config));
         }
     }
 
-    protected function deleteMigrationFile (string $tableName): void
+    public function test (array $config)
+    {
+        File::delete(gen()->config()->test($config));
+    }
+
+    public function factory (array $config)
+    {
+        File::delete(gen()->config()->factory($config));
+    }
+
+    public function model (array $config)
+    {
+        File::delete(gen()->config()->model($config));
+    }
+
+    public function livewire (array $config)
+    {
+        (new RouteService())->delete($config);
+        File::delete(gen()->config()->view($config));
+    }
+
+    public function migration (array $config): void
     {
         collect(File::files('database/migrations/'))
-            ->contains(function ($file) use ($tableName) {
-                if (Str::contains($file, '_create_' . $tableName . '_table.php'))
+            ->contains(function ($file) use ($config) {
+                if (Str::contains($file, '_create_'
+                    . gen()->config()->table($config)
+                    . '_table.php'))
                 {
                     File::delete($file);
                 }
 
-                if (Str::contains($file, Str::singular($tableName)) and Str::contains($file, 'pivot'))
+                $relationshipFields = gen()->field()->getRelationships($config);
+
+                foreach ($relationshipFields as $relationshipField)
                 {
-                    File::delete($file);
+                    if (
+                        $relationshipField['relationship']['type'] === 'belongsToMany' and
+                        Str::contains($file, $relationshipField['relationship']['pivot']['table'])
+                    )
+                    {
+                        File::delete($file);
+                    }
                 }
             });
     }

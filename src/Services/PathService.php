@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
-use JetBrains\PhpStorm\Pure;
-
 class PathService
 {
     private const LIVEWIRE = 'app/Http/Livewire/';
@@ -13,47 +11,17 @@ class PathService
     private const TEST = 'tests/Feature/';
     private const VIEW = 'resources/views/livewire/';
     private const ROUTE = 'routes/';
-    private NameService $nameService;
+    private bool $isModel = false;
+    private bool $withFile = true;
 
-    #[Pure] public function __construct ()
-    {
-        $this->nameService = new NameService();
-    }
-
-    public function get (array $config, string $type): string
-    {
-        return $this->$type($config) . $this->nameService->get($config, $type, true);
-    }
-
-    public function renderView (array $config, string $type): string
+    public function renderView (array $config): string
     {
         $path = 'livewire.';
-        $path .= $config['backend'] ? 'backend.' : 'frontend.';
+        $path .= gen()->config()->isBackend($config) ? 'backend.' : 'frontend.';
 
-        return $path . ($type == 'viewModel'
-                ? strtolower(gen()->getName($config, 'model'))
-                : $config['table']['name']);
-    }
-
-    public function namespace (array $config, string $type, bool $withName = true): string
-    {
-        $path = $this->$type($config);
-        $folders = array_filter(explode('/', $path));
-        $namespace = '';
-
-        foreach ($folders as $key => $folder)
-        {
-            $namespace .= ucfirst($folder);
-
-            if ($key !== array_key_last($folders))
-            {
-                $namespace .= "\\";
-            }
-        }
-
-        return $withName
-            ? $namespace . "\\" . $this->nameService->get($config, $type) . ';'
-            : $namespace . ';';
+        return $path . ($this->isModel
+                ? strtolower(gen()->config()->model($config))
+                : gen()->config()->table($config));
     }
 
     public function route (): string
@@ -61,68 +29,71 @@ class PathService
         return self::ROUTE . 'web.php';
     }
 
-    #[Pure] protected function livewireAllInOne (array $config): string
+    public function livewire (array $config): string
     {
-        return $this->livewire($config);
+        $path = self::LIVEWIRE . (gen()->config()->isBackend($config) ? 'Backend/' : 'Frontend/');
+
+        if ($this->withFile)
+        {
+            $path .= $this->isModel
+                ? gen()->config()->withExtension()->isModel()->livewire($config)
+                : gen()->config()->withExtension()->livewire($config);
+        }
+
+        return $path;
     }
 
-    protected function livewire (array $config): string
+    public function view (array $config): string
     {
-        return self::LIVEWIRE . ($config['backend'] ? 'Backend/' : 'Frontend/');
+        $path = self::VIEW . (gen()->config()->isBackend($config) ? 'backend/' : 'frontend/');
+
+        if ($this->withFile)
+        {
+            $path .= $this->isModel
+                ? gen()->config()->withExtension()->isModel()->view($config)
+                : gen()->config()->withExtension()->view($config);
+        }
+        return $path;
     }
 
-    #[Pure] protected function viewCollection (array $config): string
+    public function isModel (): PathService
     {
-        return $this->view($config);
+        $this->isModel = true;
+        return $this;
     }
 
-    protected function view (array $config): string
+    public function test (array $config): string
     {
-        return self::VIEW . ($config['backend'] ? 'backend/' : 'frontend/');
+        $path = self::TEST . (gen()->config()->isBackend($config) ? 'Backend/' : 'Frontend/');
+        return $this->withFile
+            ? $path . gen()->config()->withExtension()->test($config)
+            : $path;
     }
 
-    #[Pure] protected function viewModel (array $config): string
+    public function model (array $config): string
     {
-        return $this->view($config);
+        return $this->withFile
+            ? self::MODEL . gen()->config()->withExtension()->model($config)
+            : self::MODEL;
     }
 
-    #[Pure] protected function viewAllInOne (array $config): string
+    public function migration (array $config): string
     {
-        return $this->view($config);
+        return $this->withFile
+            ? self::MIGRATION . gen()->config()->withExtension()->migration($config)
+            : self::MIGRATION;
     }
 
-    #[Pure] protected function livewireModel (array $config): string
+    public function factory (array $config): string
     {
-        return $this->livewire($config);
+        return $this->withFile
+            ? self::FACTORY . gen()->config()->withExtension()->factory($config)
+            : self::FACTORY;
     }
 
-    #[Pure] protected function testModel (array $config): string
+    public function withOutFile (): PathService
     {
-        return $this->test($config);
-    }
-
-    protected function test (array $config): string
-    {
-        return self::TEST . ($config['backend'] ? 'Backend/' : 'Frontend/');
-    }
-
-    #[Pure] protected function testCollection (array $config): string
-    {
-        return $this->test($config);
-    }
-
-    protected function model (): string
-    {
-        return self::MODEL;
-    }
-
-    protected function migration (): string
-    {
-        return self::MIGRATION;
-    }
-
-    protected function factory (): string
-    {
-        return self::FACTORY;
+        $this->withFile = false;
+        return $this;
     }
 }

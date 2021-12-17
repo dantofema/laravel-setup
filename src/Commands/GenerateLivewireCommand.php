@@ -6,13 +6,11 @@ use Dantofema\LaravelSetup\Services\FileSystemService;
 use Dantofema\LaravelSetup\Services\Livewire\BelongsToManyService;
 use Dantofema\LaravelSetup\Services\Livewire\NewFileService;
 use Dantofema\LaravelSetup\Services\Livewire\SyncBelongsToManyService;
-use Dantofema\LaravelSetup\Traits\CommandTrait;
-use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class GenerateLivewireCommand extends Command
 {
-    use CommandTrait;
 
     public $signature = 'generate:livewire {path : path to the config file } {--force}';
     public $description = 'Livewire file generator';
@@ -31,67 +29,63 @@ class GenerateLivewireCommand extends Command
         $this->belongsToMany = new BelongsToManyService();
     }
 
-    /**
-     * @throws Exception
-     */
     public function handle (): bool
     {
-        $this->config = include $this->argument('path');
+        $config = include $this->argument('path');
 
-        $types = $this->config['allInOne']
-            ? ['livewireAllInOne']
-            : ['livewire'];
-
-        $this->init($types);
-
-        foreach ($this->properties as $property)
+        if ($this->option('force'))
         {
-            $this->put($property['type'], $this->replace($property));
-            gen()->addRoute($this->config, $property['type']);
+            gen()->delete()->livewire($config);
         }
+
+        $path = gen()->path()->livewire($config);
+        $stub = gen()->stub()->livewire($config);
+
+        File::put($path, $this->replace($config, $stub));
 
         return true;
     }
 
-    private function replace (array $property): string
+    private function replace (array $config, string $stub): string
     {
-        $property['stub'] = $this->getNamespace($property);
-        $property['stub'] = $this->sortField($property['stub']);
-        $property['stub'] = $this->newFileService->get($this->config, $property['stub']);
-        $property['stub'] = $this->getSaveSlug($property['stub']);
-        $property['stub'] = $this->getSaveDate($property['stub']);
-        $property['stub'] = $this->getRules($property['stub']);
-        $property['stub'] = $this->getProperties($property['stub']);
-        $property['stub'] = $this->getUseCollection($property['stub']);
-        $property['stub'] = $this->getQueryRelationships($property['stub']);
-        $property['stub'] = $this->getLayout($property['stub']);
-        $property['stub'] = $this->getDateProperties($property['stub']);
-        $property['stub'] = $this->syncBelongsToMany->get($this->config, $property['stub']);
-        return $this->belongsToMany->get($this->config, $property['stub']);
+        $stub = $this->getNamespace($config, $stub);
+        $stub = $this->sortField($config, $stub);
+        $stub = $this->newFileService->get($config, $stub);
+        $stub = $this->getSaveSlug($config, $stub);
+        $stub = $this->getSaveDate($config, $stub);
+        $stub = $this->getRules($config, $stub);
+        $stub = $this->getProperties($config, $stub);
+        $stub = $this->getUseCollection($config, $stub);
+        $stub = $this->getQueryRelationships($config, $stub);
+        $stub = $this->getLayout($config, $stub);
+        $stub = $this->getDateProperties($config, $stub);
+        $stub = $this->syncBelongsToMany->get($config, $stub);
+        $stub = $this->belongsToMany->get($config, $stub);
+        return gen()->config()->replace($config, 'livewire', $stub);
     }
 
-    private function getNamespace (array $property): string
+    private function getNamespace (array $config, string $stub): string
     {
         return str_replace(
             ':namespace:',
-            gen()->getNamespace($this->config, $property['type']),
-            $property['stub']
-        );
-    }
-
-    private function sortField (string $stub): string
-    {
-        return str_replace(
-            ':sortField:',
-            $this->config['livewire']['properties']['sortField'],
+            gen()->namespace()->livewire($config),
             $stub
         );
     }
 
-    private function getSaveSlug (string $stub): string
+    private function sortField (array $config, string $stub): string
+    {
+        return str_replace(
+            ':sortField:',
+            gen()->config()->livewireSortField($config),
+            $stub
+        );
+    }
+
+    private function getSaveSlug (array $config, string $stub): string
     {
         $slug = '';
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
             if ($field['name'] == 'slug')
             {
@@ -105,12 +99,12 @@ class GenerateLivewireCommand extends Command
         );
     }
 
-    private function getSaveDate (string $stub): string
+    private function getSaveDate (array $config, string $stub): string
     {
         $slug = '';
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
-            if (isset($field['type']) and $field['type'] == 'date')
+            if (gen()->field()->isDate($field))
             {
                 $slug = "\$this->saveDate('" . $field['name'] . "');";
             }
@@ -122,12 +116,12 @@ class GenerateLivewireCommand extends Command
         );
     }
 
-    private function getRules (string $stub): string
+    private function getRules (array $config, string $stub): string
     {
         $rules = "\$rules = [" . PHP_EOL;
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
-            if ($field['form']['input'] === 'file')
+            if (gen()->field()->isFile($field))
             {
                 continue;
             }
@@ -135,7 +129,7 @@ class GenerateLivewireCommand extends Command
             $rules .= match (true)
             {
                 isset($field['relationship']) => gen()->field()->getRulesForRelationship($field),
-                $field['type'] === 'date' => "'" . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules']),
+                gen()->field()->isDate($field) => "'" . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules']),
                 default => "'editing." . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules'])
             };
 
@@ -143,11 +137,11 @@ class GenerateLivewireCommand extends Command
         }
         $rules .= "];" . PHP_EOL;
 
-        $fieldFile = gen()->field()->getFile($this->config);
+        $fieldFile = gen()->field()->getFile($config);
 
         if ( ! empty($fieldFile))
         {
-            $this->filesystem->execute($this->config);
+            $this->filesystem->execute($config);
             $fileRules = gen()->field()->getRulesToString($fieldFile['rules']);
             $rules .= <<<EOT
         if (\$this->parameterAction == 'create')
@@ -166,13 +160,13 @@ EOT;
         );
     }
 
-    private function getProperties (string $stub): string
+    private function getProperties (array $config, string $stub): string
     {
         $response = '';
-        $relationshipFields = gen()->field()->getRelationships($this->config);
+        $relationshipFields = gen()->field()->getRelationships($config);
         foreach ($relationshipFields as $relationshipField)
         {
-            if ($relationshipField['relationship']['type'] === 'belongsToMany')
+            if (gen()->field()->isBelongsToMany($relationshipField))
             {
                 $response .= "public Collection $" . $relationshipField['relationship']['table'] . ";" . PHP_EOL;
                 $response .= "public Collection \$"
@@ -180,46 +174,46 @@ EOT;
                 $response .= "public string \$new" . $relationshipField['relationship']['model'] . "='';" . PHP_EOL;
             }
 
-            if ($relationshipField['relationship']['type'] === 'belongsTo')
+            if (gen()->field()->isBelongsTo($relationshipField))
             {
                 $response .= "public Collection $" . $relationshipField['relationship']['table'] . ";" . PHP_EOL;
             }
         }
 
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
-            if (isset($field['form']['richText']))
+            if (gen()->field()->isTrix($field))
             {
-                $response .= "private string \$disk = '" . gen()->getName($this->config, 'disk') . "';";
+                $response .= "private string \$disk = '" . gen()->config()->disk($config) . "';";
             }
         }
         return str_replace(':properties:', $response, $stub);
     }
 
-    private function getUseCollection (string $stub): string
+    private function getUseCollection (array $config, string $stub): string
     {
         return str_replace(
             ':useCollection:',
-            empty(gen()->field()->getRelationships($this->config))
+            empty(gen()->field()->getRelationships($config))
                 ? ''
                 : 'use Illuminate\Support\Collection;' . PHP_EOL,
             $stub
         );
     }
 
-    private function getQueryRelationships (string $stub): string
+    private function getQueryRelationships (array $config, string $stub): string
     {
         $response = '';
-        $fields = gen()->field()->getRelationships($this->config);
+        $fields = gen()->field()->getRelationships($config);
         foreach ($fields as $field)
         {
-            if ($field['relationship']['type'] === 'belongsTo')
+            if (gen()->field()->isBelongsTo($field))
             {
                 $response .= "\$this->" . $field['relationship']['table'] . " = " . $field['relationship']['model'] . "::all();" .
                     PHP_EOL;
             }
 
-            if ($field['relationship']['type'] === 'belongsToMany')
+            if (gen()->field()->isBelongsToMany($field))
             {
                 $response .= "\$this->" . $field['relationship']['table'] . " = "
                     . " collect([]);" .
@@ -233,24 +227,24 @@ EOT;
         return str_replace(':queryRelationships:', $response, $stub);
     }
 
-    private function getLayout (string $stub): string
+    private function getLayout (array $config, string $stub): string
     {
         $layout = '';
 
-        if ($this->config['backend'] and $this->config['view']['layout'] === 'tailwind')
+        if (gen()->config()->isBackend($config) and gen()->config()->layout($config) === 'tailwind')
         {
             $layout = "->layout('layouts.tailwind.backend.app')";
         }
         return str_replace(':layout:', $layout, $stub);
     }
 
-    private function getDateProperties (string $stub): string
+    private function getDateProperties (array $config, string $stub): string
     {
         $edit = '';
         $create = '';
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
-            if (isset($field['type']) and $field['type'] === 'date')
+            if (gen()->field()->isDate($field))
             {
                 $edit .= "\$this->" . $field['name']
                     . " = \$this->showDate('"

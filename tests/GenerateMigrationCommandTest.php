@@ -64,5 +64,6 @@ it('migration file check syntax', closure: function () {
     Artisan::call('generate:migration tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'migration')))->toContain('No syntax errors detected');
+    expect(shell_exec("php -l -f " . gen()->path()->migration($config)))
+        ->toContain('No syntax errors detected');
 });

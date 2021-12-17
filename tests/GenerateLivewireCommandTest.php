@@ -43,7 +43,7 @@ it('allInOne - replaces', closure: function () {
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(Str::contains($content, [
-        $config['model']['name'],
+        gen()->config()->model($config),
         $config['livewire']['properties']['sortField'],
         'public $newFile;',
         '$this->newFile = "";',
@@ -67,7 +67,7 @@ it('replaces in livewireModel', closure: function () {
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(Str::contains($content, [
-        $config['model']['name'],
+        gen()->config()->model($config),
         $config['livewire']['properties']['sortField'],
         'public $newFile;',
         '$this->newFile = "";',
@@ -92,7 +92,7 @@ it('replaces in livewireCollection', closure: function () {
     $content = File::get('app/Http/Livewire/Backend/PostsLivewire.php');
 
     expect(Str::contains($content, [
-        $config['model']['name'],
+        gen()->config()->model($config),
         $config['livewire']['properties']['sortField'],
         'public $newFile;',
         '$this->newFile = "";',
@@ -112,16 +112,16 @@ it('replaces in livewireCollection', closure: function () {
 it('allInOne - livewire file check syntax', closure: function () {
     Artisan::call('generate:livewire tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/all-in-one.php');
-//    dump(File::get(gen()->getPath($config, 'livewire')));
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewire')))
+//    dump(File::get( gen()->config()->bla($config)($config, 'livewire')));
+    expect(shell_exec("php -l -f " . gen()->path()->livewire($config)))
         ->toContain('No syntax errors detected');
 });
 
 it('livewire file check syntax', closure: function () {
     Artisan::call('generate:livewire tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
-//    dump(File::get(gen()->getPath($config, 'livewire')));
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'livewire')))
+//    dump(File::get( gen()->path()->livewire($config)();
+    expect(shell_exec("php -l -f " . gen()->path()->livewire($config)))
         ->toContain('No syntax errors detected');
 });;
 

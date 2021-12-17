@@ -12,11 +12,11 @@ class RouteService
     {
         $content = File::get(self::ROUTES_WEB_PHP);
 
-        if ( ! str_contains($content, gen()->getNamespace($config, $type, true)))
+        if ( ! str_contains($content, gen()->namespace()->$type($config)))
         {
             $content = str_replace(
                 "?php",
-                "?php" . PHP_EOL . "use " . gen()->getNamespace($config, $type, true) . PHP_EOL,
+                "?php" . PHP_EOL . "use " . gen()->namespace()->$type($config) . PHP_EOL,
                 $content
             );
             $content = $content . PHP_EOL . $this->getRoute($config) . PHP_EOL;
@@ -27,9 +27,9 @@ class RouteService
 
     protected function getRoute (array $config): string
     {
-        $route = "Route::get('/" . $config['route']['path'] . "/{parameterAction?}/{parameterId?}', " . gen()->getName
-            ($config, 'livewire') . "::class)";
-        $route .= $config['backend'] ? "->middleware('auth')->prefix('sistema')" : "";
+        $route = "Route::get('/" . $config['route']['path'] . "/{parameterAction?}/{parameterId?}', "
+            . gen()->config()->livewire($config) . "::class)";
+        $route .= gen()->config()->isBackend($config) ? "->middleware('auth')->prefix('sistema')" : "";
         $route .= "->name('{$config['table']['name']}');";
 
         return $route;
@@ -38,7 +38,7 @@ class RouteService
     public function delete (array $config)
     {
         $content = File::get(self::ROUTES_WEB_PHP);
-        $content = str_replace('use ' . gen()->getNamespace($config, 'livewire', true), '', $content);
+        $content = str_replace('use ' . gen()->namespace()->livewire($config), '', $content);
 
         $content = str_replace($this->getRoute($config), '', $content);
 

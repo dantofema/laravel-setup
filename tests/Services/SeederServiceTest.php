@@ -13,9 +13,9 @@ it('add seeder', closure: function () {
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
     expect(Str::contains($content, [
-        "use " . gen()->getNamespace($config, 'model', true) . ";",
+        "use " . gen()->namespace()->model($config) . ";",
         "<?php",
-        gen()->getName($config, 'model') . "::factory(10)->create();",
+        gen()->config()->model($config) . "::factory(10)->create();",
         'class DatabaseSeeder extends Seeder',
         'namespace Database\Seeders;',
     ]))->toBeTrue();
@@ -29,9 +29,11 @@ it('delete seeder', closure: function () {
 
     $content = File::get('database/seeders/DatabaseSeeder.php');
 
+//    dump(File::get("database/seeders/DatabaseSeeder.php"));
+
     expect(Str::contains($content, [
-        "use " . gen()->getNamespace($config, 'model', true) . ";",
-        gen()->getName($config, 'model') . "::factory(10)->create();",
+        "use " . gen()->namespace()->model($config),
+        gen()->config()->model($config) . "::factory(10)->create();",
     ]))->toBeFalse();
 
     expect(Str::contains($content, [
@@ -46,8 +48,10 @@ it('seeder file check syntax', closure: function () {
     $config = include(__DIR__ . '/../config/default.php');
     $seederService->add($config);
 
+//    dump(File::get("database/seeders/DatabaseSeeder.php"));
     expect(shell_exec("php -l -f database/seeders/DatabaseSeeder.php"))->toContain('No syntax errors detected');
 
     $seederService->delete($config);
+//    dump(File::get("database/seeders/DatabaseSeeder.php"));
     expect(shell_exec("php -l -f database/seeders/DatabaseSeeder.php"))->toContain('No syntax errors detected');
 });

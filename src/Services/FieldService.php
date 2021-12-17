@@ -24,6 +24,28 @@ class FieldService
         return [];
     }
 
+    public function replace (array $field, array $config, string $stub): string
+    {
+        return (new ReplaceService())->fromField($field, $config, $stub);
+    }
+
+    public function isBelongsToMany (array $field): bool
+    {
+        return isset($field['relationship']) and
+            $field['relationship']['type'] === 'belongsToMany';
+    }
+
+    public function isBelongsTo (array $field): bool
+    {
+        return isset($field['relationship']) and
+            $field['relationship']['type'] === 'belongsTo';
+    }
+
+    public function isDate (array $field): bool
+    {
+        return isset($field['type']) and $field['type'] == 'date';
+    }
+
     public function getSlug (array $config): array
     {
         foreach ($config['fields'] as $field)
@@ -56,7 +78,7 @@ class FieldService
         $searchable = [];
         foreach ($config['fields'] as $field)
         {
-            if (array_key_exists(self::KEY_INDEX, $field))
+            if (array_key_exists(self::KEY_INDEX, $field) and $field['index'] === true)
             {
                 $searchable[] = $field;
             }
@@ -77,13 +99,6 @@ class FieldService
         }
 
         return $relationships;
-    }
-
-    public function getRules (array $field): array
-    {
-        return array_key_exists('rules', $field)
-            ? $field['rules']
-            : [];
     }
 
     public function getRelationship (array $field): array
@@ -116,5 +131,24 @@ class FieldService
         }
 
         return $rule . "]";
+    }
+
+    public function isFile (array $field): bool
+    {
+        return isset($field['form']) and
+            isset($field['form']['input']) and
+            $field['form']['input'] === 'file';
+    }
+
+    public function getRules (array $field): array
+    {
+        return array_key_exists('rules', $field)
+            ? $field['rules']
+            : [];
+    }
+
+    public function isTrix (array $field): bool
+    {
+        return isset($field['form']['richText']);
     }
 }

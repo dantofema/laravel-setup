@@ -41,11 +41,11 @@ it('add namespace', function () {
 });
 
 it('model file check syntax', closure: function () {
-    Artisan::call('generate:model tests/config/all-in-one.php');
+    Artisan::call('generate:model tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
 
-//    dump(File::get(gen()->getPath($config, 'model')));
+    dump(File::get(gen()->path()->model($config)));
 
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'model')))
+    expect(shell_exec("php -l -f " . gen()->path()->model($config)))
         ->toContain('No syntax errors detected');
 });

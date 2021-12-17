@@ -8,49 +8,38 @@ class DeleteCommand extends Command
 {
     public $signature = 'generate:delete 
                         {path : path to the config file}
-                        {type : type of file to delete, if you want to delete all files pass the argument "all" }';
+                        {type : type of file to delete, if you want to delete all files pass the argument "all" }
+                        ';
 
     public $description = 'Delete files generated';
-    private array $config;
-    private array $types = [
-        'factory',
-        'livewire',
-        'livewireAllInOne',
-        'migration',
-        'model',
-        'test',
-        'viewAllInOne',
-        'viewModel',
-        'viewCollection',
-    ];
 
     public function handle (): bool
     {
-        $this->config = include $this->argument('path');
+        $config = include $this->argument('path');
 
         if ($this->argument('type') === 'route')
         {
-            $this->route();
+            $this->route($config);
 
             return true;
         }
 
         if ($this->argument('type') === 'all')
         {
-            gen()->delete($this->config, $this->types);
+            gen()->route()->delete($config);
 
-            $this->route();
+            $this->route($config);
 
             return true;
         }
 
-        gen()->delete($this->config, $this->argument('type'));
+        gen()->delete()->$this->argument('type')($config);
 
         return true;
     }
 
-    private function route ()
+    private function route (array $config): void
     {
-        gen()->removeRoute($this->config);
+        gen()->route()->delete($config);
     }
 }

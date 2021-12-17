@@ -4,13 +4,11 @@ namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Services\Models\RelationshipsService;
 use Dantofema\LaravelSetup\Services\Models\SearchService;
-use Dantofema\LaravelSetup\Traits\CommandTrait;
-use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class GenerateModelCommand extends Command
 {
-    use CommandTrait;
 
     public $signature = 'generate:model {path : path to the config file } {--force}';
     public $description = 'Model file generator';
@@ -27,58 +25,56 @@ class GenerateModelCommand extends Command
         $this->searchService = new SearchService();
     }
 
-    /**
-     * @throws Exception
-     */
     public function handle (): bool
     {
-        $this->config = include $this->argument('path');
+        $config = include $this->argument('path');
 
-        $this->init(['model']);
-
-        foreach ($this->properties as $property)
+        if ($this->option('force'))
         {
-            $this->put($property['type'], $this->replace($property));
+            gen()->delete()->model($config);
         }
+
+        $path = gen()->path()->model($config);
+        $stub = gen()->stub()->model();
+        File::put($path, $this->replace($config, $stub));
 
         return true;
     }
 
-    private function replace (array $property): string
+    private function replace (array $config, string $stub): string
     {
-        $property['stub'] = $this->getNamespace($property['stub']);
+        $stub = $this->getNamespace($config, $stub);
 
-        $property['stub'] = $this->searchService->get($this->config, $property['stub']);
-        $property['stub'] = $this->modelRelationship->get(
-            gen()->field()->getRelationships($this->config),
-            $property['stub']
+        $stub = $this->searchService->get($config, $stub);
+        $stub = $this->modelRelationship->get(
+            gen()->field()->getRelationships($config),
+            $stub
         );
-        $property['stub'] = $this->getUses($property['stub']);
-        $property['stub'] = $this->getPath($property['stub']);
-        $property['stub'] = $this->getSrcAttribute($property['stub']);
-
-        return $property['stub'];
+        $stub = $this->getUses($config, $stub);
+        $stub = $this->getPath($config, $stub);
+        $stub = $this->getSrcAttribute($config, $stub);
+        return gen()->config()->replace($config, 'model', $stub);
     }
 
-    private function getNamespace (string $stub): string
+    private function getNamespace (array $config, string $stub): string
     {
         return str_replace(
             ':namespace:',
-            gen()->getNamespace($this->config, 'model'),
+            gen()->namespace()->model($config),
             $stub
         );
     }
 
-    private function getUses (string $stub)
+    private function getUses (array $config, string $stub): string
     {
         $useNamespace = '';
         $useInClass = '';
-        if (in_array('SoftDeletes', $this->config['model']['use']))
+        if (in_array('SoftDeletes', $config['model']['use']))
         {
             $useNamespace .= "use Wildside\Userstamps\Userstamps;" . PHP_EOL;
             $useInClass .= "use Userstamps;" . PHP_EOL;
         }
-        if (in_array('SoftDeletes', $this->config['model']['use']))
+        if (in_array('SoftDeletes', $config['model']['use']))
         {
             $useNamespace .= "use Illuminate\Database\Eloquent\SoftDeletes;\r\n";
             $useInClass .= "use SoftDeletes;\r\n";
@@ -88,28 +84,20 @@ class GenerateModelCommand extends Command
         return str_replace(':useInClass:', $useInClass, $stub);
     }
 
-    private function getPath (string $stub): string
+    private function getPath (array $config, string $stub): string
     {
-        return str_replace(':path:', $this->config['route']['path'], $stub);
+        return str_replace(':path:', $config['route']['path'], $stub);
     }
 
-    protected function getSrcAttribute (string $stub): string
+    protected function getSrcAttribute (array $config, string $stub): string
     {
         return str_replace(
             ':getSrcAttribute:',
-            empty(gen()->field()->getFile($this->config))
+            empty(gen()->field()->getFile($config))
                 ? ''
                 : file_get_contents(__DIR__ . '/../Stubs/model/getSrcAttribute.stub'),
             $stub
         );
     }
 
-    private function getFileName (string $stub): string
-    {
-        return str_replace(
-            ':namespace:',
-            gen()->getNamespace($this->config, 'model'),
-            $stub
-        );
-    }
 }

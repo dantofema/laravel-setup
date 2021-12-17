@@ -2,11 +2,8 @@
 
 namespace Dantofema\LaravelSetup\Services\Views;
 
-use Dantofema\LaravelSetup\Traits\CommandTrait;
-
 class TableService
 {
-    use CommandTrait;
 
     protected string $heading = '<x-table.heading :sortable: :class:>:label:</x-table.heading>';
 

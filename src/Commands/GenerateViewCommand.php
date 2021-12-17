@@ -4,17 +4,15 @@ namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Services\Views\FormCrudService;
 use Dantofema\LaravelSetup\Services\Views\TableService;
-use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class GenerateViewCommand extends Command
 {
-    use CommandTrait;
 
     public $signature = 'generate:view {path : path to the config file } {--force}';
     public $description = 'View file generator';
-    protected array $config;
     private FormCrudService $formModal;
 
     private TableService $tableService;
@@ -23,7 +21,6 @@ class GenerateViewCommand extends Command
     {
         parent::__construct();
         $this->formModal = new FormCrudService();
-
         $this->tableService = new TableService();
     }
 
@@ -32,45 +29,52 @@ class GenerateViewCommand extends Command
      */
     public function handle (): bool
     {
-        $this->config = include $this->argument('path');
+        $config = include $this->argument('path');
 
-        $types = $this->config['allInOne']
-            ? ['viewAllInOne']
-            : ['viewCollection', 'viewModel'];
-
-        $this->init($types);
-
-        foreach ($this->properties as $property)
+        if ($this->option('force'))
         {
-            $this->put($property['type'], $this->replace($property));
+            gen()->delete()->view($config);
+        }
+
+        $path = gen()->path()->view($config);
+        $stub = gen()->stub()->view($config);
+        File::put($path, $this->replace($config, $stub));
+
+        if ( ! gen()->config()->isAllInOne($config))
+        {
+            $path = gen()->path()->isModel()->view($config);
+            $stub = gen()->stub()->isModel()->view($config);
+            File::put($path, $this->replace($config, $stub));
         }
 
         return true;
     }
 
-    private function replace (array $property): string
+    /**
+     * @throws Exception
+     */
+    private function replace (array $config, string $stub): string
     {
-        $property['stub'] = $this->getTitle($property['stub']);
-        $property['stub'] = $this->formModal->get($this->config, $property['stub']);
+        $stub = $this->getTitle($config, $stub);
+        $stub = $this->formModal->get($config, $stub);
 
-        $property['stub'] = $this->tableService->getHeadings(
-            gen()->field()->getIndex($this->config),
-            $property['stub']
+        $stub = $this->tableService->getHeadings(
+            gen()->field()->getIndex($config),
+            $stub
         );
 
-        $property['stub'] = $this->tableService->getCells(
-            gen()->field()->getIndex($this->config),
-            $property['stub']
+        $stub = $this->tableService->getCells(
+            gen()->field()->getIndex($config),
+            $stub
         );
-
-        return $property['stub'];
+        return gen()->config()->replace($config, 'view', $stub);
     }
 
-    private function getTitle (string $stub): string
+    private function getTitle (array $config, string $stub): string
     {
         return str_replace(
             ':title:',
-            $this->config['view']['title'] ?: '',
+            $config['view']['title'] ?: '',
             $stub
         );
     }

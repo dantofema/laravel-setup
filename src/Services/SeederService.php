@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\File;
 class SeederService
 {
     private string $databaseSeeder = 'database/seeders/DatabaseSeeder.php';
+    private string $searchString = "User::factory(10)->create();";
 
     public function add (array $config)
     {
         $content = File::get($this->databaseSeeder);
 
         $content = $this->addUse($config, $content);
-
-        $factory = gen()->getName($config, 'model') . "::factory(10)->create()";
+        $factory = gen()->config()->model($config) . "::factory(10)->create()";
 
         foreach ($config['fields'] as $field)
         {
@@ -24,11 +24,12 @@ class SeederService
                     . "()->attach(" . $field['relationship']['model'] . "::factory(3)->create()); })";
             }
         }
+
         if ( ! str_contains($content, $factory))
         {
             $content = str_replace(
-                "User::factory(10)->create();",
-                "User::factory(10)->create();" . PHP_EOL . $factory . ';' . PHP_EOL,
+                $this->searchString,
+                $factory . ';' . PHP_EOL . $this->searchString,
                 $content
             );
         }
@@ -38,14 +39,14 @@ class SeederService
 
     private function addUse (array $config, string $content): string|array
     {
-        $useModel = "use " . gen()->getNamespace($config, 'model', true);
+        $useModel = "use " . gen()->namespace()->withFile()->model($config);
         $use = str_contains($content, $useModel)
             ? ''
             : $useModel . PHP_EOL;
 
         foreach ($config['fields'] as $field)
         {
-            if (isset($field['relationship']) and $field['relationship']['type'] === 'belongsToMany')
+            if (gen()->field()->isBelongsToMany($field))
             {
                 $useRelationship = "use " . $field['relationship']['namespace'] . $field['relationship']['model'] . ';';
 
@@ -64,17 +65,19 @@ class SeederService
 
     public function delete (array $config)
     {
-        $rows = explode(';', File::get($this->databaseSeeder));
-
+        $rows = explode(PHP_EOL, File::get($this->databaseSeeder));
         $content = '';
         foreach ($rows as $row)
         {
-            if (str_contains($row, gen()->getName($config, 'model')))
+            if (
+                str_contains($row, gen()->config()->model($config)) and
+                ! str_contains($row, 'User::factory')
+            )
             {
                 $content .= str_contains($row, '<?php') ? '<?php' : '';
             } else
             {
-                $content .= $row . ';';
+                $content .= $row . PHP_EOL;
             }
         }
 

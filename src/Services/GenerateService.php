@@ -6,29 +6,19 @@ use JetBrains\PhpStorm\Pure;
 
 class GenerateService
 {
-    public function delete (array $config, array $types)
+    #[Pure] public function delete (): DeleteService
     {
-        (new DeleteService())->execute($config, $types);
+        return new DeleteService();
     }
 
-    public function addRoute (array $config, string $type)
+    #[Pure] public function route (): RouteService
     {
-        (new RouteService())->add($config, $type);
+        return new RouteService();
     }
 
-    public function removeRoute (array $config)
+    #[Pure] public function seeder (): SeederService
     {
-        (new RouteService())->delete($config);
-    }
-
-    public function addSeeder (array $config)
-    {
-        (new SeederService())->add($config);
-    }
-
-    public function removeSeeder (array $config)
-    {
-        (new SeederService())->delete($config);
+        return new SeederService();
     }
 
     public function setup ()
@@ -36,44 +26,14 @@ class GenerateService
         (new BeforeService())->setup();
     }
 
-    public function replaceFromConfig (array $config, string $type, string $stub): string
+    #[Pure] public function stub (): StubService
     {
-        return (new ReplaceService())->fromConfig($config, $type, $stub);
+        return new StubService();
     }
 
-    public function replaceFromField (array $field, array $config, string $stub): string
+    #[Pure] public function config (): ConfigService
     {
-        return (new ReplaceService())->fromField($field, $config, $stub);
-    }
-
-    public function getStub (string $type): string
-    {
-        return (new StubService())->get($type);
-    }
-
-    public function getName (array $config, string $type, bool $whitExtension = false): string
-    {
-        return (new NameService())->get($config, $type, $whitExtension);
-    }
-
-    #[Pure] public function getRoute (): string
-    {
-        return (new PathService())->route();
-    }
-
-    public function getPath (array $config, string $type): string
-    {
-        return (new PathService())->get($config, $type);
-    }
-
-    public function getNamespace (array $config, string $type, bool $whitName = false): string
-    {
-        return (new PathService())->namespace($config, $type, $whitName);
-    }
-
-    public function getRenderView (array $config, string $type): string
-    {
-        return (new PathService())->renderView($config, $type);
+        return new ConfigService();
     }
 
     #[Pure] public function field (): FieldService
@@ -81,14 +41,13 @@ class GenerateService
         return new FieldService();
     }
 
-    #[Pure] public function name (): NameService
-    {
-        return new NameService();
-    }
-
     #[Pure] public function path (): PathService
     {
         return new PathService();
     }
 
+    #[Pure] public function namespace (): NamespaceService
+    {
+        return new NamespaceService();
+    }
 }

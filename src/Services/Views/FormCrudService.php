@@ -2,13 +2,11 @@
 
 namespace Dantofema\LaravelSetup\Services\Views;
 
-use Dantofema\LaravelSetup\Traits\CommandTrait;
 use Exception;
 use Illuminate\Support\Facades\File;
 
 class FormCrudService
 {
-    use CommandTrait;
 
     protected const STUB_PATH_ALL_IN_ONE = __DIR__ . '/../../Stubs/view/jetstream/form-crud-modal.blade.php.stub';
     protected const STUB_PATH = __DIR__ . '/../../Stubs/view/form-crud.blade.php.stub';
@@ -25,7 +23,7 @@ class FormCrudService
      */
     public function get (array $config, string $stub): string
     {
-        $form = $config['allInOne']
+        $form = gen()->config()->isAllInOne($config)
             ? File::get(self::STUB_PATH_ALL_IN_ONE)
             : File::get(self::STUB_PATH);
 
@@ -55,10 +53,12 @@ class FormCrudService
                 'file' => $this->inputFile($field),
                 'select' => $this->inputSelect($field),
                 'date' => $this->inputDate($field),
+                'boolean' => $this->inputBoolean($field),
+
                 false => '',
-                default => dump("FormCrudService: El valor '{$field['form']['input']}' no match.")
+                default => dump("FormCrudService: El valor '{$field['form']['input']}' en el campo '{$field['name']}' en el model '" . gen()->config()->model($config) . "' no match.")
             };
-            $fields .= "\r\n";
+            $fields .= PHP_EOL;
         }
 
         return $fields;
@@ -151,5 +151,10 @@ class FormCrudService
         $stub = str_replace(':editing:', '', $stub);
 
         return str_replace(':field:', $field['name'], $stub);
+    }
+
+    private function inputBoolean (mixed $field): string
+    {
+        return $this->inputText($field);
     }
 }

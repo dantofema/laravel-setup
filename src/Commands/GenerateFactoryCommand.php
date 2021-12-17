@@ -3,13 +3,11 @@
 namespace Dantofema\LaravelSetup\Commands;
 
 use Dantofema\LaravelSetup\Services\FakerService;
-use Dantofema\LaravelSetup\Traits\CommandTrait;
-use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class GenerateFactoryCommand extends Command
 {
-    use CommandTrait;
 
     public $signature = 'generate:factory {path : path to the config file } {--force}';
     public $description = 'Factory file generator';
@@ -21,36 +19,34 @@ class GenerateFactoryCommand extends Command
         $this->faker = new FakerService();
     }
 
-    /**
-     * @throws Exception
-     */
     public function handle (): bool
     {
-        $this->config = include $this->argument('path');
+        $config = include $this->argument('path');
 
-        $this->init(['factory']);
-
-        foreach ($this->properties as $property)
+        if ($this->option('force'))
         {
-            $this->put($property['type'], $this->replace($property));
+            gen()->delete()->factory($config);
         }
 
-        gen()->addSeeder($this->config);
+        $path = gen()->path()->factory($config);
+        $stub = gen()->stub()->factory();
+        File::put($path, $this->replace($config, $stub));
 
         return true;
     }
 
-    private function replace (array $property): string
+    private function replace (array $config, string $stub): string
     {
-        $property['stub'] = str_replace(':vars:', $this->getVarsFromColumns(), $property['stub']);
-        return str_replace(':return:', $this->getReturnFromColumns(), $property['stub']);
+        $stub = str_replace(':vars:', $this->getVarsFromColumns($config), $stub);
+        $stub = str_replace(':return:', $this->getReturnFromColumns($config), $stub);
+        return gen()->config()->replace($config, 'factory', $stub);
     }
 
-    private function getVarsFromColumns (): string
+    private function getVarsFromColumns (array $config): string
     {
         $vars = '';
 
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
             if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
             {
@@ -66,12 +62,12 @@ class GenerateFactoryCommand extends Command
         return $vars;
     }
 
-    private function getReturnFromColumns (): string
+    private function getReturnFromColumns (array $config): string
     {
         $response = PHP_EOL . "return [" . PHP_EOL;
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
-            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
+            if (gen()->field()->isFile($field))
             {
                 continue;
             }

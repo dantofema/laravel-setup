@@ -3,7 +3,6 @@
 namespace Dantofema\LaravelSetup\Services\Tests;
 
 use Illuminate\Support\Facades\File;
-use JetBrains\PhpStorm\Pure;
 
 class RequiredEditService
 {
@@ -11,26 +10,11 @@ class RequiredEditService
 
     public function get (array $config, string $stub): string
     {
-        $requiredFields = $this->getRequiredFields($config['fields']);
-
-        return str_replace(':required:', $this->getRequired($requiredFields, $config), $stub);
-    }
-
-    #[Pure] private function getRequiredFields ($fields): array
-    {
-        $requiredFields = [];
-
-        foreach ($fields as $field)
-        {
-            $rule = gen()->field()->getRules($field);
-
-            if ( ! empty($rule) and empty($rule['nullable']) and $field['name'] !== 'slug')
-            {
-                $requiredFields[] = $field;
-            }
-        }
-
-        return $requiredFields;
+        return str_replace(
+            ':required:',
+            $this->getRequired(gen()->config()->requiredFields($config), $config),
+            $stub
+        );
     }
 
     private function getRequired (array $requiredFields, array $config): string
@@ -39,8 +23,13 @@ class RequiredEditService
 
         foreach ($requiredFields as $field)
         {
-            $requiredStub = gen()->replaceFromConfig($config, 'test', File::get(self::REQUIRED_STUB));
-            $required .= gen()->replaceFromField($field, $config, $requiredStub);
+            if (gen()->field()->isFile($field))
+            {
+                continue;
+            }
+
+            $requiredStub = gen()->config()->replace($config, 'test', File::get(self::REQUIRED_STUB));
+            $required .= gen()->field()->replace($field, $config, $requiredStub);
         }
 
         return $required;

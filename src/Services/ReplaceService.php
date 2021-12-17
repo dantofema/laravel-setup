@@ -2,25 +2,17 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
-use JetBrains\PhpStorm\Pure;
-
 class ReplaceService
 {
     private array $config;
     private string $stub;
     private string $type;
-    private NameService $nameService;
-
-    #[Pure] public function __construct ()
-    {
-        $this->nameService = new NameService();
-    }
 
     public function fromField (array $field, array $config, string $stub): string
     {
         $stub = str_replace(
             ':disk:',
-            $this->nameService->get($config, 'disk'),
+            gen()->config()->disk($config),
             $stub);
 
         $stub = str_replace(':testFakerFile:',
@@ -70,23 +62,23 @@ class ReplaceService
     private function table (): void
     {
         $this->stub = str_replace(':tableName:', $this->config['table']['name'], $this->stub);
-        $this->stub = str_replace(':table:', gen()->getName($this->config, 'table'), $this->stub);
+        $this->stub = str_replace(':table:', gen()->config()->table($this->config), $this->stub);
     }
 
     private function livewire (): void
     {
-        $this->stub = str_replace(':livewire:', gen()->getName($this->config, 'livewire'), $this->stub);
+        $this->stub = str_replace(':livewire:', gen()->config()->livewire($this->config), $this->stub);
     }
 
     private function renderView (): void
     {
-        $this->stub = str_replace(':renderViewCollection:', gen()->getRenderView($this->config, 'viewCollection'),
+        $this->stub = str_replace(':renderViewCollection:', gen()->path()->renderView($this->config, false),
             $this->stub);
 
-        $this->stub = str_replace(':renderViewModel:', gen()->getRenderView($this->config, 'viewModel'),
+        $this->stub = str_replace(':renderViewModel:', gen()->path()->renderView($this->config),
             $this->stub);
 
-        $this->stub = str_replace(':renderViewAllInOne:', gen()->getRenderView($this->config, 'viewAllInOne'),
+        $this->stub = str_replace(':renderViewAllInOne:', gen()->path()->renderView($this->config, false),
             $this->stub);
     }
 
@@ -97,12 +89,12 @@ class ReplaceService
 
     private function factory (): void
     {
-        $this->stub = str_replace(':factory:', gen()->getName($this->config, 'model') . 'Factory', $this->stub);
+        $this->stub = str_replace(':factory:', gen()->config()->model($this->config) . 'Factory', $this->stub);
     }
 
     private function model (): void
     {
-        $this->stub = str_replace(':model:', gen()->getName($this->config, 'model'), $this->stub);
+        $this->stub = str_replace(':model:', gen()->config()->model($this->config), $this->stub);
     }
 
     private function use (): void
@@ -126,7 +118,7 @@ class ReplaceService
 
         if ($this->type !== 'model')
         {
-            $useString .= "use App\Models\\" . gen()->getName($this->config, 'model') . ';' . PHP_EOL;
+            $useString .= "use App\Models\\" . gen()->config()->model($this->config) . ';' . PHP_EOL;
         }
 
         $useString .= str_contains($this->stub, 'Carbon::')
@@ -155,11 +147,11 @@ class ReplaceService
     {
         $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
         $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
-        $this->stub = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
+        $this->stub = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $this->stub);
     }
 
     private function disk (): void
     {
-        $this->stub = str_replace(':disk:', gen()->getName($this->config, 'disk'), $this->stub);
+        $this->stub = str_replace(':disk:', gen()->config()->disk($this->config), $this->stub);
     }
 }

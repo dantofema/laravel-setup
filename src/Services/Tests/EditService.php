@@ -24,29 +24,29 @@ class EditService
 
         foreach ($config['fields'] as $field)
         {
-            if ($field['form']['input'] === 'file')
+            if (gen()->field()->isFile($field))
             {
                 continue;
             }
 
             if ($field['form']['input'])
             {
-                $string .= gen()->replaceFromConfig(
+                $string .= gen()->config()->replace(
                     $config,
                     'test',
-                    gen()->replaceFromConfig($config, 'test', self::EDIT_STUB)
+                    gen()->config()->replace($config, 'test', self::EDIT_STUB)
                 );
 
                 $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
             }
         }
 
-        return $stub . gen()->replaceFromConfig($config, 'test', $string);
+        return $stub . gen()->config()->replace($config, 'test', $string);
     }
 
     public function file (array $config, string $stub): string
     {
-        $editStub = gen()->replaceFromConfig($config, 'test', File::get(self::EDIT_FILE_STUB));
+        $editStub = gen()->config()->replace($config, 'test', File::get(self::EDIT_FILE_STUB));
         $string = '';
 
         foreach ($config['fields'] as $field)
@@ -56,10 +56,10 @@ class EditService
                 continue;
             }
 
-            $string .= gen()->replaceFromField($field, $config, $editStub);
+            $string .= gen()->field()->replace($field, $config, $editStub);
             $string = str_replace(':faker:', $this->fakerService->toTest($field), $string);
         }
 
-        return $stub . gen()->replaceFromConfig($config, 'test', $string);
+        return $stub . gen()->config()->replace($config, 'test', $string);
     }
 }

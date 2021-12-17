@@ -25,7 +25,7 @@ class NewFileService
         if ($field)
         {
             $name = $field['name'];
-            $disk = gen()->name()->get($config, 'disk');
+            $disk = gen()->config()->disk($config);
 
             $replace = "\$this->setNewFile('$name', '$disk');";
         }

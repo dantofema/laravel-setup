@@ -7,89 +7,92 @@ use Illuminate\Console\Command;
 class GenerateCrudCommand extends Command
 {
     public $signature = 'generate:crud 
-                        {path : path to the config file }
+                        {path? : path to the config file }
                         {--force}
-                        {--all}
-                        {--factory}
-                        {--migration}
-                        {--model}
-                        {--seeder}
-                        {--test}
-                        {--view}';
+                        {--setup}
+                        ';
 
     public $description = 'CRUD generator';
 
-    public function handle(): bool
+    public function handle (): bool
     {
-        if ($this->option('all')) {
-            $this->factory();
-            $this->livewire();
-            $this->migration();
-            $this->model();
-            $this->test();
-            $this->view();
+        if ($this->option('setup'))
+        {
+            $this->setUp();
+            return true;
         }
 
+        $this->factory();
+        $this->livewire();
+        $this->migration();
+        $this->model();
+        $this->test();
+        $this->view();
         return true;
     }
 
-    protected function factory(): void
+    protected function setUp ()
+    {
+        gen()->setup();
+    }
+
+    protected function factory (): void
     {
         $this->call(
             'generate:factory',
             [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force'), ]
+                '--force' => $this->option('force'),]
         );
     }
 
-    protected function livewire(): void
+    protected function livewire (): void
     {
         $this->call(
             'generate:livewire',
             [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force'), ]
+                '--force' => $this->option('force'),]
         );
     }
 
-    protected function migration(): void
+    protected function migration (): void
     {
         $this->call(
             'generate:migration',
             [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force'), ]
+                '--force' => $this->option('force'),]
         );
     }
 
-    protected function model(): void
+    protected function model (): void
     {
         $this->call(
             'generate:model',
             [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force'), ]
+                '--force' => $this->option('force'),]
         );
     }
 
-    protected function test(): void
+    protected function test (): void
     {
         $this->call(
             'generate:test',
             [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force'), ]
+                '--force' => $this->option('force'),]
         );
     }
 
-    protected function view(): void
+    protected function view (): void
     {
         $this->call(
             'generate:view',
             [
                 'path' => $this->argument('path'),
-                '--force' => $this->option('force'), ]
+                '--force' => $this->option('force'),]
         );
     }
 }

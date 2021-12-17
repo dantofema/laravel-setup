@@ -108,6 +108,7 @@ it('factory file check syntax', closure: function () {
     Artisan::call('generate:factory tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/default.php');
 
-//    dd(File::get(Text::config($config)->path('factory')));
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'factory', true)))->toContain('No syntax errors detected');
+//    dump(File::get(gen()->path()->factory($config)));
+    expect(shell_exec("php -l -f " . gen()->path()->factory($config)))
+        ->toContain('No syntax errors detected');
 });

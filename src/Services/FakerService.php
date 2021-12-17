@@ -34,6 +34,11 @@ class FakerService
         $preFaker = '$this->faker->';
         $preFaker .= in_array('unique', $field) ? 'unique()->' : null;
 
+        return $this->match($field, $preFaker);
+    }
+
+    private function match (array $field, string $preFaker): mixed
+    {
         return match ($field['name'])
         {
             'name' => $preFaker . 'name()',
@@ -52,9 +57,23 @@ class FakerService
             'birthday' => $preFaker . 'date()',
             'date_from' => $preFaker . 'dateTimeBetween("now", "now", null)',
             'date_to' => $preFaker . 'dateTimeInInterval("now", "+5 days", null)',
-            default => isset($field['faker'])
-                ? $preFaker . $field['faker']
-                : dump('No se encuentra el faker para el campo "' . $field['name'] . '".')
+            default => $this->matchType($field, $preFaker)
+        };
+    }
+
+    private function matchType (array $field, string $preFaker): string
+    {
+        return match ($field['type'])
+        {
+            'string' => $preFaker . 'sentence()',
+            'text' => $preFaker . 'text()',
+            'boolean' => $preFaker . 'boolean()',
+            'integer' => $preFaker . 'randomNumber()',
+            'float' => $preFaker . 'randomFloat()',
+            'date' => $preFaker . 'date()',
+            'dateTime' => $preFaker . 'dateTime()',
+            'time' => $preFaker . 'time()',
+            default => ''
         };
     }
 }

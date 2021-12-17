@@ -19,7 +19,7 @@ class FileSystemService
             return;
         }
 
-        $disk = strtolower(gen()->getName($config, 'model'));
+        $disk = gen()->config()->disk($config);
 
         if (Str::contains(File::get(self::FILESYSTEM_PHP), $disk))
         {

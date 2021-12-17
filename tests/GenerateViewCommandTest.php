@@ -60,18 +60,19 @@ it('all-in-one - view file check syntax', closure: function () {
     Artisan::call('generate:view tests/config/all-in-one.php');
     $config = include(__DIR__ . '/config/all-in-one.php');
 
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'viewAllInOne')))->toContain('No syntax errors detected');
+    expect(shell_exec("php -l -f " . gen()->path()->view($config)))
+        ->toContain('No syntax errors detected');
 });
 
 it('view file check syntax', closure: function () {
     Artisan::call('generate:view tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
 
-//    dump(File::get(gen()->getPath($config, 'viewCollection')));
+//    dump(File::get(gen()->path()->view($config)));
 
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'viewModel')))
+    expect(shell_exec("php -l -f " . gen()->path()->view($config)))
         ->toContain('No syntax errors detected');
 
-    expect(shell_exec("php -l -f " . gen()->getPath($config, 'viewCollection')))
+    expect(shell_exec("php -l -f " . gen()->path()->isModel()->view($config)))
         ->toContain('No syntax errors detected');
 });

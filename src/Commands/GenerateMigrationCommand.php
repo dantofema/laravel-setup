@@ -2,54 +2,51 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Traits\CommandTrait;
-use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class GenerateMigrationCommand extends Command
 {
-    use CommandTrait;
 
     protected const DIRECTORY = 'database/migrations/';
     public $signature = 'generate:migration {path : path to the config file } {--force}';
     public $description = 'Migration file generator';
 
-    /**
-     * @throws Exception
-     */
     public function handle (): bool
     {
-        $this->config = include $this->argument('path');
+        $config = include $this->argument('path');
 
-        $this->init(['migration']);
-
-        foreach ($this->properties as $property)
+        if ($this->option('force'))
         {
-            $this->put($property['type'], $this->replace($property));
+            gen()->delete()->migration($config);
         }
+
+        $path = gen()->path()->migration($config);
+        $stub = gen()->stub()->migration();
+        File::put($path, $this->replace($config, $stub));
 
         return true;
     }
 
-    private function replace (array $property): string
+    private function replace (array $config, string $stub): string
     {
-        $rows = $this->getFields();
+        $rows = $this->getFields($config);
 
-        $property['stub'] = str_replace(':fields:', $rows, $property['stub']);
+        $stub = str_replace(':fields:', $rows, $stub);
 
-        return str_replace(
+        $stub = str_replace(
             ':className:',
-            Str::of($this->config['table']['name'])->camel()->ucfirst(),
-            $property['stub']
+            Str::of($config['table']['name'])->camel()->ucfirst(),
+            $stub
         );
+        return gen()->config()->replace($config, 'migration', $stub);
     }
 
-    public function getFields (): string
+    public function getFields ($config): string
     {
         $rows = '';
-        foreach ($this->config['fields'] as $field)
+        foreach ($config['fields'] as $field)
         {
             $relationship = gen()->field()->getRelationship($field);
             $rules = gen()->field()->getRules($field);
@@ -57,7 +54,7 @@ class GenerateMigrationCommand extends Command
             if (empty($relationship))
             {
                 $row = sprintf(
-                    "\$table->%s('%s')%s%s;\r\n",
+                    "\$table->%s('%s')%s%s;" . PHP_EOL,
                     $field['type'],
                     $field['name'],
                     ! empty($rules['nullable']) ? '->nullable()' : null,
@@ -70,18 +67,18 @@ class GenerateMigrationCommand extends Command
             $rows .= $row;
         }
 
-        if (array_key_exists('use', $this->config['model']))
+        if (array_key_exists('use', $config['model']))
         {
-            if (in_array('SoftDeletes', $this->config['model']['use']))
+            if (in_array('SoftDeletes', $config['model']['use']))
             {
-                $rows .= "\$table->softDeletes();\r\n";
+                $rows .= "\$table->softDeletes();" . PHP_EOL;
             }
 
-            if (in_array('Userstamps', $this->config['model']['use']))
+            if (in_array('Userstamps', $config['model']['use']))
             {
                 $rows .= "\$table->unsignedBigInteger('created_by')->nullable();\r\n";
                 $rows .= "\$table->unsignedBigInteger('updated_by')->nullable();\r\n";
-                if (in_array('SoftDeletes', $this->config['model']['use']))
+                if (in_array('SoftDeletes', $config['model']['use']))
                 {
                     $rows .= "\$table->unsignedBigInteger('deleted_by')->nullable();\r\n";
                 }
@@ -96,6 +93,7 @@ class GenerateMigrationCommand extends Command
         if ($field['relationship']['type'] === 'belongsToMany')
         {
             $this->createPivotMigrationFile($field['relationship']['pivot']['table']);
+            return '';
         }
 
         if ($field['relationship']['type'] === 'belongsTo')
@@ -103,7 +101,9 @@ class GenerateMigrationCommand extends Command
             return sprintf(
                 "\$table->foreignId('%s')%s->constrained('%s');" . PHP_EOL,
                 $field['name'],
-                $field['rules']['nullable'] ? '->nullable()' : null,
+                (isset($field['rules']['nullable']) and $field['rules']['nullable'])
+                    ? '->nullable()'
+                    : null,
                 $field['relationship']['table']
             );
         }

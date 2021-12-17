@@ -39,7 +39,7 @@ class EditSlugService
 
         return str_replace(
             ':table:',
-            gen()->getName($config, 'table'),
+            gen()->config()->table($config),
             $stub
         );
     }

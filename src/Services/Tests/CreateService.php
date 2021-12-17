@@ -25,22 +25,25 @@ class CreateService
         $saveStub = $this->replaceSetSection($config, $saveStub);
         $saveStub = $this->replaceAssertDatabaseSection($config, $saveStub);
         $saveStub = $this->replaceAssertExistsSection($config, $saveStub);
-        $saveStub = gen()->replaceFromConfig($config, 'test', $saveStub);
+        $saveStub = gen()->config()->replace($config, 'test', $saveStub);
 
         return $stub . str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $saveStub);
     }
 
     private function replaceNewFileSection (array $config, string $stub): string
     {
-        $string = '';
+        $newFile = '';
 
-        if ( ! empty(gen()->field()->getRelationships($config)))
+        foreach ($config['fields'] as $field)
         {
-            $string = "\$this->newFile = UploadedFile::fake()->image('file.jpg');" . PHP_EOL;
-            $string .= "\$test->set('newFile', \$this->newFile);";
+            if (gen()->field()->isFile($field))
+            {
+                $newFile = "\$this->newFile = UploadedFile::fake()->image('file.jpg');" . PHP_EOL;
+                $newFile .= "\$test->set('newFile', \$this->newFile);";
+            }
         }
 
-        return str_replace(':newFile:', $string, $stub);
+        return str_replace(':newFile:', $newFile, $stub);
     }
 
     private function replaceVarSection (array $config, string $stub): string
@@ -49,8 +52,17 @@ class CreateService
 
         foreach ($config['fields'] as $field)
         {
-            if ($field['form']['input'] === 'file')
+            if (gen()->field()->isFile($field))
             {
+                continue;
+            }
+
+            if (gen()->field()->isBelongsToMany($field))
+            {
+                $string .= $field['form']['input']
+                    ? '$' . $field['name'] . ' = '
+                    . $field['relationship']['model'] . '::take(3)->get();' . PHP_EOL
+                    : '';
                 continue;
             }
 
@@ -69,8 +81,16 @@ class CreateService
 
         foreach ($config['fields'] as $field)
         {
-            if ($field['form']['input'] === 'file')
+            if (gen()->field()->isFile($field))
             {
+                continue;
+            }
+
+            if (gen()->field()->isBelongsToMany($field))
+            {
+                $string .= $field['form']['input']
+                    ? "\$test->set('" . $field['name'] . "', $" . $field['name'] . ");" . PHP_EOL
+                    : '';
                 continue;
             }
 
@@ -87,6 +107,13 @@ class CreateService
         $replace = '';
         foreach ($config['fields'] as $field)
         {
+            if (gen()->field()->isBelongsToMany($field))
+            {
+                $replace .= "\$" . $field['relationship']['name']
+                    . "->each(function (\$item) {\$this->assertModelExists(\$item);});" . PHP_EOL;
+                continue;
+            }
+
             $string = '$this->assertDatabaseHas(:table:, :data:);' . PHP_EOL;
             $data = '[';
 
@@ -102,7 +129,7 @@ class CreateService
             }
             $data .= ']';
             $string = str_replace(':data:', $data, $string);
-            $replace .= str_replace(':table:', "'" . gen()->getName($config, 'table') . "'", $string);
+            $replace .= str_replace(':table:', "'" . gen()->config()->table($config) . "'", $string);
         }
 
         return str_replace(':assertDatabase:', $replace, $stub);
@@ -114,7 +141,7 @@ class CreateService
         $field = gen()->field()->getFile($config);
         if ( ! empty($field))
         {
-            $replace = gen()->replaceFromField(
+            $replace = gen()->field()->replace(
                 $field,
                 $config,
                 "Storage::disk(':disk:')->assertExists(:model:::first()->:field:);");

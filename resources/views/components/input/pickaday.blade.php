@@ -1,7 +1,7 @@
 <div
         x-data
         x-init="
-            new Pikaday({field: $refs.input })
+            new Pikaday({field: $refs.input, format: 'DD-MM-YYYY' })
         "
 >
     <div class="mt-1 relative">

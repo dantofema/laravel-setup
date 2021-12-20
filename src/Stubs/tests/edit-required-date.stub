@@ -1,0 +1,12 @@
+
+it('edit :table:.:field: (pickaday) is required', function () {
+    $model = :model:::factory()->create();
+
+    :actingAs:
+
+    Livewire::test(:livewire:::class)
+        ->call('edit', $model->id)
+        ->set(':setField:', '')
+        ->call('save')
+        ->assertHasErrors([':field:' => 'required']);
+});

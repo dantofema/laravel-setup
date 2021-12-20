@@ -1,0 +1,10 @@
+
+it('create :table:.:field: is required', function () {
+    :actingAs:
+
+    Livewire::test(:livewire:::class)
+        ->call('create')
+        ->set(':fieldTest:', :valueTest:)
+        ->call('save')
+        ->assertHasErrors([':fieldTest:' => 'required']);
+});

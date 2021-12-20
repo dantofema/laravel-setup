@@ -1,5 +1,5 @@
 
-it('edit slug from :field: in :table: table', function () {
+it('edit slug from :field: in :table:', function () {
     $model = :model:::factory([':field:' => Str::random(40)])->create();
     $newValue = Str::random(40);
     :actingAs:

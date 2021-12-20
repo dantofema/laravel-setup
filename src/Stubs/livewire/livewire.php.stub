@@ -19,7 +19,7 @@ class :livewire: extends Component
 
     public :model: $editing;
     public string $sortField = ':sortField:';
-    :newFile:
+    :newFiles:
     :properties:
 
     public function confirmDelete ()
@@ -41,13 +41,12 @@ class :livewire: extends Component
 
     public function edit (:model: $model)
     {
-
         $this->parameterAction = 'edit';
         $this->parameterId = $model->id;
         $this->resetValidation();
         $this->editing = $model;
         :editDateProperties:
-        :editNewFile:
+        :editNewFiles:
         :editBelongsToMany:
     }
 
@@ -58,12 +57,12 @@ class :livewire: extends Component
         $this->parameterId = null;
         $this->resetValidation();
         $this->editing = :model:::make();
-        :createNewFile:
+        :createNewFiles:
     }
 
     public function save ()
     {
-        :saveNewFile:
+        :saveNewFiles:
         :saveSlug:
         :saveDate:
         $this->validate();
@@ -75,6 +74,8 @@ class :livewire: extends Component
     public function rules (): array
     {
         :rules:
+        :fileRules:
+        return $rules;
     }
 
     public function render (): Factory|View|Application
@@ -103,7 +104,7 @@ class :livewire: extends Component
 
             if ($this->parameterAction == 'edit')
             {
-                $this->edit(Post::find($this->parameterId));
+                $this->edit(:model:::find($this->parameterId));
             }
 
             if (empty($this->parameterAction))

@@ -15,6 +15,8 @@ class DeleteCommand extends Command
 
     public function handle (): bool
     {
+        $this->info('Delete');
+
         $config = include $this->argument('path');
 
         if ($this->argument('type') === 'route')
@@ -34,6 +36,8 @@ class DeleteCommand extends Command
         }
 
         gen()->delete()->$this->argument('type')($config);
+
+        $this->warn('end');
 
         return true;
     }

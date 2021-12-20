@@ -1,4 +1,4 @@
-it('can create new item in :table:', function () {
+it('create new :modelToLower:', function () {
     actingAs($this->user);
 
     $test = Livewire::test(:livewire:::class);
@@ -7,7 +7,7 @@ it('can create new item in :table:', function () {
 
     :sets:
 
-    :newFile:
+    :newFiles:
 
     $test->set('createAction', true)
         ->call('save')

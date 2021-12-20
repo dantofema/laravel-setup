@@ -30,6 +30,7 @@ class GenerateViewCommand extends Command
     public function handle (): bool
     {
         $config = include $this->argument('path');
+        $this->info(gen()->config()->view($config));
 
         if ($this->option('force'))
         {
@@ -38,15 +39,18 @@ class GenerateViewCommand extends Command
 
         $path = gen()->path()->view($config);
         $stub = gen()->stub()->view($config);
+
         File::put($path, $this->replace($config, $stub));
 
         if ( ! gen()->config()->isAllInOne($config))
         {
             $path = gen()->path()->isModel()->view($config);
             $stub = gen()->stub()->isModel()->view($config);
+
             File::put($path, $this->replace($config, $stub));
         }
 
+        $this->warn('end');
         return true;
     }
 

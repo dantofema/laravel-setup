@@ -2,9 +2,9 @@
 
 namespace Dantofema\LaravelSetup\Commands;
 
-use Dantofema\LaravelSetup\Services\FileSystemService;
 use Dantofema\LaravelSetup\Services\Livewire\BelongsToManyService;
 use Dantofema\LaravelSetup\Services\Livewire\NewFileService;
+use Dantofema\LaravelSetup\Services\Livewire\RulesService;
 use Dantofema\LaravelSetup\Services\Livewire\SyncBelongsToManyService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -16,22 +16,23 @@ class GenerateLivewireCommand extends Command
     public $description = 'Livewire file generator';
     protected array $config;
     private NewFileService $newFileService;
-    private FileSystemService $filesystem;
     private SyncBelongsToManyService $syncBelongsToMany;
     private BelongsToManyService $belongsToMany;
+    private RulesService $rulesService;
 
     public function __construct ()
     {
         parent::__construct();
         $this->newFileService = new NewFileService();
-        $this->filesystem = new FileSystemService();
         $this->syncBelongsToMany = new SyncBelongsToManyService();
         $this->belongsToMany = new BelongsToManyService();
+        $this->rulesService = new RulesService();
     }
 
     public function handle (): bool
     {
         $config = include $this->argument('path');
+        $this->info(gen()->config()->livewire($config));
 
         if ($this->option('force'))
         {
@@ -43,6 +44,9 @@ class GenerateLivewireCommand extends Command
 
         File::put($path, $this->replace($config, $stub));
 
+        gen()->route()->add($config);
+
+        $this->warn('end');
         return true;
     }
 
@@ -53,7 +57,7 @@ class GenerateLivewireCommand extends Command
         $stub = $this->newFileService->get($config, $stub);
         $stub = $this->getSaveSlug($config, $stub);
         $stub = $this->getSaveDate($config, $stub);
-        $stub = $this->getRules($config, $stub);
+        $stub = $this->rulesService->get($config, $stub);
         $stub = $this->getProperties($config, $stub);
         $stub = $this->getUseCollection($config, $stub);
         $stub = $this->getQueryRelationships($config, $stub);
@@ -116,75 +120,36 @@ class GenerateLivewireCommand extends Command
         );
     }
 
-    private function getRules (array $config, string $stub): string
-    {
-        $rules = "\$rules = [" . PHP_EOL;
-        foreach ($config['fields'] as $field)
-        {
-            if (gen()->field()->isFile($field))
-            {
-                continue;
-            }
-
-            $rules .= match (true)
-            {
-                isset($field['relationship']) => gen()->field()->getRulesForRelationship($field),
-                gen()->field()->isDate($field) => "'" . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules']),
-                default => "'editing." . $field['name'] . "' => " . gen()->field()->getRulesToString($field['rules'])
-            };
-
-            $rules .= ',' . PHP_EOL;
-        }
-        $rules .= "];" . PHP_EOL;
-
-        $fieldFile = gen()->field()->getFile($config);
-
-        if ( ! empty($fieldFile))
-        {
-            $this->filesystem->execute($config);
-            $fileRules = gen()->field()->getRulesToString($fieldFile['rules']);
-            $rules .= <<<EOT
-        if (\$this->parameterAction == 'create')
-        {
-            \$rules['newFile'] = $fileRules;
-        }
-EOT;
-        }
-
-        $rules .= PHP_EOL . " return \$rules;" . PHP_EOL;
-
-        return str_replace(
-            ':rules:',
-            $rules,
-            $stub
-        );
-    }
-
     private function getProperties (array $config, string $stub): string
     {
         $response = '';
-        $relationshipFields = gen()->field()->getRelationships($config);
-        foreach ($relationshipFields as $relationshipField)
-        {
-            if (gen()->field()->isBelongsToMany($relationshipField))
-            {
-                $response .= "public Collection $" . $relationshipField['relationship']['table'] . ";" . PHP_EOL;
-                $response .= "public Collection \$"
-                    . strtolower($relationshipField['relationship']['model']) . "Options;" . PHP_EOL;
-                $response .= "public string \$new" . $relationshipField['relationship']['model'] . "='';" . PHP_EOL;
-            }
-
-            if (gen()->field()->isBelongsTo($relationshipField))
-            {
-                $response .= "public Collection $" . $relationshipField['relationship']['table'] . ";" . PHP_EOL;
-            }
-        }
 
         foreach ($config['fields'] as $field)
         {
+            if (gen()->field()->isBelongsToMany($field))
+            {
+                $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                $response .= "public Collection \$"
+                    . strtolower($field['relationship']['model']) . "Options;" . PHP_EOL;
+                $response .= "public string \$new" . $field['relationship']['model'] . "='';" . PHP_EOL;
+                continue;
+            }
+
+            if (gen()->field()->isBelongsTo($field))
+            {
+                $response .= "public Collection $" . $field['relationship']['table'] . ";" . PHP_EOL;
+                continue;
+            }
+
             if (gen()->field()->isTrix($field))
             {
-                $response .= "private string \$disk = '" . gen()->config()->disk($config) . "';";
+                $response .= "private string \$disk = '" . gen()->config()->disk($config) . "';" . PHP_EOL;
+                continue;
+            }
+
+            if (gen()->field()->isDate($field))
+            {
+                $response .= "public string $" . $field['name'] . " = '';" . PHP_EOL;
             }
         }
         return str_replace(':properties:', $response, $stub);

@@ -6,35 +6,27 @@ use Illuminate\Support\Facades\File;
 
 class SeederService
 {
-    private string $databaseSeeder = 'database/seeders/DatabaseSeeder.php';
+    private string $pathDatabaseSeeder = 'database/seeders/DatabaseSeeder.php';
     private string $searchString = "User::factory(10)->create();";
 
     public function add (array $config)
     {
-        $content = File::get($this->databaseSeeder);
+        $content = File::get($this->pathDatabaseSeeder);
 
         $content = $this->addUse($config, $content);
-        $factory = gen()->config()->model($config) . "::factory(10)->create()";
-
-        foreach ($config['fields'] as $field)
-        {
-            if (isset($field['relationship']) and $field['relationship']['type'] === 'belongsToMany')
-            {
-                $factory .= "->each(function(\$model) { \$model->" . $field['relationship']['name']
-                    . "()->attach(" . $field['relationship']['model'] . "::factory(3)->create()); })";
-            }
-        }
+        $factory = gen()->config()->model($config) . "::factory(10)->create();";
 
         if ( ! str_contains($content, $factory))
         {
             $content = str_replace(
                 $this->searchString,
-                $factory . ';' . PHP_EOL . $this->searchString,
+                $factory . PHP_EOL . $this->searchString,
                 $content
             );
         }
 
-        File::put($this->databaseSeeder, $content);
+        $content = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $content);
+        File::put($this->pathDatabaseSeeder, $content);
     }
 
     private function addUse (array $config, string $content): string|array
@@ -43,18 +35,6 @@ class SeederService
         $use = str_contains($content, $useModel)
             ? ''
             : $useModel . PHP_EOL;
-
-        foreach ($config['fields'] as $field)
-        {
-            if (gen()->field()->isBelongsToMany($field))
-            {
-                $useRelationship = "use " . $field['relationship']['namespace'] . $field['relationship']['model'] . ';';
-
-                $use .= str_contains($content, $useRelationship)
-                    ? ''
-                    : $useRelationship . PHP_EOL;
-            }
-        }
 
         return str_replace(
             "Seeders;",
@@ -65,7 +45,7 @@ class SeederService
 
     public function delete (array $config)
     {
-        $rows = explode(PHP_EOL, File::get($this->databaseSeeder));
+        $rows = explode(PHP_EOL, File::get($this->pathDatabaseSeeder));
         $content = '';
         foreach ($rows as $row)
         {
@@ -80,7 +60,7 @@ class SeederService
                 $content .= $row . PHP_EOL;
             }
         }
-
-        File::put($this->databaseSeeder, $content);
+        $content = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $content);
+        File::put($this->pathDatabaseSeeder, $content);
     }
 }

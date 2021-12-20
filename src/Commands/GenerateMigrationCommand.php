@@ -16,6 +16,7 @@ class GenerateMigrationCommand extends Command
     public function handle (): bool
     {
         $config = include $this->argument('path');
+        $this->info(gen()->config()->migration($config));
 
         if ($this->option('force'))
         {
@@ -24,7 +25,10 @@ class GenerateMigrationCommand extends Command
 
         $path = gen()->path()->migration($config);
         $stub = gen()->stub()->migration();
+
         File::put($path, $this->replace($config, $stub));
+
+        $this->warn('end');
 
         return true;
     }
@@ -136,6 +140,8 @@ class GenerateMigrationCommand extends Command
             $fields,
             $pivotStub
         );
+
+        $pivotStub = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $pivotStub);
 
         File::put(
             'database/migrations/' . now()->format('Y_m_d_His') . '_create_' . $table . '_pivot_table.php',

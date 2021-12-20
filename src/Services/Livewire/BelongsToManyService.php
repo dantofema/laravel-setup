@@ -21,7 +21,10 @@ class BelongsToManyService
                 $belongsToManyMethods .= $this->getRemoveItem($field['relationship']);
                 $belongsToManyMethods .= $this->getCreateItem($field['relationship']);
 
-                $detach .= $this->getDetach($field['relationship']);
+                if ( ! gen()->config()->hasUserstamps($config))
+                {
+                    $detach .= $this->getDetach($field['relationship']);
+                }
             }
         }
 

@@ -28,6 +28,7 @@ class GenerateModelCommand extends Command
     public function handle (): bool
     {
         $config = include $this->argument('path');
+        $this->info(gen()->config()->model($config));
 
         if ($this->option('force'))
         {
@@ -36,7 +37,10 @@ class GenerateModelCommand extends Command
 
         $path = gen()->path()->model($config);
         $stub = gen()->stub()->model();
+
         File::put($path, $this->replace($config, $stub));
+
+        $this->warn('end');
 
         return true;
     }
@@ -53,6 +57,7 @@ class GenerateModelCommand extends Command
         $stub = $this->getUses($config, $stub);
         $stub = $this->getPath($config, $stub);
         $stub = $this->getSrcAttribute($config, $stub);
+        $stub = $this->getCasts($config, $stub);
         return gen()->config()->replace($config, 'model', $stub);
     }
 
@@ -93,11 +98,33 @@ class GenerateModelCommand extends Command
     {
         return str_replace(
             ':getSrcAttribute:',
-            empty(gen()->field()->getFile($config))
+            empty(gen()->field()->getFiles($config))
                 ? ''
                 : file_get_contents(__DIR__ . '/../Stubs/model/getSrcAttribute.stub'),
             $stub
         );
+    }
+
+    private function getCasts (array $config, string $stub): string
+    {
+        $casts = '';
+        foreach ($config['fields'] as $field)
+        {
+            if (gen()->field()->isDate($field))
+            {
+                $casts .= "'" . $field['name'] . "' => '" . strtolower($field['type']) . "'," . PHP_EOL;
+            }
+
+            if (gen()->field()->isBool($field))
+            {
+                $casts .= "'" . $field['name'] . "' => 'boolean'," . PHP_EOL;
+            }
+        }
+        if ( ! empty($casts))
+        {
+            $casts = 'protected $casts = [' . PHP_EOL . $casts . '];';
+        }
+        return str_replace(':casts:', $casts, $stub);
     }
 
 }

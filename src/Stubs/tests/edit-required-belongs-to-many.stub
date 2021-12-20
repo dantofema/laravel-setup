@@ -1,10 +1,10 @@
 
-it('edit :table:.:field: is required', function () {
+it('edit :table:.:field:() is required', function () {
     $model = :model:::factory()->create();
     :actingAs:
     Livewire::test(:livewire:::class)
         ->call('edit', $model->id)
-        ->set('editing.:field:', '')
+        ->set(':relationshipName:', collect([]))
         ->call('save')
-        ->assertHasErrors(['editing.:field:' => 'required']);
+        ->assertHasErrors([':field:' => 'required']);
 });

@@ -5,6 +5,7 @@ namespace Dantofema\LaravelSetup\Commands;
 use Dantofema\LaravelSetup\Services\Tests\CreateService;
 use Dantofema\LaravelSetup\Services\Tests\EditService;
 use Dantofema\LaravelSetup\Services\Tests\EditSlugService;
+use Dantofema\LaravelSetup\Services\Tests\RequiredCreateService;
 use Dantofema\LaravelSetup\Services\Tests\RequiredEditService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -16,15 +17,17 @@ class GenerateTestCommand extends Command
     public $description = 'Test file generator';
     protected array $config;
     private EditSlugService $editSlugService;
-    private RequiredEditService $requiredService;
+    private RequiredEditService $requiredEditService;
     private CreateService $createService;
     private EditService $editService;
+    private RequiredCreateService $requiredCreateService;
 
     public function __construct ()
     {
         parent::__construct();
+        $this->requiredCreateService = new RequiredCreateService();
         $this->editSlugService = new EditSlugService();
-        $this->requiredService = new RequiredEditService();
+        $this->requiredEditService = new RequiredEditService();
         $this->createService = new CreateService();
         $this->editService = new EditService();
     }
@@ -32,6 +35,7 @@ class GenerateTestCommand extends Command
     public function handle (): bool
     {
         $config = include $this->argument('path');
+        $this->info(gen()->config()->test($config));
 
         if ($this->option('force'))
         {
@@ -40,8 +44,10 @@ class GenerateTestCommand extends Command
 
         $path = gen()->path()->test($config);
         $stub = gen()->stub()->test();
+
         File::put($path, $this->replace($config, $stub));
 
+        $this->warn('end');
         return true;
     }
 
@@ -52,16 +58,17 @@ class GenerateTestCommand extends Command
         $stub = $this->getField($config, $stub);
         $stub = $this->editSlug($config, $stub);
         $stub = $this->getDisk($config, $stub);
-        $stub = $this->requiredService->get($config, $stub);
+        $stub = $this->requiredCreateService->get($config, $stub);
         $stub = $this->createService->get($config, $stub);
-        $stub = $this->editService->file($config, $stub);
+        $stub = $this->requiredEditService->get($config, $stub);
+        $stub = $this->editService->get($config, $stub);
         $stub = $stub . File::get(__DIR__ . '/../Stubs/tests/extra-methods.stub');
         return gen()->config()->replace($config, 'test', $stub);
     }
 
     private function getUse (array $config, string $stub): string
     {
-        $replace = 'use ' . gen()->namespace()->livewire($config) . PHP_EOL;
+        $replace = 'use ' . gen()->namespace()->withFile()->livewire($config) . PHP_EOL;
         return str_replace(':use:', $replace, $stub);
     }
 
@@ -100,10 +107,11 @@ class GenerateTestCommand extends Command
         $disk = '';
         foreach ($config['fields'] as $field)
         {
-            if ($field['form']['input'] === 'file')
+            if (gen()->field()->isFile($field))
             {
                 $disk = "Storage::fake(':disk:');";
-                $disk .= "\$this->newFile = '';";
+                $disk .= "\$this->new"
+                    . ucfirst($field['name']) . " = '';";
             }
         }
         return str_replace(':disk:', $disk, $stub);

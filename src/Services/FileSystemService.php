@@ -14,7 +14,7 @@ class FileSystemService
 
     public function execute (array $config)
     {
-        if (empty(gen()->field()->getFile($config)))
+        if (empty(gen()->field()->getFiles($config)))
         {
             return;
         }
@@ -29,7 +29,7 @@ class FileSystemService
         $content = $this->replaceLinks($disk);
 
         $content = $this->replaceDisks($disk, $content);
-
+        $content = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $content);
         File::put(self::FILESYSTEM_PHP, $content);
     }
 

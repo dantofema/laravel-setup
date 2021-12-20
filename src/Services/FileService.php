@@ -28,6 +28,8 @@ class FileService
             if ( ! File::exists(self::LIVEWIRE_TRAITS_PATH . $file))
             {
                 $content = File::get(__DIR__ . self::LIVEWIRE_TRAITS_PATH_SOURCE . $file . '.stub');
+                $content = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $content);
+
                 File::put(self::LIVEWIRE_TRAITS_PATH . $file . '.php', $content);
             }
         }

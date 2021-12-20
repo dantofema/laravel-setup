@@ -18,7 +18,7 @@ class :livewire: extends Component
 
     public :model: $editing;
     public string $sortField = ':sortField:';
-    :newFile:
+    :newFiles:
     :properties:
 
     public function confirmDelete ()

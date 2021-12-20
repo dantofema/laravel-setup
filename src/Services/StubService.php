@@ -5,19 +5,20 @@ namespace Dantofema\LaravelSetup\Services;
 class StubService
 {
     private array $stubs = [
-        'viewAllInOne' => '/../Stubs/view/jetstream/all-in-one.blade.php.stub',
-        'viewCollection' => '/../Stubs/view/collection.blade.php.stub',
-        'viewModel' => '/../Stubs/view/model.blade.php.stub',
+        'viewAllInOne' => __DIR__ . '/../Stubs/view/jetstream/all-in-one.blade.php.stub',
+        'viewCollection' => __DIR__ . '/../Stubs/view/collection.blade.php.stub',
+        'viewModel' => __DIR__ . '/../Stubs/view/model.blade.php.stub',
 
-        'livewireAllInOne' => '/../Stubs/livewire/livewire-all-in-one.php.stub',
-        'livewire' => '/../Stubs/livewire/livewire.php.stub',
+        'livewireAllInOne' => __DIR__ . '/../Stubs/livewire/livewire-all-in-one.php.stub',
+        'livewire' => __DIR__ . '/../Stubs/livewire/livewire.php.stub',
 
-        'test' => '/../Stubs/test.stub',
-        'factory' => '/../Stubs/ModelFactory.php.stub',
-        'migration' => '/../Stubs/migration.php.stub',
-        'migrationPivot' => '/../Stubs/pivot.php.stub',
-        'model' => '/../Stubs/Model.php.stub',
+        'test' => __DIR__ . '/../Stubs/test.stub',
+        'factory' => __DIR__ . '/../Stubs/factory/factory.php.stub',
+        'migration' => __DIR__ . '/../Stubs/migration.php.stub',
+        'migrationPivot' => __DIR__ . '/../Stubs/pivot.php.stub',
+        'model' => __DIR__ . '/../Stubs/Model.php.stub',
     ];
+
     private bool $isModel = false;
     private bool $isPivot = false;
 
@@ -40,7 +41,7 @@ class StubService
 
     private function getFileContent (string $path): string
     {
-        return file_get_contents(__DIR__ . $path);
+        return file_get_contents($path);
     }
 
     public function factory (): string
@@ -68,8 +69,8 @@ class StubService
     public function livewire (array $config): string
     {
         return gen()->config()->isAllInOne($config)
-            ? $this->getFileContent($this->stubs['livewire'])
-            : $this->getFileContent($this->stubs['livewireAllInOne']);
+            ? $this->getFileContent($this->stubs['livewireAllInOne'])
+            : $this->getFileContent($this->stubs['livewire']);
     }
 
     public function migration (): string

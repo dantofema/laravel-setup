@@ -29,6 +29,7 @@ it('can edit an single row from :table:', function () {
 
     $this->assertEquals('foo', :model:::first()->:field:);
 });
-:required: :edit-slug:
+
+:edit-slug:
 
 

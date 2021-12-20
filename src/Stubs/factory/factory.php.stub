@@ -15,5 +15,12 @@ class :factory: extends Factory
         :vars:
         :return:
     }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (:model: $model) {
+            :afterCreating:
+        });
+    }
 }
 

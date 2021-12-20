@@ -45,9 +45,6 @@ it('allInOne - replaces', closure: function () {
     expect(Str::contains($content, [
         gen()->config()->model($config),
         $config['livewire']['properties']['sortField'],
-        'public $newFile;',
-        '$this->newFile = "";',
-        '$this->newFile = null;',
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
@@ -69,14 +66,11 @@ it('replaces in livewireModel', closure: function () {
     expect(Str::contains($content, [
         gen()->config()->model($config),
         $config['livewire']['properties']['sortField'],
-        'public $newFile;',
-        '$this->newFile = "";',
-        '$this->newFile = null;',
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
-        gen()->path()->renderView($config, 'viewModel'),
-        gen()->path()->renderView($config, 'viewCollection'),
+        gen()->path()->renderView($config),
+        gen()->path()->isModel()->renderView($config),
     ]))
         ->toBeTrue();
 
@@ -100,8 +94,8 @@ it('replaces in livewireCollection', closure: function () {
         "\$this->setSlug('title');",
         "namespace App\Http\Livewire\Backend",
         "'author_id' =>",
-        gen()->path()->renderView($config, 'viewModel'),
-        gen()->path()->renderView($config, 'viewCollection'),
+        gen()->path()->renderView($config),
+        gen()->path()->renderView($config),
     ]))
         ->toBeTrue();
 

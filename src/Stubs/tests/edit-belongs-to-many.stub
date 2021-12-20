@@ -1,0 +1,17 @@
+
+it('edit :table:.:field:()', function () {
+    $model = :model:::factory()->create();
+    :seedTest:
+    $relationship = :faker:;
+
+    :actingAs:
+
+    Livewire::test(:livewire:::class)
+        ->call('edit', $model->id)
+        ->set('new:relationshipModel:', $relationship->:relationSearchable:)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $this->assertModelExists($relationship);
+
+});

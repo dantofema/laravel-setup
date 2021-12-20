@@ -56,6 +56,11 @@ class ConfigService
         return isset($config['model']['use']);
     }
 
+    public function hasUserstamps (array $config): bool
+    {
+        return in_array('Userstamps', $config['model']['use']);
+    }
+
     public function livewireSortField (array $config): string
     {
         return $config['livewire']['properties']['sortField'];
@@ -127,14 +132,7 @@ class ConfigService
 
         foreach ($config['fields'] as $field)
         {
-            $rules = gen()->field()->getRules($field);
-
-            if (
-                ! empty($rules) and
-                isset($rules['required']) and
-                $field['name'] !== 'slug' and
-                $rules['required'] === true
-            )
+            if (gen()->field()->isRequired($field))
             {
                 $requiredFields[] = $field;
             }

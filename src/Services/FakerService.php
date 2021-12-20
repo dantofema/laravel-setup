@@ -50,7 +50,7 @@ class FakerService
             'remember_token' => $preFaker . 'Str::random(10)',
             'link' => $preFaker . 'url',
             'image' => $preFaker . 'word().".jpg"',
-            'phone' => $preFaker . 'isbn10',
+            'phone' => $preFaker . 'isbn10()',
             'title', 'subtitle', 'body', 'lead', 'epigraph' => $preFaker . 'sentence()',
             'publication_time' => $preFaker . 'dateTimeBetween("-90 days", "+7 days", null)',
             'facebook' => $preFaker . 'url()',
@@ -70,8 +70,7 @@ class FakerService
             'boolean' => $preFaker . 'boolean()',
             'integer' => $preFaker . 'randomNumber()',
             'float' => $preFaker . 'randomFloat()',
-            'date' => $preFaker . 'date()',
-            'dateTime' => $preFaker . 'dateTime()',
+            'date', 'dateTime' => $preFaker . 'dateTime()',
             'time' => $preFaker . 'time()',
             default => ''
         };

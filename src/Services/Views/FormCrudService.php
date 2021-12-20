@@ -128,7 +128,7 @@ class FormCrudService
 
         $stub = str_replace(':label:', $field['label'], $stub);
 
-        return str_replace(':field:', 'newFile', $stub);
+        return str_replace(':field:', 'new' . ucfirst($field['name']), $stub);
     }
 
     private function inputSelect (array $field): string

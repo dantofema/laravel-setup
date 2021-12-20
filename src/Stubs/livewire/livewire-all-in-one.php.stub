@@ -19,7 +19,7 @@ class :livewire: extends Component
 
     public :model: $editing;
     public string $sortField = ':sortField:';
-    :newFile:
+    :newFiles:
     :properties:
 
     public function confirmDelete ()
@@ -42,7 +42,7 @@ class :livewire: extends Component
         $this->createAction = false;
         $this->titleFormModal = 'Editar';
         $this->editing = $model;
-        :editNewFile:
+        :editNewFiles:
         :editBelongsToMany:
         $this->showFormModal = true;
     }
@@ -53,13 +53,13 @@ class :livewire: extends Component
         $this->createAction = true;
         $this->titleFormModal = 'Crear';
         $this->editing = :model:::make();
-        :createNewFile:
+        :createNewFiles:
         $this->showFormModal = true;
     }
 
     public function save ()
     {
-        :saveNewFile:
+        :saveNewFiles:
         :saveSlug:
         $this->validate();
         $this->editing->save();

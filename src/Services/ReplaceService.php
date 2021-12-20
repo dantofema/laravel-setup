@@ -19,7 +19,7 @@ class ReplaceService
             "UploadedFile::fake()->image('file.jpg')",
             $stub);
 
-        if ($field['form']['input'] === 'file')
+        if (gen()->field()->isFile($field))
         {
             if ( ! str_contains($stub, "use Illuminate\Http\UploadedFile;"))
             {
@@ -33,7 +33,7 @@ class ReplaceService
 
         $stub = str_replace(':field:', $field['name'], $stub);
         $stub = str_replace(':label:', $field['label'], $stub);
-
+        $stub = str_replace(':newFile:', 'new' . ucfirst($field['name']), $stub);
         $stub = empty($field['type'])
             ? $stub
             : str_replace(':type:', $field['type'], $stub);
@@ -72,13 +72,13 @@ class ReplaceService
 
     private function renderView (): void
     {
-        $this->stub = str_replace(':renderViewCollection:', gen()->path()->renderView($this->config, false),
+        $this->stub = str_replace(':renderViewCollection:', gen()->path()->renderView($this->config),
             $this->stub);
 
-        $this->stub = str_replace(':renderViewModel:', gen()->path()->renderView($this->config),
+        $this->stub = str_replace(':renderViewModel:', gen()->path()->isModel()->renderView($this->config),
             $this->stub);
 
-        $this->stub = str_replace(':renderViewAllInOne:', gen()->path()->renderView($this->config, false),
+        $this->stub = str_replace(':renderViewAllInOne:', gen()->path()->renderView($this->config),
             $this->stub);
     }
 
@@ -100,12 +100,25 @@ class ReplaceService
     private function use (): void
     {
         $useString = '';
+
         foreach ($this->config['fields'] as $field)
         {
             if (array_key_exists('relationship', $field))
             {
                 $useString .= "use App\Models\\" . $field['relationship']['model'] . ";" . PHP_EOL;
             }
+        }
+
+        if ($this->type !== 'test')
+        {
+            $useString .= str_contains($this->stub, 'Storage::')
+                ? "use Storage;" . PHP_EOL
+                : null;
+        }
+
+        if ($this->type !== 'model')
+        {
+            $useString .= "use App\Models\\" . gen()->config()->model($this->config) . ';' . PHP_EOL;
         }
 
         $useString .= str_contains($this->stub, 'BelongsTo')
@@ -116,12 +129,7 @@ class ReplaceService
             ? "use Illuminate\Database\Eloquent\Relations\BelongsToMany;" . PHP_EOL
             : null;
 
-        if ($this->type !== 'model')
-        {
-            $useString .= "use App\Models\\" . gen()->config()->model($this->config) . ';' . PHP_EOL;
-        }
-
-        $useString .= str_contains($this->stub, 'Carbon::')
+        $useString .= str_contains($this->stub, 'Carbon')
             ? "use Carbon\Carbon;" . PHP_EOL
             : null;
 
@@ -132,13 +140,6 @@ class ReplaceService
         $useString .= str_contains($this->stub, 'Str::')
             ? "use Illuminate\Support\Str;" . PHP_EOL
             : null;
-
-        if ($this->type !== 'test')
-        {
-            $useString .= str_contains($this->stub, 'Storage::')
-                ? "use Storage;" . PHP_EOL
-                : null;
-        }
 
         $this->stub = str_replace(':useDefault:', $useString, $this->stub);
     }

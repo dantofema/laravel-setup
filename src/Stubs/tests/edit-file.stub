@@ -1,5 +1,4 @@
 
-
 it('edit :table:.:field:', function () {
     $model = :model:::factory()->create();
     $newValue = :testFakerFile:;
@@ -8,7 +7,7 @@ it('edit :table:.:field:', function () {
 
     Livewire::test(:livewire:::class)
         ->call('edit', $model->id)
-        ->set('newFile', $newValue)
+        ->set(':newFile:', $newValue)
         ->call('save')
         ->assertHasNoErrors();
 

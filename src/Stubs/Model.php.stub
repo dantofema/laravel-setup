@@ -16,6 +16,7 @@ class :model: extends Model
 
     protected $table = ':table:';
     protected $guarded = [];
+    :casts:
 
     public function path():string{
         return ':path:/' . $this->id;

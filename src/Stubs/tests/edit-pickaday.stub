@@ -1,5 +1,5 @@
 
-it('edit :table:.:field:', function () {
+it('edit :table:.:field: (pickaday)', function () {
     $model = :model:::factory()->create();
     $newValue = :faker:;
 
@@ -11,5 +11,8 @@ it('edit :table:.:field:', function () {
         ->call('save')
         ->assertHasNoErrors();
 
-    $this->assertEquals($newValue, :model:::find($model->id)->:field:);
+    $this->assertEquals(
+        Carbon::createFromFormat('d-m-Y', $newValue)->format('Y-m-d'),
+        :model:::find($model->id)->:field::dateTimeTest:
+    );
 });

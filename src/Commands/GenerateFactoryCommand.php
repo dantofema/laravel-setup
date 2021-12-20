@@ -23,6 +23,8 @@ class GenerateFactoryCommand extends Command
     {
         $config = include $this->argument('path');
 
+        $this->info(gen()->config()->factory($config));
+
         if ($this->option('force'))
         {
             gen()->delete()->factory($config);
@@ -30,7 +32,12 @@ class GenerateFactoryCommand extends Command
 
         $path = gen()->path()->factory($config);
         $stub = gen()->stub()->factory();
+
         File::put($path, $this->replace($config, $stub));
+
+        gen()->seeder()->add($config);
+
+        $this->warn('end');
 
         return true;
     }
@@ -39,6 +46,7 @@ class GenerateFactoryCommand extends Command
     {
         $stub = str_replace(':vars:', $this->getVarsFromColumns($config), $stub);
         $stub = str_replace(':return:', $this->getReturnFromColumns($config), $stub);
+        $stub = str_replace(':afterCreating:', $this->getAfterCreating($config), $stub);
         return gen()->config()->replace($config, 'factory', $stub);
     }
 
@@ -48,15 +56,13 @@ class GenerateFactoryCommand extends Command
 
         foreach ($config['fields'] as $field)
         {
-            if (array_key_exists('relationship', $field) and $field['relationship']['type'] === 'belongsToMany')
-            {
-                continue;
-            }
-            $vars .= sprintf(
-                "$%s = %s;" . PHP_EOL,
-                $field['name'],
-                $this->faker->get($field)
-            );
+            if ( ! gen()->field()->isBelongsToMany($field))
+
+                $vars .= sprintf(
+                    "$%s = %s;" . PHP_EOL,
+                    $field['name'],
+                    $this->faker->get($field)
+                );
         }
 
         return $vars;
@@ -67,17 +73,42 @@ class GenerateFactoryCommand extends Command
         $response = PHP_EOL . "return [" . PHP_EOL;
         foreach ($config['fields'] as $field)
         {
-            if (gen()->field()->isFile($field))
+            if ( ! gen()->field()->isBelongsToMany($field))
             {
-                continue;
+                $response .= sprintf(
+                    "'%s' => $%s," . PHP_EOL,
+                    $field['name'],
+                    $field['name'],
+                );
             }
-            $response .= sprintf(
-                "'%s' => $%s," . PHP_EOL,
-                $field['name'],
-                $field['name'],
-            );
         }
 
         return $response . PHP_EOL . "];" . PHP_EOL;
     }
+
+    private function getAfterCreating (array $config): string
+    {
+        $afterCreating = '';
+
+        foreach ($config['fields'] as $field)
+        {
+            if (gen()->field()->isBelongsToMany($field))
+            {
+                $afterCreating .= PHP_EOL . '$' . $field['relationship']['name']
+                    . ' = ' . $field['relationship']['model']
+                    . '::inRandomOrder()->take(3)->get()->count() >= 3' . PHP_EOL . '? '
+                    . $field['relationship']['model']
+                    . '::inRandomOrder()->take(3)->get()' . PHP_EOL . ': '
+                    . $field['relationship']['model']
+                    . '::factory()->count(3)->create();' . PHP_EOL;
+
+                $afterCreating .= "\$model->"
+                    . $field['relationship']['name'] . "()->attach($"
+                    . $field['relationship']['name'] . ");" . PHP_EOL;
+            }
+        }
+
+        return str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $afterCreating);
+    }
+
 }

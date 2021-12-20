@@ -2,8 +2,6 @@
 
 namespace Dantofema\LaravelSetup\Services;
 
-use JetBrains\PhpStorm\Pure;
-
 class FieldService
 {
     protected const KEY_SLUG = 'slug';
@@ -11,17 +9,18 @@ class FieldService
     protected const KEY_RELATIONSHIPS = 'relationship';
     protected const KEY_INDEX = 'index';
 
-    public function getFile (array $config): array
+    public function getFiles (array $config): array
     {
+        $fields = [];
         foreach ($config['fields'] as $field)
         {
             if ($field['form']['input'] === 'file')
             {
-                return $field;
+                $fields[] = $field;
             }
         }
 
-        return [];
+        return $fields;
     }
 
     public function replace (array $field, array $config, string $stub): string
@@ -43,7 +42,21 @@ class FieldService
 
     public function isDate (array $field): bool
     {
-        return isset($field['type']) and $field['type'] == 'date';
+        return isset($field['type'])
+            and ($field['type'] === 'date' or strtolower($field['type']) === 'datetime');
+    }
+
+    public function isDateTime (array $field): bool
+    {
+        return isset($field['type'])
+            and strtolower($field['type']) === 'datetime';
+    }
+
+    public function isBool (array $field): bool
+    {
+        return isset ($field['form']['input']) and
+            ($field['form']['input'] === 'boolean' or
+                $field['form']['input'] === 'bool');
     }
 
     public function getSlug (array $config): array
@@ -108,35 +121,9 @@ class FieldService
             : [];
     }
 
-    #[Pure] public function getRulesForRelationship (array $field): string
-    {
-        return $field['relationship']['type'] === 'belongsToMany'
-            ? "'" . $field['name'] . "' => " . $this->getRulesToString($field['rules'])
-            : "'editing." . $field['name'] . "' => " . $this->getRulesToString($field['rules']);
-    }
-
-    public function getRulesToString (array $rules): string
-    {
-        $rule = "[";
-
-        $rule .= empty($rules['nullable']) ? "'required'," : "'nullable',";
-        $rule .= empty($rules['unique']) ? '' : $rules['unique'] . ',';
-
-        if ( ! empty($rules['extra']))
-        {
-            foreach ($rules['extra'] as $extra)
-            {
-                $rule .= "'$extra',";
-            }
-        }
-
-        return $rule . "]";
-    }
-
     public function isFile (array $field): bool
     {
-        return isset($field['form']) and
-            isset($field['form']['input']) and
+        return isset($field['form']['input']) and
             $field['form']['input'] === 'file';
     }
 
@@ -150,5 +137,43 @@ class FieldService
     public function isTrix (array $field): bool
     {
         return isset($field['form']['richText']);
+    }
+
+    public function isNullable (array $field): bool
+    {
+        return isset($field['rules']['nullable']);
+    }
+
+    public function getRulesToString (mixed $field): string
+    {
+        $rule = "[";
+
+        $rule .= gen()->field()->isRequired($field) ? "'required'," : "'nullable',";
+        $rule .= gen()->field()->isUnique($field) ? $field['rules']['unique'] . ',' : '';
+
+        if ( ! empty($field['rules']['extra']))
+        {
+            foreach ($field['rules']['extra'] as $extra)
+            {
+                $rule .= "'$extra',";
+            }
+        }
+
+        return $rule . "]";
+    }
+
+    public function isRequired (array $field): bool
+    {
+        return ! isset($field['rules']['nullable']) and $this->hasInput($field);
+    }
+
+    public function hasInput (array $field): bool
+    {
+        return boolval($field['form']['input']);
+    }
+
+    public function isUnique (array $field): bool
+    {
+        return isset($field['rules']['unique']);
     }
 }

@@ -14,6 +14,7 @@ class PestService
     {
         $pest = File::get(self::PEST_PATH);
         $actingAs = File::get(self::STUB_PATH);
+        $actingAs .= str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $actingAs);
         str_contains($pest, 'actingAs') ?: File::put(self::PEST_PATH, $pest . $actingAs);
     }
 }

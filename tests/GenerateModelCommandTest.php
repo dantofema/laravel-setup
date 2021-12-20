@@ -44,7 +44,7 @@ it('model file check syntax', closure: function () {
     Artisan::call('generate:model tests/config/default.php');
     $config = include(__DIR__ . '/config/default.php');
 
-    dump(File::get(gen()->path()->model($config)));
+//    dump(File::get(gen()->path()->model($config)));
 
     expect(shell_exec("php -l -f " . gen()->path()->model($config)))
         ->toContain('No syntax errors detected');

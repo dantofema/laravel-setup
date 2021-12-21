@@ -10,14 +10,14 @@
             <div class="flex-1 flex flex-col overflow-y-auto">
                 <nav class="flex-1 px-2 py-4 bg-gray-800 space-y-1">
 
-                    <x-setup.tailwind.sidebar.link href="{{ url('sistema/inicio') }}"
+                    <x-setup.tailwind.sidebar.link href="{{ url('admin/inicio') }}"
                                                    id="sidebar-item-dashboard">
                         <x-heroicon-o-home class="h-6 m-6 mr-2"/>
                         Inicio
                     </x-setup.tailwind.sidebar.link>
 
                     @can('archivos-externos')
-                        <x-setup.tailwind.sidebar.link href="{{ url('sistema/archivos-externos') }}"
+                        <x-setup.tailwind.sidebar.link href="{{ url('admin/archivos-externos') }}"
                                                        id="sidebar-item-external-files">
                             <x-heroicon-o-home class="mr-2"/>
                             Archivos externos

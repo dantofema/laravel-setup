@@ -8,7 +8,7 @@ it('in web.php not found post or posts route', closure: function () {
     $content = File::get('routes/web.php');
 
     expect(Str::contains($content, [
-            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');",
+            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('admin')->name('posts');",
         ]
     ))->toBeFalse();
 });
@@ -21,7 +21,7 @@ it('add route', closure: function () {
     $content = File::get('routes/web.php');
 
     expect(Str::contains($content, [
-            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');",
+            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('admin')->name('posts');",
             "<?php",
             "use App\Http\Livewire\Backend\PostsLivewire;",
         ]
@@ -36,7 +36,7 @@ it('delete route', closure: function () {
     $content = File::get('routes/web.php');
 
     expect(Str::contains($content, [
-            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');",
+            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('admin')->name('posts');",
             "use App\Http\Livewire\Backend\PostsLivewire;",
         ]
     ))->toBeFalse();
@@ -51,7 +51,7 @@ it('add & delete & add route', closure: function () {
     $content = File::get('routes/web.php');
 
     expect(Str::contains($content, [
-            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('sistema')->name('posts');",
+            "Route::get('/notas/{action?}/{modelId?}', PostsLivewire::class)->middleware('auth')->prefix('admin')->name('posts');",
             "<?php",
             "use App\Http\Livewire\Backend\PostsLivewire;",
         ]

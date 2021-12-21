@@ -25,7 +25,9 @@
 # spatie permissions
 ./vendor/bin/sail composer require spatie/laravel-permission;
 ./vendor/bin/sail php artisan config:clear;
+./vendor/bin/sail php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider";
 ./vendor/bin/sail php artisan migrate;
+
 
 # laraveles
 ./vendor/bin/sail composer require laraveles/spanish;
@@ -67,6 +69,7 @@ mkdir storage/app/public/images
 ./vendor/bin/sail composer require pestphp/pest-plugin-laravel --dev
 ./vendor/bin/sail php artisan pest:install -q
 ./vendor/bin/sail composer require pestphp/pest-plugin-faker --dev
+./vendor/bin/sail composer require pestphp/pest-plugin-livewire --dev
 
 ./vendor/bin/sail composer update;
 ./vendor/bin/sail composer dump-autoload;
@@ -79,7 +82,7 @@ sudo chown -R dantofema ./
 
 git init;
 git add .;
-git commit -m "first commit";
+git commit -m "generate setup commit";
 git branch -M main;
 
 # blade ui components

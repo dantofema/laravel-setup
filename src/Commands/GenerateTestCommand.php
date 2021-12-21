@@ -74,7 +74,7 @@ class GenerateTestCommand extends Command
 
     private function getUri (array $config, string $stub): string
     {
-        $uri = $config['backend'] ? 'sistema/' : '';
+        $uri = $config['backend'] ? 'admin/' : '';
         return str_replace(
             ':uri:',
             $uri . $config['route']['path'],

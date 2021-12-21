@@ -43,7 +43,7 @@ class RouteService
     {
         $route = "Route::get('/" . $config['route']['path'] . "/{parameterAction?}/{parameterId?}', "
             . gen()->config()->livewire($config) . "::class)";
-        $route .= gen()->config()->isBackend($config) ? "->middleware('auth')->prefix('sistema')" : "";
+        $route .= gen()->config()->isBackend($config) ? "->middleware('auth')->prefix('admin')" : "";
         $route .= "->name('{$config['table']['name']}');";
 
         return $route;

@@ -62,7 +62,6 @@ class GenerateTestCommand extends Command
         $stub = $this->createService->get($config, $stub);
         $stub = $this->requiredEditService->get($config, $stub);
         $stub = $this->editService->get($config, $stub);
-        $stub = $stub . File::get(__DIR__ . '/../Stubs/tests/extra-methods.stub');
         return gen()->config()->replace($config, 'test', $stub);
     }
 
